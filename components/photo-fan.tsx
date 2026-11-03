@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 import type { Slide } from '../lib/content';
 
@@ -11,6 +11,7 @@ export function PhotoFan({ photos }: { photos: Slide[] }) {
     photos.slice(index * 7, index * 7 + 7),
   );
   const photo = open === null ? null : photos[open.index];
+  const closeDialog = useCallback(() => setOpen(null), []);
   return (
     <>
       <div className="photo-eventail">
@@ -56,7 +57,7 @@ export function PhotoFan({ photos }: { photos: Slide[] }) {
         ))}
       </div>
       {photo ? (
-        <PhotoDialog photo={photo} source={open?.source ?? null} onClose={() => setOpen(null)} />
+        <PhotoDialog photo={photo} source={open?.source ?? null} onClose={closeDialog} />
       ) : null}
     </>
   );
@@ -78,96 +79,160 @@ function PhotoDialog({
     const dialog = ref.current;
     const frame = frameRef.current;
     if (!dialog || !frame || !source) return;
-    dialog.showModal();
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    const trigger = source;
+    const html = document.documentElement;
+    const body = document.body;
+    const previous = {
+      html: html.getAttribute('style'),
+      body: body.getAttribute('style'),
+      x: scrollX,
+      y: scrollY,
+    };
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let animation: Animation | undefined;
+    const token = crypto.randomUUID();
+    let ownsHistory = true;
+    let released = false;
     let closing = false;
+    let finished = false;
+    let closeAnimationStarted = false;
+    let animation: Animation | undefined;
+    let pointer: { id: number; x: number; y: number } | null = null;
+
+    function restore() {
+      if (released) return;
+      released = true;
+      for (const [element, style] of [
+        [html, previous.html],
+        [body, previous.body],
+      ] as const) {
+        if (style === null) element.removeAttribute('style');
+        else element.setAttribute('style', style);
+      }
+      window.scrollTo({ left: previous.x, top: previous.y, behavior: 'instant' });
+      requestAnimationFrame(() => trigger.focus({ preventScroll: true }));
+    }
+    function popOwnHistory() {
+      if (ownsHistory && history.state?.photoViewer === token) {
+        ownsHistory = false;
+        history.back();
+      }
+    }
     function sourceTransform() {
-      const start = source!.getBoundingClientRect();
+      const start = trigger.getBoundingClientRect();
       const end = frame!.getBoundingClientRect();
-      const matrix = new DOMMatrixReadOnly(getComputedStyle(source!).transform);
+      const matrix = new DOMMatrixReadOnly(getComputedStyle(trigger).transform);
       const scale = Math.hypot(matrix.a, matrix.b);
       const angle = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
       const x = start.x + start.width / 2 - (end.x + end.width / 2);
       const y = start.y + start.height / 2 - (end.y + end.height / 2);
-      return `translate(${x}px, ${y}px) rotate(${angle}deg) scale(${(source!.offsetWidth * scale) / end.width}, ${(source!.offsetHeight * scale) / end.height})`;
+      return `translate(${x}px, ${y}px) rotate(${angle}deg) scale(${(trigger.offsetWidth * scale) / end.width}, ${(trigger.offsetHeight * scale) / end.height})`;
     }
-    const start = sourceTransform();
+    // Every user/native close path enters here; finalization and unmount share restore().
+    function close({ fromHistory = false, immediate = false } = {}) {
+      if (finished) return;
+      if (!closing) {
+        closing = true;
+        if (!fromHistory) popOwnHistory();
+      }
+      if (immediate || reducedMotion.matches || !dialog!.open) {
+        finished = true;
+        animation?.cancel();
+        if (dialog!.open) dialog!.close();
+        restore();
+        onClose();
+        return;
+      }
+      if (closeAnimationStarted) return;
+      closeAnimationStarted = true;
+      const currentTransform = getComputedStyle(frame!).transform;
+      animation?.cancel();
+      const style = getComputedStyle(dialog!);
+      const durationValue = style.getPropertyValue('--photo-close-duration').trim();
+      const duration = Number.parseFloat(durationValue) * (durationValue.endsWith('ms') ? 1 : 1000);
+      getComputedStyle(dialog!, '::backdrop').getPropertyValue('opacity');
+      dialog!.dataset.closing = 'true';
+      animation = frame!.animate(
+        [{ transform: currentTransform }, { transform: sourceTransform() }],
+        {
+          duration,
+          easing: style.getPropertyValue('--photo-close-easing').trim(),
+          fill: 'forwards',
+        },
+      );
+    }
+    closeRef.current = close;
+    const onCancel = (event: Event) => {
+      event.preventDefault();
+      close();
+    };
+    const onNativeClose = () => close({ immediate: true });
+    const onClick = (event: MouseEvent) => {
+      if (event.target === dialog) close();
+    };
+    const onPopState = () => {
+      if (history.state?.photoViewer === token) return;
+      ownsHistory = false;
+      close({ fromHistory: true });
+    };
+    const onTransitionEnd = (event: TransitionEvent) => {
+      if (closing && event.pseudoElement === '::backdrop' && event.propertyName === 'opacity')
+        close({ fromHistory: true, immediate: true });
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.pointerType === 'touch' && event.isPrimary)
+        pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    };
+    const onPointerUp = (event: PointerEvent) => {
+      if (!pointer || pointer.id !== event.pointerId) return;
+      const dy = event.clientY - pointer.y;
+      const dx = event.clientX - pointer.x;
+      pointer = null;
+      if (dy > 64 && dy > Math.abs(dx) * 1.2) close();
+    };
+    const onPointerCancel = () => {
+      pointer = null;
+    };
+    dialog.addEventListener('cancel', onCancel);
+    dialog.addEventListener('close', onNativeClose);
+    dialog.addEventListener('click', onClick);
+    dialog.addEventListener('transitionend', onTransitionEnd);
+    dialog.addEventListener('pointerdown', onPointerDown);
+    dialog.addEventListener('pointerup', onPointerUp);
+    dialog.addEventListener('pointercancel', onPointerCancel);
+    window.addEventListener('popstate', onPopState);
+    html.style.setProperty('overflow', 'hidden', 'important');
+    dialog.showModal();
+    history.pushState({ ...history.state, photoViewer: token }, '', location.href);
     if (!reducedMotion.matches) {
-      animation = frame.animate([{ transform: start }, { transform: 'none' }], {
+      animation = frame.animate([{ transform: sourceTransform() }, { transform: 'none' }], {
         duration: 420,
         easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
       });
     }
-    closeRef.current = () => {
-      if (closing) return;
-      closing = true;
-      const currentTransform = getComputedStyle(frame).transform;
-      animation?.cancel();
-      if (reducedMotion.matches) {
-        onClose();
-        return;
-      }
-      const style = getComputedStyle(dialog);
-      const durationValue = style.getPropertyValue('--photo-close-duration').trim();
-      const duration = Number.parseFloat(durationValue) * (durationValue.endsWith('ms') ? 1 : 1000);
-      const easing = style.getPropertyValue('--photo-close-easing').trim();
-      // Establish the visible backdrop before changing its transition target.
-      getComputedStyle(dialog, '::backdrop').getPropertyValue('opacity');
-      dialog.dataset.closing = 'true';
-      animation = frame.animate(
-        [{ transform: currentTransform }, { transform: sourceTransform() }],
-        {
-          duration,
-          easing,
-          fill: 'forwards',
-        },
-      );
-    };
-    const onCancel = (event: Event) => {
-      event.preventDefault();
-      closeRef.current();
-    };
-    const onClick = (event: MouseEvent) => {
-      if (event.target === dialog) closeRef.current();
-    };
-    const onTransitionEnd = (event: TransitionEvent) => {
-      if (closing && event.pseudoElement === '::backdrop' && event.propertyName === 'opacity') {
-        onClose();
-      }
-    };
-    dialog.addEventListener('transitionend', onTransitionEnd);
-    dialog.addEventListener('cancel', onCancel);
-    dialog.addEventListener('click', onClick);
     return () => {
-      animation?.cancel();
-      document.body.style.overflow = overflow;
-      dialog.removeEventListener('transitionend', onTransitionEnd);
       dialog.removeEventListener('cancel', onCancel);
+      dialog.removeEventListener('close', onNativeClose);
       dialog.removeEventListener('click', onClick);
-      dialog.close();
-      requestAnimationFrame(() => source.focus({ preventScroll: true }));
+      dialog.removeEventListener('transitionend', onTransitionEnd);
+      dialog.removeEventListener('pointerdown', onPointerDown);
+      dialog.removeEventListener('pointerup', onPointerUp);
+      dialog.removeEventListener('pointercancel', onPointerCancel);
+      window.removeEventListener('popstate', onPopState);
+      animation?.cancel();
+      popOwnHistory();
+      if (dialog.open) dialog.close();
+      restore();
     };
   }, [source, onClose]);
   return (
     <dialog ref={ref} className="photo-dialog" aria-label={photo.caption}>
       <button
         type="button"
-        className="photo-close"
+        className="sr-only"
         aria-label="Close photo"
         onClick={() => closeRef.current()}
       >
-        <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
-          <path
-            d="M3 3l8 8M11 3l-8 8"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-          />
-        </svg>
+        Close photo
       </button>
       <figure ref={frameRef} className="photo-frame">
         <PhotoImage photo={photo} full />

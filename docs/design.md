@@ -35,3 +35,7 @@ The exported `404.html` keeps the home-page shell and footer. Its 404 numeral us
 ## Footer links
 
 The social glyphs are X, Instagram, LinkedIn, then the theme toggle. All are 16px with separate 44×44 hit areas, muted text color, and the link color on hover or keyboard focus. Below 640px they occupy a left-aligned row above the time and Markdown link; from tablet up the footer stays on one line. Contributions flows directly into Elsewhere.
+
+## Photo viewer cleanup
+
+All viewer exits use one close function: the sr-only keyboard/screen-reader control, backdrop tap, swipe down, Escape, browser back, and native dialog close. The HTML element is locked with overflow hidden; body is never fixed. The viewer contains overscroll, is capped to 90vw/85vh, and restores the exact prior root/body inline styles, scroll position, and trigger focus on close or unmount. A same-URL history entry lets browser back close the viewer; other exits consume it. Image taps leave the viewer open. The close control stays visually clipped even while focused.

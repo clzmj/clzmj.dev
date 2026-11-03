@@ -12,7 +12,8 @@ test('a fan photo opens by itself', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Previous photo' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Next photo' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /photo \d/ })).toHaveCount(0);
-  await dialog.getByRole('button', { name: 'Close photo' }).click();
+  await dialog.getByRole('button', { name: 'Close photo' }).focus();
+  await page.keyboard.press('Enter');
   await expect(dialog).toHaveCount(0);
 });
 
@@ -84,7 +85,8 @@ test('the backdrop fades with the card and keeps the dialog mounted until transi
   await page.getByRole('button', { name: photos[10].caption, exact: true }).click();
   const dialog = page.getByRole('dialog');
   await dialog.locator('.photo-frame').evaluate((element) => element.getAnimations()[0].finish());
-  await dialog.getByRole('button', { name: 'Close photo' }).click();
+  await dialog.getByRole('button', { name: 'Close photo' }).focus();
+  await page.keyboard.press('Enter');
   const timing = await dialog.evaluate((element) => {
     const fade = element
       .getAnimations({ subtree: true })

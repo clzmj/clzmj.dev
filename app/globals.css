@@ -602,9 +602,11 @@ body {
 .photo-dialog {
   --photo-close-duration: 320ms;
   --photo-close-easing: cubic-bezier(0.22, 1, 0.36, 1);
-  width: min(520px, calc(100vw - 48px), calc((100vh - 104px) * 0.8));
-  max-width: calc(100vw - 48px);
-  max-height: calc(100vh - 48px);
+  width: min(520px, 90vw, calc((85vh - 96px) * 0.8));
+  max-width: 90vw;
+  max-height: 85vh;
+  overscroll-behavior: contain;
+  touch-action: pan-x pinch-zoom;
   margin: auto;
   padding: 0;
   border: 0;
@@ -644,24 +646,6 @@ body {
 
 .photo-frame figcaption {
   margin: 12px 8px 8px;
-}
-
-.photo-close {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: var(--gray-300);
-  color: var(--gray-1100);
-  box-shadow: 0 0 0 1px var(--preview-border);
-  cursor: pointer;
 }
 
 .footer {
