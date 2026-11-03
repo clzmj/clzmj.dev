@@ -30,8 +30,8 @@ State is the S3 backend in `backend.tf` (R2 bucket `clzmj-dev-tfstate`, native l
 
 | Workflow | When | What |
 | --- | --- | --- |
-| `pull-request.yml` | Pull request | Build the site. `terraform fmt -check`, `validate`, and `plan -lock=false`. Update one PR comment with the plan. |
-| `deploy.yml` | Push to `main` | Build, `wrangler deploy`, then `terraform apply`. A concurrency group keeps applies from overlapping. |
+| `pull-request.yml` | Pull request | `bun run lint`, `bun run format:check`, install Playwright Chromium, and build the site. `terraform fmt -check`, `validate`, and `plan -lock=false`. Update one PR comment with the plan. |
+| `deploy.yml` | Push to `main` | Install Playwright Chromium, build, `wrangler deploy`, then `terraform apply`. A concurrency group keeps applies from overlapping. |
 | `deploy.yml` | Daily 08:00 UTC, and `workflow_dispatch` | Build and `wrangler deploy` only. The contributions graph is rendered at build time. |
 
 The build fails if `package.json` or a Bun lockfile is missing, or if `bun run build` does not write `out/`. Production deploy also fails if `wrangler.jsonc` is missing. Build steps do not receive Cloudflare or R2 credentials.
