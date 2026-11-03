@@ -29,3 +29,7 @@ Photos in `content/photos.json` render as a tilted overlapping fan. Hover lifts 
 ## Not found
 
 The exported `404.html` keeps the home-page shell and footer. Its 404 numeral uses Geist Serif, followed by “Nothing lives here.” and a Back home link. The footer cat stays awake on this page, including at night. Reduced motion holds its first awake frame. The Worker uses `assets.not_found_handling: "404-page"`; there is no custom 500 page.
+
+## Footer links
+
+The social glyphs are X, Instagram, LinkedIn, then the theme toggle. All are 16px with separate 44×44 hit areas, muted text color, and the link color on hover or keyboard focus. Below 640px they occupy a left-aligned row above the time and Markdown link; from tablet up the footer stays on one line. Contributions flows directly into Elsewhere.

@@ -36,6 +36,8 @@ That serves `out/` on port 3000.
 
 ## Content
 
+Footer social URLs and labels live in `lib/social.ts`. X is `@clzmj`; Instagram and LinkedIn remain TODOs and link to their platform home pages until their profile URLs are supplied. All three icons stay in the footer.
+
 - Photos: drop a file in `public/photos/` and point `content/photos.json` at it (`src`, `alt`, `caption`, `width`, `height`). They render as the tilted fan. A click opens that one photo. There are no previous, next, or autoplay controls.
 - Cat: replace `public/cat.png` and `public/cat-dark.png` with sheets of the same size, 128×64 pixels, 4 columns by 2 rows of 32×32 frames. Row 0 is awake, row 1 is asleep. The CSS in `app/globals.css` does not need to change if the grid stays the same.
 

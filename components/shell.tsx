@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { formatClock } from '../lib/time';
 import { Cat } from './cat';
 import { Clock } from './clock';
+import { FooterSocialLinks } from './footer-social-links';
 import { ThemeToggle } from './theme-toggle';
 
 export function Shell({
@@ -32,11 +33,12 @@ export function Shell({
             <Cat awake={awakeCat} />
           </p>
           <div className="footer-actions">
+            <FooterSocialLinks />
             <ThemeToggle />
-            <a className="footer-link" href={markdownHref}>
-              {label}
-            </a>
           </div>
+          <a className="footer-link" href={markdownHref}>
+            {label}
+          </a>
         </footer>
       </main>
     </>

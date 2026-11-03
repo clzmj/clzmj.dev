@@ -49,7 +49,7 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      className="theme-toggle"
+      className="theme-toggle footer-icon-control"
       data-hydrated={ready ? 'true' : 'false'}
       aria-label={`Theme: ${choice}`}
       onClick={() => {
