@@ -1,6 +1,6 @@
 # Design
 
-Personal site for Carlos Lezama. The layout follows the quiet single column of noechague.com: a 16px name and role, a short bio, a contribution year, a tilted photo fan, and Bingo in the footer. There is no components section. The location is Mexico City.
+Personal site for Carlos Lezama. The layout follows the quiet single column of noechague.com: a 16px name and role, a short bio, a contribution year, a tilted photo fan, and Bingo in the profile picture slot. There is no components section. The location is Mexico City.
 
 ## Type
 
@@ -12,9 +12,9 @@ Light and dark tokens live in `app/globals.css`. Text and muted text both clear 
 
 ## Bingo
 
-Bingo is a red merle border collie. The supplied `public/dog.png` and `public/dog-dark.png` are 128×64 pixel sheets with four columns and two rows of 32×32 frames. The top row idles with a continuous wag/pant loop (0.9s); the bottom row runs (0.6s) while hovered or focused, including after a tap. The 404 autoplays the run cycle.
+Bingo is Carlos's border collie and replaces the profile picture. The supplied `public/bingo.png` and `public/bingo-dark.png` are 128×64 sheets: four 32×32 frames per row. The top row is a continuous wag/pant loop (0.9s). Hover, tap, or keyboard focus plays the bottom run-toward-you row once (0.6s), then restores the wag loop.
 
-Rendering keeps exact 2× scaling: a 256×128 background, 64×64 frame, -64px run-row offset and -256px loop offset. The transparent frame stays in the existing 40×24 footer anchor at the same position with `image-rendering: pixelated`. The sprite is `aria-hidden`; its focusable button is named Play with Bingo. The dark sheet follows the theme. Reduced motion holds frame 0 of the current row with no animation.
+The existing 44×44 slot and profile text positions stay fixed. A centered 96×96 sprite frame is the nearest allowed integer size (3×), with a 384×192 background, -96px run-row offset and -384px loop offset. The slot has no circular crop, border, or overflow clipping, so the ears remain visible. The sprite uses `image-rendering: pixelated`, `role="img"` and the accessible name "Bingo, Carlos's border collie". Its interactive button is keyboard focusable. Reduced motion shows static frame 0 of the top row, even during interaction.
 
 ## Column
 
@@ -26,7 +26,7 @@ Photos in `content/photos.json` render as a tilted overlapping fan. Hover lifts 
 
 ## Not found
 
-The exported `404.html` keeps the home-page shell and footer. Its 404 numeral uses Geist Serif, followed by “Nothing lives here.” and a Back home link. Bingo autoplays the run cycle on this page. Reduced motion holds the first run frame. The Worker uses `assets.not_found_handling: "404-page"`; there is no custom 500 page.
+The exported `404.html` keeps the home-page shell and footer. Its 404 numeral uses Geist Serif, followed by “Nothing lives here.” and a Back home link. The 404 has no profile slot or animal. The Worker uses `assets.not_found_handling: "404-page"`; there is no custom 500 page.
 
 ## Footer links
 

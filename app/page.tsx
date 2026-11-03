@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { Bingo } from '../components/bingo';
 import { Bio, roleLine } from '../components/bio';
 import { ContributionGraph } from '../components/contribution-graph';
 import { JsonLd } from '../components/json-ld';
@@ -67,7 +68,7 @@ export default function HomePage() {
         className="identity animate-enter animate-enter-individual"
         style={{ ['--stagger' as string]: 0 }}
       >
-        <img className="avatar" src="/avatar.png" alt={site.name} width={256} height={256} />
+        <Bingo />
         <div>
           <h1 className="site-name">{site.name}</h1>
           <p className="role">{role}</p>

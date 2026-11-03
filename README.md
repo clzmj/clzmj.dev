@@ -39,7 +39,7 @@ That serves `out/` on port 3000.
 Footer social URLs and labels live in `lib/social.ts`. X and Instagram use `@clzmj`; LinkedIn links to the `clzmj` profile. All three icons stay in the footer.
 
 - Photos: drop a file in `public/photos/` and point `content/photos.json` at it (`src`, `alt`, `caption`, `width`, `height`). They render as the tilted fan. A click opens that one photo. There are no previous, next, or autoplay controls.
-- Bingo: `public/dog.png` and `public/dog-dark.png` contain 128×64 pixel sheets with four 32×32 frames per row. The top row is the idle wag/pant loop; the bottom row runs on hover, tap, or focus and autoplays on the 404. Reduced motion holds the first frame.
+- Bingo: `public/bingo.png` and `public/bingo-dark.png` contain 128×64 pixel sheets with four 32×32 frames per row. She replaces the profile picture: a 96px sprite frame at exactly 3× scale is centered in the existing 44px slot, without a circular crop or clipping. The top row wags/pants continuously; hover, tap, or focus plays one run-toward-you cycle before returning to idle. Reduced motion holds static frame 0. The footer and 404 contain no animal.
 
 ## Checks
 

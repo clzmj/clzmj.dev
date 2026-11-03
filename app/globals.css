@@ -212,14 +212,6 @@ body {
   min-width: 0;
 }
 
-.avatar {
-  width: 44px;
-  height: 44px;
-  flex: none;
-  border-radius: 999px;
-  object-fit: cover;
-}
-
 .site-name {
   margin: 0;
   color: var(--gray-1200);
@@ -689,6 +681,7 @@ body {
   display: flex;
   align-items: center;
   justify-self: end;
+  align-self: center;
   gap: 28px;
   color: var(--muted);
 }
@@ -722,62 +715,72 @@ body {
   cursor: pointer;
 }
 
-.dog-anchor {
+.bingo-slot {
   position: relative;
   display: inline-block;
-  width: 40px;
-  height: 24px;
+  width: 44px;
+  height: 44px;
   flex: none;
   padding: 0;
   margin: 0;
   border: 0;
+  border-radius: 0;
+  overflow: visible;
   background: transparent;
   cursor: pointer;
 }
 
-.dog-anchor:focus-visible {
+.bingo-slot:focus-visible {
   outline: 1px solid var(--gray-1000);
   outline-offset: 4px;
-  border-radius: 4px;
 }
 
-.dog {
+.bingo {
   position: absolute;
-  left: -12px;
-  bottom: 0;
+  left: -26px;
+  top: -26px;
   display: block;
-  width: 64px;
-  height: 64px;
-  background-image: url('/dog.png');
+  width: 96px;
+  height: 96px;
+  background-image: url('/bingo.png');
   background-repeat: no-repeat;
-  background-size: 256px 128px;
+  background-size: 384px 192px;
   image-rendering: pixelated;
   background-position: 0 0;
-  animation: dog-frames 0.9s steps(4, end) infinite;
+  animation: bingo-idle 0.9s steps(4, end) infinite;
   pointer-events: none;
 }
 
-html[data-theme='dark'] .dog {
-  background-image: url('/dog-dark.png');
+html[data-theme='dark'] .bingo {
+  background-image: url('/bingo-dark.png');
 }
 
 @media (prefers-color-scheme: dark) {
-  html:not([data-theme='light']) .dog {
-    background-image: url('/dog-dark.png');
+  html:not([data-theme='light']) .bingo {
+    background-image: url('/bingo-dark.png');
   }
 }
 
-.dog[data-state='running'] {
-  background-position-y: -64px;
-  animation-duration: 0.6s;
+.bingo[data-state='running'] {
+  background-position-y: -96px;
+  animation: bingo-run 0.6s steps(4, end);
 }
 
-@keyframes dog-frames {
+@keyframes bingo-idle {
   from {
     background-position-x: 0;
   }
   to {
-    background-position-x: -256px;
+    background-position-x: -384px;
+  }
+}
+
+@keyframes bingo-run {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -384px;
   }
 }
 
@@ -823,9 +826,10 @@ html[data-theme='dark'] .dog {
     transform: translateY(var(--fan-y)) rotate(var(--fan-r));
   }
 
-  .dog {
+  .bingo,
+  .bingo[data-state='running'] {
     animation: none;
-    background-position-x: 0;
+    background-position: 0 0;
   }
 }
 

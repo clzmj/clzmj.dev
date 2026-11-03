@@ -57,7 +57,7 @@ for (const theme of ['auto', 'light', 'dark']) {
       };
     });
     expect(metrics.lines).toBe(1);
-    expect(metrics.height).toBeCloseTo(29, 0);
+    expect(metrics.height).toBeCloseTo(19.25, 1);
     expect(metrics.right).toBeLessThanOrEqual(metrics.edge + 1);
     await expect(page.getByRole('button', { name: /Theme:/ })).toBeVisible();
   });

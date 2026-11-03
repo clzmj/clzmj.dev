@@ -73,7 +73,7 @@ test('mobile themes retain distinct 16px glyphs and separate 44px tap targets', 
     expect(metrics.color).toBe(metrics.linkColor);
     expect(metrics.hitWidth).toBe('44px');
     expect(metrics.hitHeight).toBe('44px');
-    expect(metrics.clockHeight).toBeCloseTo(29, 0);
+    expect(metrics.clockHeight).toBeCloseTo(19.25, 1);
     expect(metrics.right).toBeLessThanOrEqual(metrics.edge + 1);
     await page.mouse.click(metrics.hitX, metrics.hitY);
   }

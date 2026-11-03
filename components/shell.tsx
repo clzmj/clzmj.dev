@@ -2,19 +2,10 @@ import type { ReactNode } from 'react';
 
 import { formatClock } from '../lib/time';
 import { Clock } from './clock';
-import { Dog } from './dog';
 import { FooterSocialLinks } from './footer-social-links';
 import { ThemeToggle } from './theme-toggle';
 
-export function Shell({
-  markdownHref,
-  children,
-  runningDog = false,
-}: {
-  markdownHref: string;
-  children: ReactNode;
-  runningDog?: boolean;
-}) {
+export function Shell({ markdownHref, children }: { markdownHref: string; children: ReactNode }) {
   const label = markdownHref.split('/').pop() ?? 'index.md';
   const now = new Date();
   return (
@@ -30,7 +21,6 @@ export function Shell({
         >
           <p className="footer-clock">
             <Clock initial={formatClock(now)} initialIso={now.toISOString()} />
-            <Dog running={runningDog} />
           </p>
           <div className="footer-actions">
             <FooterSocialLinks />
