@@ -1,12 +1,12 @@
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium } from 'playwright';
+import { bunExecutable } from '../lib/runtime';
 import { shotPages, viewports } from '../tests/viewports';
 
-const bun = join(process.env.HOME ?? '', '.bun/bin/bun');
 const port = 4173;
 
-const server = Bun.spawn([bun, 'scripts/serve.ts'], {
+const server = Bun.spawn([bunExecutable(), 'scripts/serve.ts'], {
   env: { ...process.env, PORT: String(port) },
   stdout: 'inherit',
   stderr: 'inherit',

@@ -5,10 +5,11 @@ import { Shell } from '../../../components/shell';
 import { loadEvents } from '../../../lib/content';
 import { renderMdx } from '../../../lib/mdx';
 import { site } from '../../../lib/site';
+import { staticParams } from '../../../lib/static-params';
 import { formatLongDate, withMexicoOffset } from '../../../lib/time';
 
 export function generateStaticParams() {
-  return loadEvents().map((event) => ({ slug: event.slug }));
+  return staticParams(loadEvents().map((event) => event.slug));
 }
 
 export const dynamicParams = false;

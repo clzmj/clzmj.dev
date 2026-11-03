@@ -7,6 +7,9 @@ blob-report
 .wrangler
 .DS_Store
 *.tsbuildinfo
+next-env.d.ts
+shots
+.hidden-build-*
 public/og
 public/diagrams
 public/rss.xml
@@ -16,5 +19,6 @@ public/index.md
 public/writings.md
 public/events.md
 public/writings/*.md
+public/writings/*.png
 public/events/*.md
 public/events/*.ics

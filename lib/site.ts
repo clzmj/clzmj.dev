@@ -15,7 +15,7 @@ export const site = {
 } as const;
 
 export function showDemoPosts(): boolean {
-  return process.env.SHOW_DEMO_POSTS !== 'false';
+  return process.env.SHOW_DEMO_POSTS === 'true';
 }
 
 export function absoluteUrl(path: string): string {

@@ -1,7 +1,5 @@
-import { join } from 'node:path';
 import { defineConfig } from '@playwright/test';
-
-const bun = join(process.env.HOME ?? '', '.bun/bin/bun');
+import { bunExecutable } from './lib/runtime';
 
 export default defineConfig({
   testDir: 'tests',
@@ -12,7 +10,7 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:3000',
   },
   webServer: {
-    command: `${bun} scripts/serve.ts`,
+    command: `${bunExecutable()} scripts/serve.ts`,
     url: 'http://127.0.0.1:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 30000,

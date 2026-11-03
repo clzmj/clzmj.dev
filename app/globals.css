@@ -475,12 +475,14 @@ body {
   max-width: 100%;
   min-width: 0;
   overflow-x: auto;
+  direction: rtl;
 }
 
 .contrib-months,
 .contrib-grid {
   display: grid;
   width: max-content;
+  direction: ltr;
   grid-auto-flow: column;
   grid-auto-columns: 11px;
   gap: 3px;

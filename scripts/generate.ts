@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { chromium, type Page } from 'playwright';
 import { loadEvents, loadWritings, visibleWritings } from '../lib/content';
@@ -7,7 +7,7 @@ import { diagramBlocks } from '../lib/diagrams';
 import { eventToIcs } from '../lib/ics';
 import { llmsFullText, llmsText, markdownFor, rssXml } from '../lib/publish';
 import { pageRoutes } from '../lib/routes';
-import { site } from '../lib/site';
+import { showDemoPosts, site } from '../lib/site';
 
 function writePublic(relativePath: string, contents: string | Uint8Array) {
   const path = join(process.cwd(), 'public', relativePath);
@@ -15,7 +15,27 @@ function writePublic(relativePath: string, contents: string | Uint8Array) {
   writeFileSync(path, contents);
 }
 
+function resetGenerated() {
+  for (const relative of [
+    'public/diagrams',
+    'public/og',
+    'public/rss.xml',
+    'public/llms.txt',
+    'public/llms-full.txt',
+    'public/index.md',
+    'public/writings.md',
+    'public/events.md',
+    'public/writings',
+    'public/events',
+  ]) {
+    rmSync(join(process.cwd(), relative), { recursive: true, force: true });
+  }
+}
+
 async function refreshContributions() {
+  const refresh =
+    process.env.REFRESH_CONTRIBUTIONS === 'true' || Boolean(process.env.CONTRIBUTIONS_TOKEN);
+  if (!refresh) return;
   const target = join(process.cwd(), 'content', 'contributions.json');
   try {
     const response = await fetch('https://github.com/users/clzmj/contributions', {
@@ -41,7 +61,7 @@ async function renderDiagrams(page: Page) {
     join(process.cwd(), 'node_modules/mermaid/dist/mermaid.min.js'),
     'utf8',
   );
-  const posts = loadWritings();
+  const posts = visibleWritings(loadWritings());
   for (const post of posts) {
     const blocks = diagramBlocks(post.body);
     for (const [index, block] of blocks.entries()) {
@@ -96,10 +116,20 @@ async function renderOgImages(page: Page) {
   }
 }
 
+function publishDemoImage(writings: { slug: string; demo: boolean }[]) {
+  const source = join(process.cwd(), 'content', 'writings', 'demo-still.png');
+  if (!showDemoPosts() || !writings.some((post) => post.demo) || !existsSync(source)) return;
+  const target = join(process.cwd(), 'public', 'writings', 'demo-still.png');
+  mkdirSync(dirname(target), { recursive: true });
+  cpSync(source, target);
+}
+
 async function main() {
+  resetGenerated();
   await refreshContributions();
   const writings = visibleWritings(loadWritings());
   const events = loadEvents();
+  publishDemoImage(writings);
   const routes = pageRoutes(writings, events);
   for (const route of routes) {
     const relative = route.markdownPath.replace(/^\//, '');

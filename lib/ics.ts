@@ -26,14 +26,26 @@ function escapeText(value: string): string {
 }
 
 function fold(line: string): string {
-  const chars = [...line];
-  if (chars.length <= 73) return line;
+  const encoder = new TextEncoder();
+  const characters = Array.from(line);
   const parts: string[] = [];
-  parts.push(chars.slice(0, 73).join(''));
-  for (let index = 73; index < chars.length; index += 73) {
-    parts.push(` ${chars.slice(index, index + 73).join('')}`);
+  let current = '';
+  let used = 0;
+  let limit = 75;
+  for (const character of characters) {
+    const size = encoder.encode(character).length;
+    if (used + size > limit && current.length > 0) {
+      parts.push(current);
+      current = character;
+      used = size;
+      limit = 74;
+    } else {
+      current += character;
+      used += size;
+    }
   }
-  return parts.join('\r\n');
+  if (current.length > 0) parts.push(current);
+  return parts.map((part, index) => (index === 0 ? part : ` ${part}`)).join('\r\n');
 }
 
 export function eventToIcs(event: SiteEvent, publishedAt: Date = new Date()): string {

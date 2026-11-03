@@ -43,6 +43,16 @@ test('reduced motion holds the first frame and keeps the z marks still', async (
   expect(opacity).toBe('1');
 });
 
+test('a page left open switches when the hour crosses into sleep', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-06-15T22:30:00-06:00') });
+  await page.goto('/');
+  const cat = page.locator('#site-cat');
+  await expect(cat).toHaveAttribute('data-state', 'awake');
+  await page.clock.fastForward(60 * 60 * 1000);
+  await expect(cat).toHaveAttribute('data-state', 'asleep');
+  await expect(page.locator('html')).toHaveAttribute('data-cat', 'asleep');
+});
+
 test('the cat is decorative', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.cat-anchor')).toHaveAttribute('aria-hidden', 'true');

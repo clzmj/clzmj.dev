@@ -5,7 +5,7 @@
     "generate": "bun scripts/generate.ts",
     "prebuild": "bun scripts/generate.ts",
     "build": "next build",
-    "dev": "bun scripts/generate.ts && next dev",
+    "dev": "SHOW_DEMO_POSTS=true bun scripts/generate.ts && SHOW_DEMO_POSTS=true next dev",
     "lint": "biome check .",
     "format": "biome check --write .",
     "typecheck": "tsc --noEmit",
@@ -38,6 +38,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "lighthouse": "^13.6.0",
+    "playwright": "^1.64.1",
     "tailwindcss": "^4.3.4",
     "typescript": "^7.0.2",
     "wrangler": "4.156.2"

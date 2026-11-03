@@ -22,7 +22,7 @@ Light and dark tokens live in `app/globals.css`. Text and muted text both clear 
 
 `public/cat.png` is the light sheet and `public/cat-dark.png` is the same sheet with a light outline. Both are 128×64, four columns by two rows of 32×32 frames. Row 0 is awake (about 0.9s per loop). Row 1 is asleep (about 1.8s). The element is 64×64, `background-size: 256px 128px`, `image-rendering: pixelated`, and a `steps(4)` animation on `background-position-x`. The sheet swaps with `data-theme`. No artwork is copied from the reference site.
 
-The cat sleeps from 23:00 through 07:59 in `America/Mexico_City`. The build stamps a default `data-cat` value, and a small script corrects it in the browser. While asleep, three Geist Mono `z` marks use the theme text color, staggered by `--rang` at 1.05s, on a 3.2s fade that drifts up and to the right.
+The cat sleeps from 23:00 through 07:59 in `America/Mexico_City`. The build stamps a default `data-cat` value, and a small script corrects it in the browser, then again every minute, so a tab left open switches at the boundary. While asleep, three Geist Mono `z` marks use the theme text color, staggered by `--rang` at 1.05s, on a 3.2s fade that drifts up and to the right.
 
 `prefers-reduced-motion: reduce` holds the first frame of the current row. The `z` marks stay visible and still while the cat is asleep. The cat is `aria-hidden`.
 

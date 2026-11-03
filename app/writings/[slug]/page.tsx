@@ -5,10 +5,11 @@ import { Shell } from '../../../components/shell';
 import { visibleWritings } from '../../../lib/content';
 import { renderMdx } from '../../../lib/mdx';
 import { site } from '../../../lib/site';
+import { staticParams } from '../../../lib/static-params';
 import { formatLongDate } from '../../../lib/time';
 
 export function generateStaticParams() {
-  return visibleWritings().map((post) => ({ slug: post.slug }));
+  return staticParams(visibleWritings().map((post) => post.slug));
 }
 
 export const dynamicParams = false;

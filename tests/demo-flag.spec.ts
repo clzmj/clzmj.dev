@@ -1,11 +1,9 @@
 import { execFileSync } from 'node:child_process';
-import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
-
-const bun = join(process.env.HOME ?? '', '.bun/bin/bun');
+import { bunExecutable } from '../lib/runtime';
 
 function list(flag: string): string {
-  return execFileSync(bun, ['scripts/visible-writings.ts'], {
+  return execFileSync(bunExecutable(), ['scripts/visible-writings.ts'], {
     cwd: process.cwd(),
     env: { ...process.env, SHOW_DEMO_POSTS: flag },
     encoding: 'utf8',
