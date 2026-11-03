@@ -108,10 +108,10 @@ export function loadEvents(): SiteEvent[] {
 }
 
 export function loadSlides(): Slide[] {
-  const raw = readFileSync(contentPath('carousel.json'), 'utf8');
+  const raw = readFileSync(contentPath('photos.json'), 'utf8');
   const parsed = JSON.parse(raw) as Slide[];
   return parsed.map((slide) => ({
     ...slide,
-    src: slide.src.startsWith('/') ? slide.src : `/carousel/${slide.src}`,
+    src: slide.src.startsWith('/') ? slide.src : `/photos/${slide.src}`,
   }));
 }

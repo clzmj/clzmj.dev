@@ -61,12 +61,13 @@ scenes = [
     ("03.png", (28, 32, 40), (16, 16, 18), (232, 208, 140), 0.58, "street"),
     ("04.png", (232, 228, 216), (168, 164, 150), (62, 96, 70), 0.72, "plant"),
     ("05.png", (196, 188, 176), (120, 112, 100), (40, 40, 38), 0.8, "notebook"),
+    ("07.png", (186, 196, 188), (92, 96, 90), (244, 236, 220), 0.62, "window"),
     ("06.png", (168, 188, 204), (86, 96, 88), (244, 244, 240), 0.66, "sky"),
 ]
 
-carousel = ROOT / "public" / "carousel"
+photos = ROOT / "public" / "photos"
 for name, sky, ground, accent, horizon, mark in scenes:
-    write_png(carousel / name, 960, 1200, scene(960, 1200, sky, ground, accent, horizon, mark))
+    write_png(photos / name, 960, 1200, scene(960, 1200, sky, ground, accent, horizon, mark))
 
 
 def still(x, y):
