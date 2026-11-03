@@ -21,7 +21,7 @@ SHOW_DEMO_POSTS=true bun run build
 
 The static site is written to `out/`. That directory is the Worker asset bundle. `bun run build` runs `scripts/generate.ts` first (the `prebuild` hook), then `next build` with `output: 'export'`.
 
-Demo posts are hidden unless `SHOW_DEMO_POSTS=true`. A production build leaves them out of the HTML, sitemap, feeds, Open Graph images, diagrams, and the demo figure. `bun run dev` turns them on.
+Demo posts and example events are hidden unless `SHOW_DEMO_POSTS=true`. A production build leaves them out of the HTML, sitemap, feeds, Open Graph images, diagrams, and the demo figure and event calendar downloads. Empty dynamic-route sentinel files are removed after export so those URLs return 404. `bun run dev` turns them on.
 
 Generation renders Mermaid and Open Graph images in Chromium, so `bunx playwright install chromium` has to have been run first. The contribution snapshot in `content/contributions.json` is reused as-is. Set `REFRESH_CONTRIBUTIONS=true` or `CONTRIBUTIONS_TOKEN` when that file should be fetched again.
 
@@ -41,7 +41,7 @@ That serves `out/` on port 3000.
 
 - Notes: `content/writings/*.mdx`. A post with `demo: true` is omitted unless `SHOW_DEMO_POSTS=true`. With no visible posts, the Writings section and `/writings` are omitted, and the build still succeeds.
 - Events: `content/events/*.md`. See `docs/events.md`.
-- Photos: drop a file in `public/carousel/` and point `content/carousel.json` at it (`src`, `alt`, `caption`, `width`, `height`). They render as the tilted fan. A click opens that one photo. There are no previous, next, or autoplay controls.
+- Photos: drop a file in `public/photos/` and point `content/photos.json` at it (`src`, `alt`, `caption`, `width`, `height`). They render as the tilted fan. A click opens that one photo. There are no previous, next, or autoplay controls.
 - Cat: replace `public/cat.png` and `public/cat-dark.png` with sheets of the same size, 128×64 pixels, 4 columns by 2 rows of 32×32 frames. Row 0 is awake, row 1 is asleep. The CSS in `app/globals.css` does not need to change if the grid stays the same.
 
 ## Checks

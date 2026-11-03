@@ -58,10 +58,23 @@ test('next build with demos hidden succeeds and omits the demo', () => {
     expect(existsSync(join(out, 'writings', 'markdown-demo.md'))).toBe(false);
     expect(existsSync(join(out, 'writings', 'demo-still.png'))).toBe(false);
     expect(existsSync(join(out, 'diagrams', 'markdown-demo-0.svg'))).toBe(false);
+    for (const name of [
+      'example-evening.html',
+      'example-evening.md',
+      'example-evening.ics',
+      'empty.html',
+    ]) {
+      expect(existsSync(join(out, 'events', name))).toBe(false);
+    }
+    expect(existsSync(join(out, 'writings', 'empty.html'))).toBe(false);
+    expect(readFileSync(join(out, 'index.html'), 'utf8')).not.toContain('Example evening');
     const names = walk(out).map((file) => relative(out, file));
     expect(names.some((name) => name.includes('markdown-demo'))).toBe(false);
     for (const file of ['sitemap.xml', 'llms.txt', 'llms-full.txt', 'rss.xml']) {
-      expect(readFileSync(join(out, file), 'utf8')).not.toContain('markdown-demo');
+      const text = readFileSync(join(out, file), 'utf8');
+      expect(text).not.toContain('markdown-demo');
+      expect(text).not.toContain('example-evening');
+      expect(text).not.toContain('/empty');
     }
   } finally {
     rmSync(dir, { recursive: true, force: true });

@@ -26,3 +26,22 @@ test('the demo post hide flag removes demo posts and the built site shows them',
   await page.goto('/writings/markdown-demo');
   await expect(page.getByRole('heading', { level: 1, name: 'Markdown demo' })).toBeVisible();
 });
+
+test('the explicit demo build includes the example event and badge', async ({ page, request }) => {
+  await page.goto('/events/example-evening');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Example evening');
+  await expect(page.locator('h1 .badge')).toHaveText('Example');
+  const sitemap = await (await request.get('/sitemap.xml')).text();
+  expect(sitemap).toContain('/events/example-evening');
+});
+
+test('empty sentinel URLs return 404', async ({ request }) => {
+  for (const path of [
+    '/writings/empty',
+    '/writings/empty.html',
+    '/events/empty',
+    '/events/empty.html',
+  ]) {
+    expect((await request.get(path)).status()).toBe(404);
+  }
+});

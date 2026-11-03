@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "start": "bun scripts/serve.ts",
     "shots": "bun scripts/shots.ts",
-    "test": "playwright test"
+    "test": "playwright test",
+    "postbuild": "bun scripts/clean-export.ts"
   },
   "dependencies": {
     "geist": "1.9.0",

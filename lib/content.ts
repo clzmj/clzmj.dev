@@ -100,11 +100,13 @@ export function loadEvents(): SiteEvent[] {
       body: parsed.content.trim(),
     };
   });
-  return events.sort((a, b) => {
-    if (a.status !== b.status) return a.status === 'upcoming' ? -1 : 1;
-    if (a.status === 'upcoming') return a.start.localeCompare(b.start);
-    return b.start.localeCompare(a.start);
-  });
+  return events
+    .filter((event) => showDemoPosts() || !event.example)
+    .sort((a, b) => {
+      if (a.status !== b.status) return a.status === 'upcoming' ? -1 : 1;
+      if (a.status === 'upcoming') return a.start.localeCompare(b.start);
+      return b.start.localeCompare(a.start);
+    });
 }
 
 export function loadSlides(): Slide[] {
