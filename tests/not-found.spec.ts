@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 
 for (const width of [393, 1280]) {
-  test(`the exported 404 uses the shared shell and an awake cat at ${width}px`, async ({
+  test(`the exported 404 uses the shared shell and a running Bingo at ${width}px`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 900 });
@@ -30,26 +30,20 @@ for (const width of [393, 1280]) {
         .locator('.not-found-code')
         .evaluate((element) => getComputedStyle(element).fontFamily),
     ).toMatch(/Geist.*Serif/i);
-    await expect(page.locator('#site-cat')).toHaveAttribute('data-state', 'awake');
+    await expect(page.locator('#site-dog')).toHaveAttribute('data-state', 'running');
     expect(
       await page
-        .locator('#site-cat')
+        .locator('#site-dog')
         .evaluate((element) => getComputedStyle(element).backgroundPositionY),
-    ).toMatch(/^0(px|%)$/);
-    expect(
-      await page
-        .locator('.cat-z')
-        .first()
-        .evaluate((element) => getComputedStyle(element).display),
-    ).toBe('none');
+    ).toBe('-64px');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     expect(
       await page
-        .locator('#site-cat')
+        .locator('#site-dog')
         .evaluate((element) => getComputedStyle(element).animationName),
     ).toBe('none');
     await page.clock.fastForward(60_000);
-    await expect(page.locator('#site-cat')).toHaveAttribute('data-state', 'awake');
+    await expect(page.locator('#site-dog')).toHaveAttribute('data-state', 'running');
     await expect(page.locator('footer .footer-time')).toContainText('23:31 in Mexico City');
     await page.getByRole('link', { name: 'Back home', exact: true }).click();
     await expect(page).toHaveURL('/');

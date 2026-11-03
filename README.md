@@ -39,7 +39,7 @@ That serves `out/` on port 3000.
 Footer social URLs and labels live in `lib/social.ts`. X and Instagram use `@clzmj`; LinkedIn links to the `clzmj` profile. All three icons stay in the footer.
 
 - Photos: drop a file in `public/photos/` and point `content/photos.json` at it (`src`, `alt`, `caption`, `width`, `height`). They render as the tilted fan. A click opens that one photo. There are no previous, next, or autoplay controls.
-- Cat: replace `public/cat.png` and `public/cat-dark.png` with sheets of the same size, 128×64 pixels, 4 columns by 2 rows of 32×32 frames. Row 0 is awake, row 1 is asleep. The CSS in `app/globals.css` does not need to change if the grid stays the same.
+- Bingo: `public/dog.png` and `public/dog-dark.png` contain 128×64 pixel sheets with four 32×32 frames per row. The top row is the idle wag/pant loop; the bottom row runs on hover, tap, or focus and autoplays on the 404. Reduced motion holds the first frame.
 
 ## Checks
 
@@ -54,4 +54,4 @@ bun run shots
 
 `bun run test` expects `out/` from `bun run build`. `bun run shots` writes light and dark home-page screenshots to the gitignored `shots/` directory.
 
-Type, color, and the cat are described in `docs/design.md`.
+Type, color, and Bingo are described in `docs/design.md`.

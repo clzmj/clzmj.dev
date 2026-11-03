@@ -5,7 +5,7 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
 import { site } from '../lib/site';
-import { catState, initScript } from '../lib/time';
+import { initScript } from '../lib/time';
 
 import './globals.css';
 
@@ -49,7 +49,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       suppressHydrationWarning
-      data-cat={catState(new Date())}
       className={`${GeistSans.variable} ${GeistMono.variable} ${GeistSerif.variable}`}
     >
       <head>

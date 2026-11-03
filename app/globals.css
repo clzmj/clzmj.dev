@@ -722,112 +722,62 @@ body {
   cursor: pointer;
 }
 
-.cat-anchor {
+.dog-anchor {
   position: relative;
   display: inline-block;
   width: 40px;
   height: 24px;
   flex: none;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
-.cat {
+.dog-anchor:focus-visible {
+  outline: 1px solid var(--gray-1000);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.dog {
   position: absolute;
   left: -12px;
   bottom: 0;
   display: block;
   width: 64px;
   height: 64px;
-  background-image: url('/cat.png');
+  background-image: url('/dog.png');
   background-repeat: no-repeat;
   background-size: 256px 128px;
   image-rendering: pixelated;
   background-position: 0 0;
+  animation: dog-frames 0.9s steps(4, end) infinite;
+  pointer-events: none;
 }
 
-html[data-theme='dark'] .cat {
-  background-image: url('/cat-dark.png');
+html[data-theme='dark'] .dog {
+  background-image: url('/dog-dark.png');
 }
 
 @media (prefers-color-scheme: dark) {
-  html:not([data-theme='light']) .cat {
-    background-image: url('/cat-dark.png');
+  html:not([data-theme='light']) .dog {
+    background-image: url('/dog-dark.png');
   }
 }
 
-html[data-cat='awake'] .cat {
-  background-position-y: 0;
-  animation: cat-frames 0.9s steps(4, end) infinite;
-}
-
-html[data-cat='asleep'] .cat {
+.dog[data-state='running'] {
   background-position-y: -64px;
-  animation: cat-frames 1.8s steps(4, end) infinite;
+  animation-duration: 0.6s;
 }
 
-@keyframes cat-frames {
+@keyframes dog-frames {
   from {
     background-position-x: 0;
   }
   to {
     background-position-x: -256px;
-  }
-}
-
-.cat-zs {
-  pointer-events: none;
-}
-
-.cat-z {
-  position: absolute;
-  color: var(--gray-1200);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1;
-  opacity: 0;
-}
-
-.cat-z:nth-child(1) {
-  left: 18px;
-  bottom: 22px;
-}
-.cat-z:nth-child(2) {
-  left: 26px;
-  bottom: 30px;
-}
-.cat-z:nth-child(3) {
-  left: 34px;
-  bottom: 38px;
-}
-
-html[data-cat='asleep'] .cat-z {
-  animation: cat-z 3.2s ease-out infinite;
-  animation-delay: calc(var(--rang) * 1.05s);
-}
-
-.cat-anchor[data-always-awake='true'] .cat {
-  background-position-y: 0;
-  animation: cat-frames 0.9s steps(4, end) infinite;
-}
-
-.cat-anchor[data-always-awake='true'] .cat-z {
-  display: none;
-}
-
-@keyframes cat-z {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.6);
-  }
-  22% {
-    opacity: 1;
-  }
-  68% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(8px, -14px) scale(1.15);
   }
 }
 
@@ -873,17 +823,9 @@ html[data-cat='asleep'] .cat-z {
     transform: translateY(var(--fan-y)) rotate(var(--fan-r));
   }
 
-  html[data-cat='awake'] .cat,
-  html[data-cat='asleep'] .cat,
-  .cat-anchor[data-always-awake='true'] .cat {
+  .dog {
     animation: none;
     background-position-x: 0;
-  }
-
-  html[data-cat='asleep'] .cat-z {
-    animation: none;
-    opacity: 1;
-    transform: none;
   }
 }
 

@@ -3,7 +3,6 @@ import zlib
 from pathlib import Path
 
 ROOT = Path("/workspace")
-UPLOADS = Path("/home/ubuntu/.cursor/projects/workspace/uploads")
 
 
 def chunk(tag: bytes, data: bytes) -> bytes:
@@ -101,9 +100,3 @@ def icon(size, x, y):
 
 write_png(ROOT / "app" / "icon.png", 32, 32, lambda x, y: icon(32, x, y))
 write_png(ROOT / "app" / "apple-icon.png", 180, 180, lambda x, y: icon(180, x, y))
-
-for source, target in (
-    ("cat_f819.png", ROOT / "public" / "cat.png"),
-    ("cat-dark_ed81.png", ROOT / "public" / "cat-dark.png"),
-):
-    target.write_bytes((UPLOADS / source).read_bytes())
