@@ -39,7 +39,7 @@ for (const width of [393, 744, 1280]) {
       await expect(link).toHaveAttribute('title', profile.name);
       await expect(link).toHaveAttribute('href', profile.href);
       await expect(link).toHaveAttribute('target', '_blank');
-      await expect(link).toHaveAttribute('rel', 'noopener');
+      await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
       await expect(link.locator('svg')).toHaveAttribute('width', '16');
       await expect(link.locator('svg')).toHaveAttribute('height', '16');
       const target = await link.evaluate((element) => {
