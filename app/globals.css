@@ -322,46 +322,59 @@ body {
 
 .avatar-group {
   display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
   vertical-align: middle;
-  height: 18px;
+  height: 20px;
   margin-block: -4px;
 }
 
 .avatar-faces {
   display: inline-flex;
   align-items: center;
+  isolation: isolate;
 }
 
-.mini-avatar {
+.bio .mini-avatar {
+  position: relative;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  margin-left: -8px;
-  border-radius: 999px;
-  background: var(--gray-300);
-  color: var(--gray-1100);
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-left: -6px;
+  border-radius: 50%;
   box-shadow: 0 0 0 2px var(--bg);
-  font-size: 7px;
-  font-weight: 600;
-  line-height: 1;
-  transition: margin 0.2s ease-out;
+  transition: transform 150ms ease;
+}
+
+.mini-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.mini-avatar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gray-1200) 10%, transparent);
+  pointer-events: none;
 }
 
 .mini-avatar:first-child {
   margin-left: 0;
 }
 
-.avatar-faces:hover .mini-avatar {
-  margin-left: -2px;
+.mini-avatar:hover,
+.mini-avatar:focus-visible {
+  transform: translateY(-2px);
 }
 
-.avatar-faces:hover .mini-avatar:first-child {
-  margin-left: 0;
+@media (prefers-reduced-motion: reduce) {
+  .bio .mini-avatar {
+    transition: none;
+  }
 }
 
 .section {
@@ -820,7 +833,7 @@ html[data-theme='dark'] .bingo {
   .preview-right,
   .fan-card,
   .footer-time,
-  .mini-avatar {
+  .bio .mini-avatar {
     animation: none;
     transition: none;
   }

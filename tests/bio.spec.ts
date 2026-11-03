@@ -39,3 +39,50 @@ test('the approved three-paragraph bio and company text links are exact', async 
   for (const [, href] of companies) expect(markdown).toContain(href);
   expect(markdown).not.toContain('placeholders');
 });
+
+test('official company logos keep their order, links, full-bleed circles and overlap', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const logos = page.locator('.bio .mini-avatar');
+  expect(
+    await logos.evaluateAll((links) => links.map((link) => link.getAttribute('aria-label'))),
+  ).toEqual(companies.slice(1).map(([name]) => name));
+  for (const [index, [name, href]] of companies.slice(1).entries()) {
+    const logo = logos.nth(index);
+    await expect(logo).toHaveAttribute('href', href);
+    await expect(logo).toHaveAttribute('title', name);
+    await expect(logo).toHaveAttribute('target', '_blank');
+    await expect(logo).toHaveAttribute('rel', 'noopener');
+    const metrics = await logo.evaluate((link) => {
+      const css = getComputedStyle(link);
+      const img = link.querySelector('img')!;
+      return {
+        width: link.getBoundingClientRect().width,
+        height: link.getBoundingClientRect().height,
+        margin: css.marginLeft,
+        z: css.zIndex,
+        fit: getComputedStyle(img).objectFit,
+        loaded: img.complete && img.naturalWidth === 64 && img.naturalHeight === 64,
+      };
+    });
+    expect(metrics).toEqual({
+      width: 20,
+      height: 20,
+      margin: index ? '-6px' : '0px',
+      z: String(4 - index),
+      fit: 'cover',
+      loaded: true,
+    });
+  }
+  expect(
+    await page
+      .locator('.bio p')
+      .nth(1)
+      .evaluate((p) => p.firstChild?.textContent),
+  ).toBe('Before that, ');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  expect(await logos.first().evaluate((link) => getComputedStyle(link).transitionDuration)).toBe(
+    '0s',
+  );
+});

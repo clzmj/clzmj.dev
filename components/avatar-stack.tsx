@@ -1,15 +1,23 @@
 import type { ProfileAvatar } from '../lib/profile';
 
-// Reserved for the approved company-logo assets; no community count is rendered.
 export function AvatarStack({ avatars }: { avatars: ProfileAvatar[] }) {
   if (!avatars.length) return null;
   return (
     <span className="avatar-group">
       <span className="avatar-faces">
-        {avatars.map((avatar) => (
-          <span key={avatar.label} className="mini-avatar" aria-hidden="true">
-            {avatar.src ? <img src={avatar.src} alt="" width={18} height={18} /> : null}
-          </span>
+        {avatars.map((avatar, index) => (
+          <a
+            key={avatar.label}
+            className="mini-avatar"
+            href={avatar.href}
+            target="_blank"
+            rel="noopener"
+            aria-label={avatar.label}
+            title={avatar.label}
+            style={{ zIndex: avatars.length - index }}
+          >
+            <img src={avatar.src} alt="" width={20} height={20} />
+          </a>
         ))}
       </span>
     </span>

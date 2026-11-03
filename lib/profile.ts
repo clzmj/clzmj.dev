@@ -14,7 +14,7 @@ export type ProfilePart =
   | { avatars: true }
   | ProfileLink;
 
-export type ProfileAvatar = { label: string; href?: string; src?: string };
+export type ProfileAvatar = { label: string; href: string; src: string };
 
 export type Profile = {
   role: string;

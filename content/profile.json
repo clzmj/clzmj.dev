@@ -1,6 +1,27 @@
 {
   "role": "ML & Software Engineer",
-  "avatarStack": [],
+  "avatarStack": [
+    {
+      "label": "Monopolio",
+      "href": "https://monopolio.com.mx/",
+      "src": "/logos/monopolio.png"
+    },
+    {
+      "label": "DD360",
+      "href": "https://dd360.mx/",
+      "src": "/logos/dd360.png"
+    },
+    {
+      "label": "RappiCard",
+      "href": "https://rappicard.mx/",
+      "src": "/logos/rappicard.png"
+    },
+    {
+      "label": "DiDi Food",
+      "href": "https://www.didi-food.com/es-MX/",
+      "src": "/logos/didi-food.png"
+    }
+  ],
   "paragraphs": [
     [
       "I'm Carlos Lezama. I live in Mexico City and work at ",
@@ -11,7 +32,11 @@
       " as a software engineer."
     ],
     [
-      "Before that, I scraped half of Mexico's real estate for ",
+      "Before that, ",
+      {
+        "avatars": true
+      },
+      " I scraped half of Mexico's real estate for ",
       {
         "label": "Monopolio",
         "href": "https://monopolio.com.mx/"
