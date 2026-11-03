@@ -5,7 +5,6 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 type Choice = 'auto' | 'light' | 'dark';
 
 const order: Choice[] = ['auto', 'light', 'dark'];
-const labels: Record<Choice, string> = { auto: 'Auto', light: 'Light', dark: 'Dark' };
 
 function resolve(choice: Choice): 'light' | 'dark' {
   if (choice === 'dark') return 'dark';
@@ -59,7 +58,6 @@ export function ThemeToggle() {
         apply(next);
       }}
     >
-      <span className="theme-label">{labels[choice]}</span>
       <svg
         className="theme-icon"
         data-theme-icon={choice}

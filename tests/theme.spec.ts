@@ -43,7 +43,7 @@ test('mobile themes have distinct 16px glyphs and a 44px tap target without grow
   const glyphs = new Set<string>();
   for (const choice of ['auto', 'light', 'dark']) {
     await expect(toggle).toHaveAccessibleName(`Theme: ${choice}`);
-    await expect(toggle.locator('.theme-label')).toBeHidden();
+    await expect(toggle.locator('.theme-label')).toHaveCount(0);
     await expect(toggle.locator('svg')).toHaveAttribute('data-theme-icon', choice);
     await toggle.scrollIntoViewIfNeeded();
     const metrics = await toggle.evaluate((button) => {
@@ -80,9 +80,24 @@ test('mobile themes have distinct 16px glyphs and a 44px tap target without grow
   await expect(toggle).toHaveAccessibleName('Theme: auto');
 });
 
-test('desktop theme controls retain text labels', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 1000 });
+test('desktop theme controls are icon-only with a 44px hit area in every state', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
-  await expect(page.locator('.theme-label')).toBeVisible();
-  await expect(page.locator('.theme-icon')).toBeHidden();
+  const toggle = page.locator('.theme-toggle');
+  await toggle.scrollIntoViewIfNeeded();
+  for (const state of ['auto', 'light', 'dark']) {
+    await expect(toggle).toHaveAccessibleName(`Theme: ${state}`);
+    await expect(toggle).toHaveText('');
+    await expect(toggle.locator('svg')).toBeVisible();
+    await expect(toggle.locator('svg')).toHaveAttribute('data-theme-icon', state);
+    const hit = await toggle.evaluate((button) => {
+      const style = getComputedStyle(button, '::before');
+      return { width: style.width, height: style.height };
+    });
+    expect(hit).toEqual({ width: '44px', height: '44px' });
+    await toggle.click();
+  }
+  await expect(toggle).toHaveAccessibleName('Theme: auto');
 });

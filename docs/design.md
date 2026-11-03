@@ -8,7 +8,7 @@ The `geist` package supplies the faces. Body copy and headings are Geist Sans: 1
 
 ## Color
 
-Light and dark tokens live in `app/globals.css`. Text and muted text both clear WCAG AA on the page background. `auto` follows the system. The choice is stored in `localStorage` under `theme`. An inline script in `head` sets `data-theme` before paint.
+Light and dark tokens live in `app/globals.css`. Text and muted text both clear WCAG AA on the page background. `auto` follows the system. The theme switch is a 16px state-specific icon at every width with a 44×44 hit area. The choice is stored in `localStorage` under `theme`. An inline script in `head` sets `data-theme` before paint.
 
 ## Cat
 

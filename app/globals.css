@@ -880,36 +880,30 @@ html[data-cat='asleep'] .cat-z {
   }
 }
 
+.theme-toggle {
+  position: relative;
+}
+
+.theme-toggle::before {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  top: 50%;
+  right: -2px;
+  transform: translateY(-50%);
+}
+
 .theme-icon {
-  display: none;
+  display: inline-block;
+  vertical-align: -2px;
 }
 
 @media (max-width: 40rem) {
-  .footer {
-    gap: 4px;
-  }
+  .footer,
   .footer-clock,
   .footer-actions {
     gap: 4px;
-  }
-  .theme-toggle {
-    position: relative;
-  }
-  .theme-toggle::before {
-    content: '';
-    position: absolute;
-    width: 44px;
-    height: 44px;
-    top: 50%;
-    right: -2px;
-    transform: translateY(-50%);
-  }
-  .theme-label {
-    display: none;
-  }
-  .theme-icon {
-    display: inline-block;
-    vertical-align: -2px;
   }
 }
 
