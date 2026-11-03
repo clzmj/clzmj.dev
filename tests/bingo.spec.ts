@@ -35,7 +35,7 @@ for (const width of [393, 820, 1440]) {
     expect(metrics.anchor.height).toBeCloseTo(44, 3);
     expect(metrics.header.height).toBeCloseTo(44, 3);
     expect(metrics.anchor.x).toBeCloseTo(metrics.header.x, 0);
-    expect(metrics.nameX).toBeCloseTo(metrics.anchor.right + 12, 0);
+    expect(metrics.nameX).toBeCloseTo(metrics.anchor.right + 16, 0);
     expect(metrics.frame.width).toBe(96);
     expect(metrics.frame.height).toBeCloseTo(96, 3);
     expect(metrics.frame.x + 48).toBeCloseTo(metrics.anchor.x + 22, 0);

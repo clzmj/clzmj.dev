@@ -203,15 +203,9 @@ body {
 .identity {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 24px;
   min-width: 0;
-}
-
-@media (width < 640px) {
-  .identity {
-    margin-bottom: 32px;
-  }
 }
 
 .identity > div {
