@@ -1,5 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    Math.random = () => 0.999999;
+  });
+});
+
 test.use({ viewport: { width: 393, height: 852 }, hasTouch: true, isMobile: true });
 
 async function snapshot(page: Page) {

@@ -3,6 +3,7 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 import type { Slide } from '../lib/content';
+import { orderedPhotos, shuffleScript } from '../lib/elsewhere-shuffle';
 
 export function PhotoFan({ photos }: { photos: Slide[] }) {
   const [open, setOpen] = useState<{ index: number; source: HTMLButtonElement } | null>(null);
@@ -10,10 +11,14 @@ export function PhotoFan({ photos }: { photos: Slide[] }) {
   const rows = Array.from({ length: Math.ceil(photos.length / 7) }, (_, index) =>
     photos.slice(index * 7, index * 7 + 7),
   );
-  const photo = open === null ? null : photos[open.index];
+  const photo = open === null ? null : orderedPhotos(photos)[open.index];
   const closeDialog = useCallback(() => setOpen(null), []);
   return (
     <>
+      <script
+        id="elsewhere-shuffle"
+        dangerouslySetInnerHTML={{ __html: shuffleScript(photos.map((photo) => photo.id)) }}
+      />
       <div className="photo-eventail">
         {rows.map((row, rowIndex) => (
           <div className="photo-fan-row" key={row[0].src}>
@@ -27,6 +32,7 @@ export function PhotoFan({ photos }: { photos: Slide[] }) {
                     key={item.src}
                     type="button"
                     className="fan-card"
+                    data-photo-id={item.id}
                     style={{
                       left: `calc(50% + var(--u) * ${offset * 80 - 68})`,
                       ['--fan-y' as string]: `${arc}%`,
@@ -34,14 +40,19 @@ export function PhotoFan({ photos }: { photos: Slide[] }) {
                       ['--fan-i' as string]: String(column),
                     }}
                     aria-label={item.caption}
-                    aria-expanded={open?.index === index}
+                    aria-expanded={photo?.id === item.id}
                     onPointerEnter={() => setActive(index)}
                     onPointerLeave={(event) => {
                       if (document.activeElement !== event.currentTarget) setActive(null);
                     }}
                     onFocus={() => setActive(index)}
                     onBlur={() => setActive(null)}
-                    onClick={(event) => setOpen({ index, source: event.currentTarget })}
+                    onClick={(event) =>
+                      setOpen({
+                        index: orderedPhotos(photos).findIndex((photo) => photo.id === item.id),
+                        source: event.currentTarget,
+                      })
+                    }
                   >
                     <PhotoImage photo={item} />
                   </button>
@@ -49,7 +60,10 @@ export function PhotoFan({ photos }: { photos: Slide[] }) {
               })}
             </div>
             <p className="fan-caption" data-slot="fan-caption">
-              {active !== null && Math.floor(active / 7) === rowIndex
+              {active !== null &&
+              Math.floor(
+                orderedPhotos(photos).findIndex((photo) => photo.id === photos[active].id) / 7,
+              ) === rowIndex
                 ? photos[active].caption
                 : '\u00a0'}
             </p>
@@ -260,7 +274,7 @@ function PhotoImage({ photo, full = false }: { photo: Slide; full?: boolean }) {
         alt={photo.caption}
         width={photo.width}
         height={photo.height}
-        loading={full ? 'eager' : 'lazy'}
+        loading="lazy"
         decoding="async"
         style={{ objectPosition: photo.objectPosition }}
         onLoad={() => setLoaded(true)}

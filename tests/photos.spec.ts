@@ -2,6 +2,12 @@ import { expect, test } from '@playwright/test';
 
 import photos from '../lib/elsewhere.json';
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    Math.random = () => 0.999999;
+  });
+});
+
 test('a fan photo opens by itself', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: photos[0].caption, exact: true }).click();
