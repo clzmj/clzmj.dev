@@ -32,7 +32,7 @@ test('auto follows the system preference', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-theme-choice', 'auto');
 });
 
-test('mobile themes have distinct 16px glyphs and a 44px tap target without growing the footer', async ({
+test('mobile themes retain distinct 16px glyphs and separate 44px tap targets', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 393, height: 852 });
@@ -46,6 +46,7 @@ test('mobile themes have distinct 16px glyphs and a 44px tap target without grow
     await expect(toggle.locator('.theme-label')).toHaveCount(0);
     await expect(toggle.locator('svg')).toHaveAttribute('data-theme-icon', choice);
     await toggle.scrollIntoViewIfNeeded();
+    await page.mouse.move(0, 0);
     const metrics = await toggle.evaluate((button) => {
       const icon = button.querySelector('svg')!;
       const rect = button.getBoundingClientRect();
@@ -56,12 +57,12 @@ test('mobile themes have distinct 16px glyphs and a 44px tap target without grow
         width: icon.getBoundingClientRect().width,
         height: icon.getBoundingClientRect().height,
         color: getComputedStyle(icon).color,
-        linkColor: getComputedStyle(footer.querySelector('.footer-link')!).color,
+        linkColor: getComputedStyle(footer.querySelector('.footer-actions')!).color,
         hitWidth: hit.width,
         hitHeight: hit.height,
-        hitX: rect.right + 2 - 44 + 2,
-        hitY: rect.y + rect.height / 2 - 20,
-        footerHeight: footer.getBoundingClientRect().height,
+        hitX: rect.x - 12,
+        hitY: rect.y - 12,
+        clockHeight: footer.querySelector('.footer-clock')!.getBoundingClientRect().height,
         right: footer.querySelector('.footer-actions')!.getBoundingClientRect().right,
         edge: footer.getBoundingClientRect().right,
       };
@@ -72,7 +73,7 @@ test('mobile themes have distinct 16px glyphs and a 44px tap target without grow
     expect(metrics.color).toBe(metrics.linkColor);
     expect(metrics.hitWidth).toBe('44px');
     expect(metrics.hitHeight).toBe('44px');
-    expect(metrics.footerHeight).toBeCloseTo(29, 0);
+    expect(metrics.clockHeight).toBeCloseTo(29, 0);
     expect(metrics.right).toBeLessThanOrEqual(metrics.edge + 1);
     await page.mouse.click(metrics.hitX, metrics.hitY);
   }

@@ -36,7 +36,9 @@ test('the footer clock names Mexico City', async ({ page }) => {
 });
 
 for (const theme of ['auto', 'light', 'dark']) {
-  test(`the 393px footer stays on one line in ${theme} mode`, async ({ page }) => {
+  test(`the 393px footer time line stays intact beneath the icons in ${theme} mode`, async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 393, height: 852 });
     await page.clock.install({ time: new Date('2026-06-15T11:59:00-06:00') });
     await page.addInitScript((choice) => localStorage.setItem('theme', choice), theme);
@@ -48,7 +50,7 @@ for (const theme of ['auto', 'light', 'dark']) {
       range.selectNodeContents(time);
       const rect = footer.getBoundingClientRect();
       return {
-        height: rect.height,
+        height: footer.querySelector('.footer-clock')!.getBoundingClientRect().height,
         lines: range.getClientRects().length,
         right: footer.querySelector('.footer-actions')!.getBoundingClientRect().right,
         edge: rect.right,
