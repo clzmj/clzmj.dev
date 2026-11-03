@@ -6,6 +6,11 @@ import type { ReactNode } from 'react';
 
 import { site } from '../lib/site';
 import { initScript } from '../lib/time';
+import appleTouchIcon from './apple-touch-icon.png';
+import icon16 from './icon-16.png';
+import icon32 from './icon-32.png';
+import icon192 from './icon-192.png';
+import icon512 from './icon-512.png';
 
 import './globals.css';
 
@@ -19,6 +24,15 @@ export const metadata: Metadata = {
   applicationName: site.name,
   authors: [{ name: site.name, url: site.url }],
   creator: site.name,
+  icons: {
+    icon: [
+      { url: icon16.src, sizes: '16x16', type: 'image/png' },
+      { url: icon32.src, sizes: '32x32', type: 'image/png' },
+      { url: icon192.src, sizes: '192x192', type: 'image/png' },
+      { url: icon512.src, sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: appleTouchIcon.src, sizes: '180x180', type: 'image/png' }],
+  },
   openGraph: {
     type: 'website',
     locale: site.locale,

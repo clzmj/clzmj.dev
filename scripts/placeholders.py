@@ -42,15 +42,3 @@ def avatar(x, y):
 
 
 write_png(ROOT / "public" / "avatar.png", 256, 256, avatar)
-
-
-def icon(size, x, y):
-    color = (244, 241, 232)
-    if size * 0.28 < x < size * 0.48 and size * 0.22 < y < size * 0.78:
-        if not (size * 0.36 < x < size * 0.48 and size * 0.34 < y < size * 0.66):
-            color = (28, 28, 26)
-    return color
-
-
-write_png(ROOT / "app" / "icon.png", 32, 32, lambda x, y: icon(32, x, y))
-write_png(ROOT / "app" / "apple-icon.png", 180, 180, lambda x, y: icon(180, x, y))

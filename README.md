@@ -56,4 +56,6 @@ bun run shots
 
 `bun run test` expects `out/` from `bun run build`. `bun run shots` writes light and dark home-page screenshots to the gitignored `shots/` directory.
 
+Ted’s supplied Bingo favicon set is stored unchanged in `app/` and linked through Next metadata. `icon.png` and `apple-icon.png` are byte-identical aliases for the supplied 32px and 180px files.
+
 Type, color, and Bingo are described in `docs/design.md`.
