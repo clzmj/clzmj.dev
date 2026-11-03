@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-clzmj.dev is a static Next.js export. Bun builds it, `output: 'export'` writes `out/`, and the site renders a GitHub contributions graph at build time. The zone already has mail DNS, a Google site-verification TXT record, and a proxied `www` address. The apex does not resolve yet.
+clzmj.dev is a static Next.js export. Bun builds it, `output: 'export'` writes `out/`, and the site renders a GitHub contributions graph at build time. The zone already has Google Workspace mail and domain-verification DNS records, plus a proxied `www` address. The apex does not resolve yet.
 
 The Cloudflare API token used from CI is limited to this zone and to Workers. It cannot manage the zone resource or account-level zone settings. The account is a personal account, and the monthly cost has to stay at zero.
 
@@ -18,7 +18,7 @@ The site pull request adds the only Worker config: root `wrangler.jsonc`, Worker
 
 Terraform owns the edge around that Worker:
 
-- DNS records that already exist, adopted with `import` blocks
+- the existing proxied `www` DNS record, adopted with an `import` block
 - the existing dynamic redirect ruleset
 - Always Use HTTPS, minimum TLS 1.2, and HSTS
 - the Workers custom domain from `clzmj.dev` to `clzmj-dev`
@@ -49,7 +49,7 @@ Build steps never receive the Cloudflare or R2 secrets. Pull requests do not dep
 
 Public requests to `http://www.clzmj.dev` and `https://www.clzmj.dev` return a single 301 to `https://clzmj.dev`, keeping the path, the trailing slash, and the query string. The imported ruleset matches the live rule: name `default`, host equals `www.clzmj.dev`, dynamic target `concat("https://clzmj.dev", http.request.uri.path)`, status 301, preserve the query string, description `Redirect www to clzmj.dev`.
 
-The Google DKIM TXT value is longer than a single DNS string. Cloudflare stores it quoted, including the split between the two character-strings. The record is hardcoded with that quoted content, TTL 60, and its existing comment. TXT records for site verification, SPF, and DMARC use the same quoted form.
+Google Workspace mail and verification records stay in the Cloudflare zone unmanaged by Terraform on purpose. Google issued these records; never change them.
 
 ### Zone hardening that stays free
 
