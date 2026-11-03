@@ -41,7 +41,7 @@ for (const theme of ['auto', 'light', 'dark']) {
     await page.clock.install({ time: new Date('2026-06-15T11:59:00-06:00') });
     await page.addInitScript((choice) => localStorage.setItem('theme', choice), theme);
     await page.goto('/');
-    await expect(page.locator('.footer-time')).toContainText('11:59am');
+    await expect(page.locator('.footer-time')).toContainText('11:59');
     const metrics = await page.locator('.footer').evaluate((footer) => {
       const time = footer.querySelector('.footer-time')!;
       const range = document.createRange();
@@ -69,3 +69,12 @@ test('inline avatars keep every bio line at 26px', async ({ page }) => {
     .evaluateAll((paragraphs) => paragraphs.map((p) => p.getBoundingClientRect().height));
   for (const height of heights) expect(height % 26).toBe(0);
 });
+
+for (const time of ['00:00', '09:05', '22:12']) {
+  test(`the footer displays ${time} in 24-hour time`, async ({ page }) => {
+    await page.clock.install({ time: new Date(`2026-06-15T${time}:00-06:00`) });
+    await page.goto('/');
+    await expect(page.locator('.footer-time')).toHaveText(`${time} in Mexico City, Mexico`);
+    await expect(page.locator('.footer-time')).not.toContainText(/am|pm/i);
+  });
+}

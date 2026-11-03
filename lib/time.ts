@@ -17,18 +17,13 @@ export function catState(date: Date): CatState {
 }
 
 export function formatClock(date: Date): string {
-  const parts = new Intl.DateTimeFormat('en-US', {
+  const time = new Intl.DateTimeFormat('en-GB', {
     timeZone: site.timezone,
-    hour: 'numeric',
+    hour: '2-digit',
     minute: '2-digit',
-    hour12: true,
-  }).formatToParts(date);
-  const hour = parts.find((part) => part.type === 'hour')?.value ?? '';
-  const minute = parts.find((part) => part.type === 'minute')?.value ?? '00';
-  const period = (parts.find((part) => part.type === 'dayPeriod')?.value ?? 'am')
-    .toLowerCase()
-    .replace(/\./g, '');
-  return `${hour}:${minute}${period} in Mexico City, Mexico`;
+    hourCycle: 'h23',
+  }).format(date);
+  return `${time} in Mexico City, Mexico`;
 }
 
 export function initScript(): string {
