@@ -716,16 +716,15 @@ body {
 }
 
 .bingo-slot {
-  position: relative;
   display: inline-block;
-  width: 44px;
-  height: 44px;
-  flex: none;
+  width: 54px;
+  height: 81px;
+  flex-shrink: 0;
   padding: 0;
   margin: 0;
   border: 0;
   border-radius: 0;
-  overflow: visible;
+  overflow: hidden;
   background: transparent;
   cursor: pointer;
 }
@@ -736,18 +735,14 @@ body {
 }
 
 .bingo {
-  position: absolute;
-  /* Frame 0 alpha bounds: left 6px, top 5px, bottom 31px at 3×. */
-  left: -18px;
-  top: -32px;
   display: block;
-  width: 96px;
-  height: 96px;
+  width: 54px;
+  height: 81px;
   background-image: url('/bingo.png');
   background-repeat: no-repeat;
   background-size: 384px 192px;
   image-rendering: pixelated;
-  background-position: 0 0;
+  background-position: -18px -13px;
   animation: bingo-idle 0.9s steps(1, end) infinite;
   pointer-events: none;
 }
@@ -763,61 +758,40 @@ html[data-theme='dark'] .bingo {
 }
 
 .bingo[data-state='running'] {
-  background-position-y: -96px;
   animation: bingo-run 0.6s steps(1, end);
 }
 
-/* Normalize each frame's alpha padding without changing or cropping its pixels.
-   Each step keeps the visible left at the content edge and its center at 22px. */
+/* The largest visible frame is 18×27 source pixels: 54×81 at 3×.
+   Background offsets remove alpha padding and center shorter frames inside it. */
 @keyframes bingo-idle {
-  0% {
-    background-position-x: 0;
-    left: -18px;
-    top: -32px;
+  0%,
+  100% {
+    background-position: -18px -13px;
   }
   25% {
-    background-position-x: -96px;
-    left: -24px;
-    top: -32px;
+    background-position: -120px -13px;
   }
   50% {
-    background-position-x: -192px;
-    left: -18px;
-    top: -32px;
+    background-position: -210px -13px;
   }
   75% {
-    background-position-x: -288px;
-    left: -24px;
-    top: -30px;
-  }
-  100% {
-    background-position-x: -384px;
-    left: -18px;
-    top: -32px;
+    background-position: -312px -12px;
   }
 }
 
 @keyframes bingo-run {
   0% {
-    background-position-x: 0;
-    left: -21px;
-    top: -32px;
+    background-position: -21px -109px;
   }
   25% {
-    background-position-x: -96px;
-    left: -21px;
-    top: -29px;
+    background-position: -117px -106px;
   }
   50% {
-    background-position-x: -192px;
-    left: -24px;
-    top: -32px;
+    background-position: -216px -109px;
   }
   75%,
   100% {
-    background-position-x: -288px;
-    left: -21px;
-    top: -33px;
+    background-position: -309px -111px;
   }
 }
 
@@ -866,7 +840,7 @@ html[data-theme='dark'] .bingo {
   .bingo,
   .bingo[data-state='running'] {
     animation: none;
-    background-position: 0 0;
+    background-position: -18px -13px;
   }
 }
 

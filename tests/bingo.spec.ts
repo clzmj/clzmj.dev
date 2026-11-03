@@ -4,7 +4,7 @@ const name = "Bingo, Carlos's border collie";
 
 for (const width of [393, 820, 1440]) {
   for (const theme of ['light', 'dark']) {
-    test(`Bingo's visible pixels align with the name block at ${width}px in ${theme}`, async ({
+    test(`Bingo's visible pixels stay contained and clear the paragraph at ${width}px in ${theme}`, async ({
       page,
     }) => {
       await page.setViewportSize({ width, height: 1000 });
@@ -21,7 +21,14 @@ for (const width of [393, 820, 1440]) {
         const identity = slot.closest('.identity')!;
         const identityStyle = getComputedStyle(identity);
         return {
-          frameWidth: element.getBoundingClientRect().width,
+          frame: element.getBoundingClientRect().toJSON(),
+          shrink: slotStyle.flexShrink,
+          margins: [
+            slotStyle.marginTop,
+            slotStyle.marginRight,
+            slotStyle.marginBottom,
+            slotStyle.marginLeft,
+          ],
           anchor: anchor.toJSON(),
           nameX: identity.querySelector('.site-name')!.getBoundingClientRect().x,
           margin: identityStyle.marginBottom,
@@ -33,17 +40,23 @@ for (const width of [393, 820, 1440]) {
           overflow: slotStyle.overflow,
         };
       });
-      expect(metrics.anchor.width).toBe(44);
-      expect(metrics.anchor.height).toBeCloseTo(44, 3);
+      expect(metrics.anchor.width).toBe(54);
+      expect(metrics.anchor.height).toBeCloseTo(81, 3);
       expect(metrics.nameX).toBeCloseTo(metrics.anchor.right + 16, 0);
       expect(metrics.margin).toBe('32px');
       expect(metrics.gap).toBe('16px');
-      expect(metrics.frameWidth).toBe(96);
+      expect(metrics.frame.width).toBe(54);
+      expect(metrics.frame.height).toBeCloseTo(81, 3);
+      expect(metrics.frame.left).toBeCloseTo(metrics.anchor.left, 3);
+      expect(metrics.frame.top).toBeCloseTo(metrics.anchor.top, 3);
+      expect(metrics.shrink).toBe('0');
+      expect(metrics.margins).toEqual(['0px', '0px', '0px', '0px']);
       expect(metrics.background).toBe('384px 192px');
       expect(metrics.rendering).toBe('pixelated');
       expect(metrics.radius).toBe('0px');
       expect(metrics.border).toBe('0px');
-      expect(metrics.overflow).toBe('visible');
+      expect(metrics.overflow).toBe('hidden');
+      const measurements = [];
       for (const state of ['idle', 'running']) {
         if (state === 'running') await page.getByRole('button', { name, exact: true }).focus();
         await expect(bingo).toHaveAttribute('data-state', state);
@@ -65,12 +78,14 @@ for (const width of [393, 820, 1440]) {
             const pixels = context.getImageData(0, 0, 32, 32).data;
             let left = 32,
               top = 32,
+              right = 0,
               bottom = 0;
             for (let y = 0; y < 32; y += 1) {
               for (let x = 0; x < 32; x += 1) {
                 if (pixels[(y * 32 + x) * 4 + 3] > 0) {
                   left = Math.min(left, x);
                   top = Math.min(top, y);
+                  right = Math.max(right, x + 1);
                   bottom = Math.max(bottom, y + 1);
                 }
               }
@@ -79,11 +94,29 @@ for (const width of [393, 820, 1440]) {
             const identity = element.closest('.identity')!;
             const nameBlock = identity.querySelector('div')!.getBoundingClientRect();
             const contentLeft = identity.getBoundingClientRect().left;
-            const scale = frame.width / 32;
+            const style = getComputedStyle(element);
+            const scale = Number.parseFloat(style.backgroundSize) / image.naturalWidth;
+            const offsetX = Number.parseFloat(style.backgroundPositionX);
+            const offsetY = Number.parseFloat(style.backgroundPositionY);
+            const visible = {
+              left: frame.left + offsetX + (column * 32 + left) * scale,
+              right: frame.left + offsetX + (column * 32 + right) * scale,
+              top: frame.top + offsetY + (row * 32 + top) * scale,
+              bottom: frame.top + offsetY + (row * 32 + bottom) * scale,
+            };
             return {
-              leftError: Math.abs(frame.left + left * scale - contentLeft),
+              column,
+              containment: {
+                left: visible.left - frame.left,
+                right: frame.right - visible.right,
+                top: visible.top - frame.top,
+                bottom: frame.bottom - visible.bottom,
+              },
+              paragraphGap:
+                identity.nextElementSibling!.getBoundingClientRect().top - visible.bottom,
+              leftError: Math.abs(visible.left - contentLeft),
               centerError: Math.abs(
-                frame.top + ((top + bottom) * scale) / 2 - (nameBlock.top + nameBlock.height / 2),
+                (visible.top + visible.bottom) / 2 - (nameBlock.top + nameBlock.height / 2),
               ),
               scale,
             };
@@ -93,8 +126,16 @@ for (const width of [393, 820, 1440]) {
           expect(frame.scale).toBe(3);
           expect(frame.leftError).toBeLessThanOrEqual(0.1);
           expect(frame.centerError).toBeLessThanOrEqual(2);
+          for (const distance of Object.values(frame.containment))
+            expect(distance).toBeGreaterThanOrEqual(-0.01);
+          expect(frame.paragraphGap).toBeGreaterThanOrEqual(32);
         }
+        measurements.push({ state, frames });
       }
+      await test.info().attach('bingo-geometry', {
+        body: JSON.stringify({ width, theme, measurements }),
+        contentType: 'application/json',
+      });
       await expect(page.locator('footer .bingo, footer .bingo-slot')).toHaveCount(0);
     });
   }
@@ -116,7 +157,7 @@ for (const theme of ['light', 'dark']) {
         return Number.parseFloat(getComputedStyle(element).backgroundPositionX);
       });
     });
-    expect(frames).toEqual([0, -96, -192, -288]);
+    expect(frames).toEqual([-18, -120, -210, -312]);
   });
 }
 
@@ -132,7 +173,7 @@ for (const interaction of ['hover', 'focus']) {
       const style = getComputedStyle(element);
       return { row: style.backgroundPositionY, count: style.animationIterationCount };
     });
-    expect(run).toEqual({ row: '-96px', count: '1' });
+    expect(run).toEqual({ row: '-109px', count: '1' });
     await bingo.evaluate((element) => element.getAnimations()[0].finish());
     await expect(bingo).toHaveAttribute('data-state', 'idle');
     expect(await bingo.evaluate((element) => getComputedStyle(element).animationName)).toBe(
@@ -171,7 +212,7 @@ test('reduced motion holds static frame zero through every interaction', async (
         animations: element.getAnimations().length,
       };
     });
-    expect(frame).toEqual({ x: 0, y: 0, animations: 0 });
+    expect(frame).toEqual({ x: -18, y: -13, animations: 0 });
     await expect(bingo).toHaveAttribute('data-state', 'idle');
   }
 });
