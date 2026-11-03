@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+
 import { shotPages, viewports } from './viewports';
 
 for (const shotPage of shotPages) {

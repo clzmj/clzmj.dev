@@ -1,7 +1,7 @@
 ---
 title: Markdown demo
 description: A temporary post that shows every feature the writing renderer supports.
-date: "2026-11-01"
+date: '2026-11-01'
 demo: true
 ---
 
@@ -40,10 +40,10 @@ Inline `code` sits in a sentence, next to plain words.
 
 ```ts
 export function mexicoCityHour(date: Date): number {
-  const hour = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "America/Mexico_City",
-    hour: "2-digit",
-    hourCycle: "h23",
+  const hour = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'America/Mexico_City',
+    hour: '2-digit',
+    hourCycle: 'h23',
   }).format(date);
   return Number(hour);
 }
@@ -55,11 +55,11 @@ export function mexicoCityHour(date: Date): number {
 
 ## A table
 
-| Piece | Face | Use |
-| --- | --- | --- |
-| Name | Geist Serif | Display |
-| Body | Geist Sans | Reading |
-| Clock | Geist Mono | Data |
+| Piece | Face        | Use     |
+| ----- | ----------- | ------- |
+| Name  | Geist Serif | Display |
+| Body  | Geist Sans  | Reading |
+| Clock | Geist Mono  | Data    |
 
 ## A footnote
 
@@ -78,7 +78,12 @@ The inline form is $a^2 + b^2 = c^2$.
 ## A figure
 
 <figure>
-  <img src="/writings/demo-still.png" alt="Abstract still life with a cup, a book, and a window" width="1200" height="750" />
+  <img
+    src="/writings/demo-still.png"
+    alt="Abstract still life with a cup, a book, and a window"
+    width="1200"
+    height="750"
+  />
   <figcaption>A caption under the figure.</figcaption>
 </figure>
 
@@ -94,5 +99,5 @@ flowchart LR
 ## A callout
 
 <Callout>
-This callout is part of the demo. It uses the theme text color and stays readable in both themes.
+  This callout is part of the demo. It uses the theme text color and stays readable in both themes.
 </Callout>

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+
 import { formatClock } from '../lib/time';
 import { Cat } from './cat';
 import { Clock } from './clock';

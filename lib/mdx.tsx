@@ -5,6 +5,7 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+
 import { Callout } from '../components/callout';
 import { injectDiagrams } from './diagrams';
 

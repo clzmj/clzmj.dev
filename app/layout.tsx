@@ -3,8 +3,10 @@ import { GeistSans } from 'geist/font/sans';
 import { GeistSerif } from 'geist/font/serif/variable';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
+
 import { site } from '../lib/site';
 import { catState, initScript } from '../lib/time';
+
 import './globals.css';
 
 export const metadata: Metadata = {

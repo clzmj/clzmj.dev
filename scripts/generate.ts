@@ -1,6 +1,8 @@
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+
 import { chromium, type Page } from 'playwright';
+
 import { loadEvents, loadWritings, visibleWritings } from '../lib/content';
 import { parseContributions } from '../lib/contributions';
 import { diagramBlocks } from '../lib/diagrams';

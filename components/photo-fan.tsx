@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+
 import type { Slide } from '../lib/content';
 
 export function PhotoFan({ photos }: { photos: Slide[] }) {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+
 import type { ContributionDay, Contributions } from '../lib/contributions';
 import { site } from '../lib/site';
 

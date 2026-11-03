@@ -1,6 +1,7 @@
 'use client';
 
 import { useLayoutEffect } from 'react';
+
 import { catState } from '../lib/time';
 
 function applyCatState() {

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+
 import { canonical, pageRoutes } from '../lib/routes';
 
 export const dynamic = 'force-static';

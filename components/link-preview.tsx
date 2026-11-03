@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+
 import type { ProfileLink } from '../lib/profile';
 
 export function LinkPreview({ link }: { link: ProfileLink }) {

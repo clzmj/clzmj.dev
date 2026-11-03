@@ -1,7 +1,9 @@
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { join, relative } from 'node:path';
+
 import { expect, test } from '@playwright/test';
+
 import { bunExecutable } from '../lib/runtime';
 import { staticParams } from '../lib/static-params';
 

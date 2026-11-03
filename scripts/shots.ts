@@ -1,6 +1,8 @@
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
+
 import { chromium } from 'playwright';
+
 import { bunExecutable } from '../lib/runtime';
 import { shotPages, viewports } from '../tests/viewports';
 

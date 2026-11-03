@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+
 import { RowList } from '../../components/row-list';
 import { DateChip, ItemRow } from '../../components/rows';
 import { Shell } from '../../components/shell';

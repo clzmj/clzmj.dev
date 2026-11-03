@@ -6,8 +6,8 @@ Each event is one Markdown file in `content/events/`. The filename becomes the s
 
 ```yaml
 title: Example evening
-start: "2026-12-04T19:00:00"
-end: "2026-12-04T21:00:00"
+start: '2026-12-04T19:00:00'
+end: '2026-12-04T21:00:00'
 timezone: America/Mexico_City
 location: Mexico City
 url: https://clzmj.dev/events/example-evening

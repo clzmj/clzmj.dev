@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+
 import { Bio, roleLine } from '../components/bio';
 import { ContributionGraph } from '../components/contribution-graph';
 import { JsonLd } from '../components/json-ld';

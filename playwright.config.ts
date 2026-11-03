@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+
 import { bunExecutable } from './lib/runtime';
 
 export default defineConfig({

@@ -1,10 +1,10 @@
-@import "tailwindcss";
-@import "katex/dist/katex.min.css";
+@import 'tailwindcss';
+@import 'katex/dist/katex.min.css';
 
 @theme inline {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-serif: var(--font-geist-serif), "Times New Roman", serif;
+  --font-serif: var(--font-geist-serif), 'Times New Roman', serif;
   --color-bg: var(--bg);
   --color-text: var(--text);
   --color-muted: var(--muted);
@@ -46,7 +46,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-theme='light']) {
     color-scheme: dark;
     --bg: #0f0f0f;
     --gray-200: #1c1c1c;
@@ -73,7 +73,7 @@
   }
 }
 
-html[data-theme="dark"] {
+html[data-theme='dark'] {
   color-scheme: dark;
   --bg: #0f0f0f;
   --gray-200: #1c1c1c;
@@ -100,7 +100,7 @@ html[data-theme="dark"] {
   --contrib-4: #39d353;
 }
 
-html[data-theme="light"] {
+html[data-theme='light'] {
   color-scheme: light;
   --bg: #fcfcfc;
   --gray-200: #f6f6f6;
@@ -997,29 +997,29 @@ body {
   display: block;
   width: 32px;
   height: 32px;
-  background-image: url("/cat.png");
+  background-image: url('/cat.png');
   background-repeat: no-repeat;
   background-size: 128px 64px;
   image-rendering: pixelated;
   background-position: 0 0;
 }
 
-html[data-theme="dark"] .cat {
-  background-image: url("/cat-dark.png");
+html[data-theme='dark'] .cat {
+  background-image: url('/cat-dark.png');
 }
 
 @media (prefers-color-scheme: dark) {
-  html:not([data-theme="light"]) .cat {
-    background-image: url("/cat-dark.png");
+  html:not([data-theme='light']) .cat {
+    background-image: url('/cat-dark.png');
   }
 }
 
-html[data-cat="awake"] .cat {
+html[data-cat='awake'] .cat {
   background-position-y: 0;
   animation: cat-frames 0.9s steps(4, end) infinite;
 }
 
-html[data-cat="asleep"] .cat {
+html[data-cat='asleep'] .cat {
   background-position-y: -32px;
   animation: cat-frames 1.8s steps(4, end) infinite;
 }
@@ -1060,7 +1060,7 @@ html[data-cat="asleep"] .cat {
   bottom: 38px;
 }
 
-html[data-cat="asleep"] .cat-z {
+html[data-cat='asleep'] .cat-z {
   animation: cat-z 3.2s ease-out infinite;
   animation-delay: calc(var(--rang) * 1.05s);
 }
@@ -1185,7 +1185,7 @@ h3:hover .heading-anchor,
   padding-left: 16px;
   border-left: 2px solid var(--gray-600);
   color: var(--gray-1200);
-  font-family: var(--font-geist-serif), "Times New Roman", serif;
+  font-family: var(--font-geist-serif), 'Times New Roman', serif;
   font-size: 16px;
   line-height: 1.625;
 }
@@ -1220,14 +1220,14 @@ h3:hover .heading-anchor,
   background: transparent;
 }
 
-html[data-theme="dark"] .prose pre code,
-html[data-theme="dark"] .prose pre code span {
+html[data-theme='dark'] .prose pre code,
+html[data-theme='dark'] .prose pre code span {
   color: var(--shiki-dark);
 }
 
 @media (prefers-color-scheme: dark) {
-  html:not([data-theme="light"]) .prose pre code,
-  html:not([data-theme="light"]) .prose pre code span {
+  html:not([data-theme='light']) .prose pre code,
+  html:not([data-theme='light']) .prose pre code span {
     color: var(--shiki-dark);
   }
 }
@@ -1336,13 +1336,13 @@ html[data-theme="dark"] .prose pre code span {
     transform: translateY(var(--fan-y)) rotate(var(--fan-r));
   }
 
-  html[data-cat="awake"] .cat,
-  html[data-cat="asleep"] .cat {
+  html[data-cat='awake'] .cat,
+  html[data-cat='asleep'] .cat {
     animation: none;
     background-position-x: 0;
   }
 
-  html[data-cat="asleep"] .cat-z {
+  html[data-cat='asleep'] .cat-z {
     animation: none;
     opacity: 1;
     transform: none;

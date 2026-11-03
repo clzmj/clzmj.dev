@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+
 import { JsonLd } from '../../../components/json-ld';
 import { Shell } from '../../../components/shell';
 import { loadEvents } from '../../../lib/content';
