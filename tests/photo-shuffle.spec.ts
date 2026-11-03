@@ -21,7 +21,7 @@ async function visualOrder(page: Page) {
   });
 }
 
-test('inline Fisher–Yates changes visual positions, not React DOM, and taps keep the matching photo', async ({
+test('the inline permutation hands off to React DOM order without hydration warnings', async ({
   page,
 }) => {
   const warnings: string[] = [];
@@ -39,7 +39,7 @@ test('inline Fisher–Yates changes visual positions, not React DOM, and taps ke
     await page
       .locator('.fan-card')
       .evaluateAll((cards) => cards.map((card) => card.getAttribute('data-photo-id'))),
-  ).toEqual(photos.map((photo) => photo.id));
+  ).toEqual(expected);
   for (const photo of photos) {
     const card = page.locator(`.fan-card[data-photo-id="${photo.id}"]`);
     await expect(card).toHaveAccessibleName(photo.caption);
@@ -49,6 +49,7 @@ test('inline Fisher–Yates changes visual positions, not React DOM, and taps ke
     ).toBe(photo.objectPosition);
     await expect(card.locator('img')).toHaveAttribute('loading', 'lazy');
   }
+  await expect(page.locator('#elsewhere-shuffle-style')).toHaveCount(0);
   const tapped = photos[1];
   await page.locator(`.fan-card[data-photo-id="${tapped.id}"]`).click();
   await expect(page.getByRole('dialog')).toHaveAccessibleName(tapped.caption);
@@ -84,4 +85,41 @@ test('without JavaScript the fan keeps its manifest order', async ({ browser }) 
   } finally {
     await page.close();
   }
+});
+
+test('Tab order matches visual order and viewer next/previous follows that sequence', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Math.random = () => 0;
+  });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await expect(page.locator('#elsewhere-shuffle-style')).toHaveCount(0);
+  const expected = [...photos.slice(1), photos[0]];
+  expect(await visualOrder(page)).toEqual(expected.map((p) => p.id));
+  const cards = page.locator('.fan-card');
+  await cards.first().focus();
+  for (const [i, photo] of expected.entries()) {
+    if (i) await page.keyboard.press('Tab');
+    await expect(cards.nth(i)).toBeFocused();
+    await expect(cards.nth(i)).toHaveAttribute('data-photo-id', photo.id);
+    await expect(cards.nth(i)).not.toHaveAttribute('tabindex');
+  }
+  await cards.first().focus();
+  await page.keyboard.press('Enter');
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toHaveAccessibleName(expected[0].caption);
+  await page.keyboard.press('ArrowRight');
+  await expect(dialog).toHaveAccessibleName(expected[1].caption);
+  await page.keyboard.press('ArrowLeft');
+  await expect(dialog).toHaveAccessibleName(expected[0].caption);
+  await dialog.getByRole('button', { name: 'Previous photo' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(dialog).toHaveAccessibleName(expected.at(-1)!.caption);
+  await dialog.getByRole('button', { name: 'Next photo' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(dialog).toHaveAccessibleName(expected[0].caption);
+  await page.keyboard.press('Escape');
+  await expect(cards.first()).toBeFocused();
 });

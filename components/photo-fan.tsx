@@ -1,18 +1,37 @@
 'use client';
 
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import type { Slide } from '../lib/content';
 import { orderedPhotos, shuffleScript } from '../lib/elsewhere-shuffle';
 
 export function PhotoFan({ photos }: { photos: Slide[] }) {
   const [open, setOpen] = useState<{ index: number; source: HTMLButtonElement } | null>(null);
-  const [active, setActive] = useState<number | null>(null);
-  const rows = Array.from({ length: Math.ceil(photos.length / 7) }, (_, index) =>
-    photos.slice(index * 7, index * 7 + 7),
+  const [active, setActive] = useState<string | null>(null);
+  const [displayed, setDisplayed] = useState(photos);
+  const [adopted, setAdopted] = useState(false);
+  useEffect(() => {
+    setDisplayed(orderedPhotos(photos));
+    setAdopted(true);
+  }, [photos]);
+  useLayoutEffect(() => {
+    if (adopted) document.getElementById('elsewhere-shuffle-style')?.remove();
+  }, [adopted]);
+  const rows = Array.from({ length: Math.ceil(displayed.length / 7) }, (_, index) =>
+    displayed.slice(index * 7, index * 7 + 7),
   );
   const photo = open === null ? null : orderedPhotos(photos)[open.index];
   const closeDialog = useCallback(() => setOpen(null), []);
+  const navigate = useCallback(
+    (direction: number) => {
+      setOpen((value) =>
+        value
+          ? { ...value, index: (value.index + direction + photos.length) % photos.length }
+          : value,
+      );
+    },
+    [photos.length],
+  );
   return (
     <>
       <script
@@ -24,7 +43,6 @@ export function PhotoFan({ photos }: { photos: Slide[] }) {
           <div className="photo-fan-row" key={row[0].src}>
             <div className="photo-piste">
               {row.map((item, column) => {
-                const index = rowIndex * 7 + column;
                 const offset = column - (row.length - 1) / 2;
                 const arc = ((0.6 * offset * offset) / 168) * 100;
                 return (
@@ -41,11 +59,11 @@ export function PhotoFan({ photos }: { photos: Slide[] }) {
                     }}
                     aria-label={item.caption}
                     aria-expanded={photo?.id === item.id}
-                    onPointerEnter={() => setActive(index)}
+                    onPointerEnter={() => setActive(item.id)}
                     onPointerLeave={(event) => {
                       if (document.activeElement !== event.currentTarget) setActive(null);
                     }}
-                    onFocus={() => setActive(index)}
+                    onFocus={() => setActive(item.id)}
                     onBlur={() => setActive(null)}
                     onClick={(event) =>
                       setOpen({
@@ -61,17 +79,21 @@ export function PhotoFan({ photos }: { photos: Slide[] }) {
             </div>
             <p className="fan-caption" data-slot="fan-caption">
               {active !== null &&
-              Math.floor(
-                orderedPhotos(photos).findIndex((photo) => photo.id === photos[active].id) / 7,
-              ) === rowIndex
-                ? photos[active].caption
+              Math.floor(orderedPhotos(photos).findIndex((photo) => photo.id === active) / 7) ===
+                rowIndex
+                ? photos.find((photo) => photo.id === active)!.caption
                 : '\u00a0'}
             </p>
           </div>
         ))}
       </div>
       {photo ? (
-        <PhotoDialog photo={photo} source={open?.source ?? null} onClose={closeDialog} />
+        <PhotoDialog
+          photo={photo}
+          source={open?.source ?? null}
+          onClose={closeDialog}
+          onNavigate={navigate}
+        />
       ) : null}
     </>
   );
@@ -81,10 +103,12 @@ function PhotoDialog({
   photo,
   source,
   onClose,
+  onNavigate,
 }: {
   photo: Slide;
   source: HTMLButtonElement | null;
   onClose: () => void;
+  onNavigate: (direction: number) => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const frameRef = useRef<HTMLElement>(null);
@@ -175,6 +199,12 @@ function PhotoDialog({
       );
     }
     closeRef.current = close;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        onNavigate(event.key === 'ArrowRight' ? 1 : -1);
+      }
+    };
     const onCancel = (event: Event) => {
       event.preventDefault();
       close();
@@ -206,6 +236,7 @@ function PhotoDialog({
     const onPointerCancel = () => {
       pointer = null;
     };
+    dialog.addEventListener('keydown', onKeyDown);
     dialog.addEventListener('cancel', onCancel);
     dialog.addEventListener('close', onNativeClose);
     dialog.addEventListener('click', onClick);
@@ -224,6 +255,7 @@ function PhotoDialog({
       });
     }
     return () => {
+      dialog.removeEventListener('keydown', onKeyDown);
       dialog.removeEventListener('cancel', onCancel);
       dialog.removeEventListener('close', onNativeClose);
       dialog.removeEventListener('click', onClick);
@@ -237,7 +269,7 @@ function PhotoDialog({
       if (dialog.open) dialog.close();
       restore();
     };
-  }, [source, onClose]);
+  }, [source, onClose, onNavigate]);
   return (
     <dialog ref={ref} className="photo-dialog" aria-label={photo.caption}>
       <button
@@ -248,8 +280,24 @@ function PhotoDialog({
       >
         Close photo
       </button>
+      <button
+        type="button"
+        className="sr-only"
+        aria-label="Previous photo"
+        onClick={() => onNavigate(-1)}
+      >
+        Previous photo
+      </button>
+      <button
+        type="button"
+        className="sr-only"
+        aria-label="Next photo"
+        onClick={() => onNavigate(1)}
+      >
+        Next photo
+      </button>
       <figure ref={frameRef} className="photo-frame">
-        <PhotoImage photo={photo} full />
+        <PhotoImage key={photo.id} photo={photo} full />
         <figcaption>{photo.caption}</figcaption>
       </figure>
     </dialog>

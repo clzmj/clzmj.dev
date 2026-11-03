@@ -15,8 +15,8 @@ test('a fan photo opens by itself', async ({ page }) => {
   await expect(dialog).toBeVisible();
   await expect(dialog.locator('img')).toHaveAttribute('alt', photos[0].caption);
   await expect(dialog.locator('figcaption')).toHaveText(photos[0].caption);
-  await expect(page.getByRole('button', { name: 'Previous photo' })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Next photo' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Previous photo' })).toHaveClass('sr-only');
+  await expect(page.getByRole('button', { name: 'Next photo' })).toHaveClass('sr-only');
   await expect(page.getByRole('button', { name: /photo \d/ })).toHaveCount(0);
   await dialog.getByRole('button', { name: 'Close photo' }).focus();
   await page.keyboard.press('Enter');
