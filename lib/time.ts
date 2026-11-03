@@ -50,10 +50,10 @@ export function formatLongDate(iso: string): string {
   }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
-export function formatMonthYear(iso: string): string {
+export function formatMonthYear(iso: string, monthStyle: 'long' | 'short' = 'long'): string {
   const [year, month] = iso.slice(0, 10).split('-').map(Number);
   return new Intl.DateTimeFormat('en-US', {
-    month: 'long',
+    month: monthStyle,
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(Date.UTC(year, month - 1, 1)));

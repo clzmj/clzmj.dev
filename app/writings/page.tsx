@@ -2,11 +2,10 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { RowList } from '../../components/row-list';
-import { ItemRow, NoteIcon } from '../../components/rows';
+import { ItemRow, NoteIcon, WritingDate } from '../../components/rows';
 import { Shell } from '../../components/shell';
 import { visibleWritings } from '../../lib/content';
 import { site } from '../../lib/site';
-import { formatLongDate } from '../../lib/time';
 
 export const metadata: Metadata = {
   title: 'Writings',
@@ -51,7 +50,7 @@ export default function WritingsPage() {
             href={`/writings/${post.slug}`}
             icon={<NoteIcon />}
             title={post.title}
-            meta={formatLongDate(post.date)}
+            meta={<WritingDate date={post.date} detailed />}
             badge={post.demo ? 'Demo' : undefined}
           />
         ))}

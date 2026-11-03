@@ -6,7 +6,7 @@ import { JsonLd } from '../components/json-ld';
 import { NewsPill } from '../components/news-pill';
 import { PhotoFan } from '../components/photo-fan';
 import { RowList } from '../components/row-list';
-import { DateChip, ItemRow, NoteIcon } from '../components/rows';
+import { DateChip, ItemRow, NoteIcon, WritingDate } from '../components/rows';
 import { Shell } from '../components/shell';
 import { loadEvents, loadSlides, visibleWritings } from '../lib/content';
 import { site } from '../lib/site';
@@ -105,7 +105,7 @@ export default function HomePage() {
                 href={`/writings/${post.slug}`}
                 icon={<NoteIcon />}
                 title={post.title}
-                meta={formatMonthYear(post.date)}
+                meta={<WritingDate date={post.date} />}
                 badge={post.demo ? 'Demo' : index === 0 ? 'New' : undefined}
               />
             ))}

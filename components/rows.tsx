@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import { formatLongDate, formatMonthYear } from '../lib/time';
+
 export function ItemRow({
   href,
   icon,
@@ -11,7 +13,7 @@ export function ItemRow({
   href: string;
   icon: ReactNode;
   title: string;
-  meta: string;
+  meta: ReactNode;
   badge?: string;
   external?: boolean;
 }) {
@@ -50,5 +52,16 @@ export function DateChip({ month, day }: { month: string; day: string }) {
         <span>{day}</span>
       </span>
     </span>
+  );
+}
+
+export function WritingDate({ date, detailed = false }: { date: string; detailed?: boolean }) {
+  return (
+    <time dateTime={date} className="writing-date">
+      <span className="writing-date-full">
+        {detailed ? formatLongDate(date) : formatMonthYear(date)}
+      </span>
+      <span className="writing-date-short">{formatMonthYear(date, 'short')}</span>
+    </time>
   );
 }

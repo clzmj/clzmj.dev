@@ -1425,3 +1425,24 @@ html[data-theme='dark'] .prose pre code span {
     flex-wrap: wrap;
   }
 }
+
+.writing-date-short {
+  display: none;
+}
+
+@media (width < 480px) {
+  .writing-date-full {
+    display: none;
+  }
+  .writing-date-short {
+    display: inline;
+  }
+  .row:has(.writing-date) .row-title {
+    min-width: 0;
+    flex-shrink: 1;
+  }
+  .row:has(.writing-date) .badge,
+  .row:has(.writing-date) .row-meta {
+    flex-shrink: 0;
+  }
+}
