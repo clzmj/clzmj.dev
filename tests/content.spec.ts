@@ -76,7 +76,7 @@ for (const time of ['00:00', '09:05', '22:12']) {
   test(`the footer displays ${time} in 24-hour time`, async ({ page }) => {
     await page.clock.install({ time: new Date(`2026-06-15T${time}:00-06:00`) });
     await page.goto('/');
-    await expect(page.locator('.footer-time')).toHaveText(`${time} in Mexico City`);
+    await expect(page.locator('.footer-time')).toHaveText(`${time}:00 in Mexico City`);
     await expect(page.locator('.footer-time')).not.toContainText(/am|pm/i);
   });
 }
@@ -95,7 +95,7 @@ test('the footer uses Geist Mono and tabular digits for its complete clock label
 }) => {
   await page.clock.install({ time: new Date('2026-06-15T22:12:00-06:00') });
   await page.goto('/');
-  await expect(page.locator('.footer-time')).toHaveText('22:12 in Mexico City');
+  await expect(page.locator('.footer-time')).toHaveText('22:12:00 in Mexico City');
   const font = await page.locator('.footer-time').evaluate((element) => {
     const style = getComputedStyle(element);
     return { family: style.fontFamily, numerals: style.fontVariantNumeric };

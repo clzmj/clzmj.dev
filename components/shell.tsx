@@ -1,13 +1,11 @@
 import type { ReactNode } from 'react';
 
-import { formatClock } from '../lib/time';
 import { Clock } from './clock';
 import { FooterSocialLinks } from './footer-social-links';
 import { ThemeToggle } from './theme-toggle';
 
 export function Shell({ markdownHref, children }: { markdownHref: string; children: ReactNode }) {
   const label = markdownHref.split('/').pop() ?? 'index.md';
-  const now = new Date();
   return (
     <>
       <a className="skip" href="#content">
@@ -20,7 +18,7 @@ export function Shell({ markdownHref, children }: { markdownHref: string; childr
           style={{ ['--stagger' as string]: 6 }}
         >
           <p className="footer-clock">
-            <Clock initial={formatClock(now)} initialIso={now.toISOString()} />
+            <Clock />
           </p>
           <div className="footer-actions">
             <FooterSocialLinks />

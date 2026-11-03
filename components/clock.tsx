@@ -2,30 +2,38 @@
 
 import { useEffect, useState } from 'react';
 
-import { formatClock } from '../lib/time';
-
-export function Clock({ initial, initialIso }: { initial: string; initialIso: string }) {
-  const [label, setLabel] = useState(initial);
-  const [iso, setIso] = useState(initialIso);
-  const [ready, setReady] = useState(false);
+export function Clock() {
+  const [time, setTime] = useState({ label: '--:--:--', iso: '' });
   useEffect(() => {
-    const update = () => {
+    const format = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'America/Mexico_City',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23',
+    });
+    let timeout = 0;
+    const resync = () => {
+      window.clearTimeout(timeout);
+      if (document.hidden) return;
       const now = new Date();
-      setLabel(formatClock(now));
-      setIso(now.toISOString());
+      setTime({ label: format.format(now), iso: now.toISOString() });
+      timeout = window.setTimeout(resync, 1000 - (now.getTime() % 1000));
     };
-    update();
-    setReady(true);
-    const id = window.setInterval(update, 60_000);
-    return () => window.clearInterval(id);
+    document.addEventListener('visibilitychange', resync);
+    resync();
+    return () => {
+      window.clearTimeout(timeout);
+      document.removeEventListener('visibilitychange', resync);
+    };
   }, []);
   return (
     <time
-      className={ready ? 'footer-time is-ready' : 'footer-time'}
-      dateTime={iso}
+      className="footer-time is-ready"
+      dateTime={time.iso || undefined}
       suppressHydrationWarning
     >
-      {label}
+      {`${time.label} in Mexico City`}
     </time>
   );
 }

@@ -4,7 +4,7 @@ Personal site for Carlos Lezama. The layout follows the quiet single column of n
 
 ## Type
 
-The `geist` package supplies the faces. Body copy and headings are Geist Sans: 16px body at `#646464`, 16px medium headings and the name, 14px footer. The footer clock uses Geist Mono with tabular digits. It is 24-hour, updates once a minute, and reads `18:34 in Mexico City`.
+The `geist` package supplies the faces. Body copy and headings are Geist Sans: 16px body at `#646464`, 16px medium headings and the name, 14px footer. The footer clock uses Geist Mono with tabular digits. It is 24-hour, ticks on second boundaries while the tab is visible, and reads `18:34:00 in Mexico City`. Static HTML shows `--:--:-- in Mexico City`; a `<time>` element resyncs on visibility change without aria-live announcements.
 
 ## Color
 

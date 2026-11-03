@@ -32,7 +32,7 @@ for (const width of [393, 1280]) {
     ).toMatch(/Geist.*Serif/i);
     await expect(page.locator('.bingo-slot, .bingo')).toHaveCount(0);
     await page.clock.fastForward(60_000);
-    await expect(page.locator('footer .footer-time')).toContainText('23:31 in Mexico City');
+    await expect(page.locator('footer .footer-time')).toContainText('23:31:00 in Mexico City');
     await page.getByRole('link', { name: 'Back home', exact: true }).click();
     await expect(page).toHaveURL('/');
   });
