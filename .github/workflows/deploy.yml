@@ -128,7 +128,7 @@ jobs:
             exit 1
           fi
           terraform fmt -check -recursive
-          terraform init -input=false
-          terraform validate
-          terraform plan -input=false -out=tfplan
+          terraform init -input=false -no-color
+          terraform validate -no-color
+          terraform plan -input=false -no-color -out=tfplan
           terraform apply -input=false -auto-approve tfplan

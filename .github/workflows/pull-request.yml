@@ -107,8 +107,8 @@ jobs:
               exit 1
             fi
             terraform fmt -check -recursive
-            terraform init -input=false
-            terraform validate
+            terraform init -input=false -no-color
+            terraform validate -no-color
             terraform plan -lock=false -input=false -no-color -out=tfplan
           } 2>&1 | tee plan.txt
 

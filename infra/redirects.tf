@@ -6,9 +6,10 @@ resource "cloudflare_ruleset" "www_redirect" {
 
   rules = [
     {
+      ref         = "d3fb8f3957134315824c9d97ccb4efc3"
       action      = "redirect"
       expression  = "(http.host eq \"www.clzmj.dev\")"
-      description = "Redirect from WWW to root"
+      description = "Redirect www to clzmj.dev"
       enabled     = true
       action_parameters = {
         from_value = {

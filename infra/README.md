@@ -7,7 +7,6 @@ Terraform manages the clzmj.dev zone edge. Wrangler deploys the site.
 - DNS that was already on the zone: `www` AAAA, Google MX, SPF, site verification, DMARC, and the Google DKIM TXT record.
 - The existing `http_request_dynamic_redirect` ruleset (`www` to the apex).
 - Free zone settings: Always Use HTTPS, minimum TLS 1.2, and HSTS.
-- A free cache rule for static file extensions on the apex.
 - The Workers custom domain that routes `clzmj.dev` to the Worker `clzmj-dev`.
 
 Terraform does not create the zone, and it does not define the Worker script, versions, or assets. The root `wrangler.jsonc` is the only Worker config. The apex DNS record created by the custom domain is left to that resource.

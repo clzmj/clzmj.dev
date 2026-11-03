@@ -21,7 +21,6 @@ Terraform owns the edge around that Worker:
 - DNS records that already exist, adopted with `import` blocks
 - the existing dynamic redirect ruleset
 - Always Use HTTPS, minimum TLS 1.2, and HSTS
-- a free cache rule for static extensions
 - the Workers custom domain from `clzmj.dev` to `clzmj-dev`
 
 The zone itself is a data source. The custom domain creates the apex DNS record as part of attaching the hostname, so Terraform does not declare that record a second time.
@@ -48,17 +47,15 @@ Build steps never receive the Cloudflare or R2 secrets. Pull requests do not dep
 
 ### Redirect and DKIM
 
-Public requests to `http://www.clzmj.dev` and `https://www.clzmj.dev` return a single 301 to `https://clzmj.dev`, keeping the path, the trailing slash, and the query string. The imported ruleset reproduces that: host equals `www.clzmj.dev`, dynamic target `concat("https://clzmj.dev", http.request.uri.path)`, status 301, preserve the query string. The ruleset's display name was not visible without the API. It is set to `default`, which is the usual phase entrypoint name. The read-only plan is what confirms it.
+Public requests to `http://www.clzmj.dev` and `https://www.clzmj.dev` return a single 301 to `https://clzmj.dev`, keeping the path, the trailing slash, and the query string. The imported ruleset matches the live rule: name `default`, host equals `www.clzmj.dev`, dynamic target `concat("https://clzmj.dev", http.request.uri.path)`, status 301, preserve the query string, description `Redirect www to clzmj.dev`.
 
-The Google DKIM TXT value is longer than a single DNS string. Its content, name, TTL, and proxied flag are read from `cloudflare_dns_record` at plan time and written back unchanged, so the first plan does not rewrite the key. A later dashboard edit of that record is adopted on the next plan rather than reverted.
+The Google DKIM TXT value is longer than a single DNS string. Cloudflare stores it quoted, including the split between the two character-strings. The record is hardcoded with that quoted content, TTL 60, and its existing comment. TXT records for site verification, SPF, and DMARC use the same quoted form.
 
 ### Zone hardening that stays free
 
-Always Use HTTPS, TLS 1.2, and HSTS (one year, include subdomains, `nosniff`, preload off) are free zone settings. They are imported, because every zone already has the settings, and updated only where the live value differs. Preload stays off. Submitting the domain to the preload list is hard to undo.
+Always Use HTTPS, TLS 1.2, and HSTS (one year, include subdomains, `nosniff`, preload off) are free zone settings. They are imported, because every zone already has the settings, and updated only where the live value differs. The read-only plan showed Always Use HTTPS off, minimum TLS 1.0, and HSTS disabled. Preload stays off. Submitting the domain to the preload list is hard to undo.
 
-Workers static assets are the cache that actually serves the site. Cloudflare sends `Cache-Control: public, max-age=0, must-revalidate` and an `ETag`, and reports `CF-Cache-Status`. Zone Cache Rules do not apply to a Worker's cache. The Terraform cache rule still marks static extensions on the apex eligible for the free zone cache and sets edge and browser TTL to respect origin, so HTML is not pinned if a request is ever served outside the Worker. It does not turn on Cache Reserve.
-
-`cache.enabled` in Wrangler (Workers Cache) is a different product. With it on, static asset requests that are otherwise free are billed. This stack does not set it, and `wrangler.jsonc` should leave it off.
+There is no zone cache rule. A Worker on a custom domain runs in front of the zone cache, so a cache rule would not apply. Workers static assets already cache at the edge (`Cache-Control: public, max-age=0, must-revalidate`, an `ETag`, and `CF-Cache-Status`). `cache.enabled` in Wrangler is a different product and would bill static asset requests that are otherwise free. `wrangler.jsonc` should leave it off.
 
 ## Deploy flow
 
@@ -85,8 +82,6 @@ flowchart TD
 
 ## Consequences
 
-- The first production apply imports the existing DNS, redirect ruleset, and zone settings, then creates the custom domain and the cache rule. Zone settings change in place only where they are not already at the declared values.
+- The first production apply imports the existing DNS and redirect ruleset with no changes, updates Always Use HTTPS, minimum TLS, and HSTS, and creates the apex custom domain.
 - Applying before the first successful `wrangler deploy` fails, because the custom domain has no Worker to attach.
 - The site build and the Worker config land in another pull request. Until `package.json` and `wrangler.jsonc` are on the ref, the workflows fail those checks instead of skipping them.
-- DKIM is not pinned to a literal. Rotating it in Cloudflare will not show a Terraform diff.
-- A zone cache rule does not change how the Worker caches HTML or hashed assets. Longer browser caching of fingerprinted files belongs in the site's `_headers` file.

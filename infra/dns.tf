@@ -5,6 +5,7 @@ resource "cloudflare_dns_record" "www_aaaa" {
   ttl     = 1
   content = "100::"
   proxied = true
+  comment = "Placeholder so Cloudflare can redirect www to the root domain"
 }
 
 resource "cloudflare_dns_record" "mx" {
@@ -15,6 +16,7 @@ resource "cloudflare_dns_record" "mx" {
   content  = "smtp.google.com"
   priority = 1
   proxied  = false
+  comment  = "Google Workspace - inbound mail (MX)"
 }
 
 resource "cloudflare_dns_record" "google_site_verification" {
@@ -22,8 +24,9 @@ resource "cloudflare_dns_record" "google_site_verification" {
   name    = "clzmj.dev"
   type    = "TXT"
   ttl     = 60
-  content = "google-site-verification=RrFlAVnFkcaqEbI3PbETZRbqqPUbkUxc-WXfir61ux0"
+  content = "\"google-site-verification=RrFlAVnFkcaqEbI3PbETZRbqqPUbkUxc-WXfir61ux0\""
   proxied = false
+  comment = "Google Workspace - domain ownership verification"
 }
 
 resource "cloudflare_dns_record" "spf" {
@@ -31,8 +34,9 @@ resource "cloudflare_dns_record" "spf" {
   name    = "clzmj.dev"
   type    = "TXT"
   ttl     = 60
-  content = "v=spf1 include:_spf.google.com ~all"
+  content = "\"v=spf1 include:_spf.google.com ~all\""
   proxied = false
+  comment = "Google Workspace - authorized mail senders (SPF)"
 }
 
 resource "cloudflare_dns_record" "dmarc" {
@@ -40,20 +44,17 @@ resource "cloudflare_dns_record" "dmarc" {
   name    = "_dmarc.clzmj.dev"
   type    = "TXT"
   ttl     = 60
-  content = "v=DMARC1; p=none; adkim=r; aspf=r"
+  content = "\"v=DMARC1; p=none; adkim=r; aspf=r\""
   proxied = false
-}
-
-data "cloudflare_dns_record" "dkim" {
-  zone_id       = var.cloudflare_zone_id
-  dns_record_id = local.dns_record_ids.dkim
+  comment = "Email authentication - DMARC initial policy (p=none)"
 }
 
 resource "cloudflare_dns_record" "dkim" {
   zone_id = data.cloudflare_zone.clzmj.id
-  name    = data.cloudflare_dns_record.dkim.name
-  type    = data.cloudflare_dns_record.dkim.type
-  ttl     = data.cloudflare_dns_record.dkim.ttl
-  content = data.cloudflare_dns_record.dkim.content
-  proxied = data.cloudflare_dns_record.dkim.proxied
+  name    = "google._domainkey.clzmj.dev"
+  type    = "TXT"
+  ttl     = 60
+  content = "\"v=DKIM1;k=rsa;p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArKyyHefrb9/VMXLFk10dul3IllZP0raUC8Zl7tRJRKbpc/8sHzeljaInl+y6cGOKWHk8O4PXWb1C7jqMfk8oZtBZntiVUy38uMBVvp60ViPbtmAEMM7iL7rUNDSvG/Xw/VGrnq/sLcp+zeexHvnZnxS4+mKT9wulUnch7pZWbkTVcYqk/NYF5x7RK8v6VBl8Olt\" \"TbZsG2Zw3PeTUjkv28NYirAC8t5X4MDiDi2IebLhJa97BVTSVEwCWhwURhlWaEgAe6CLcoXx0snMGr69F2YeSTTdEDsyn/yzOpLaPEm73gY2M2VwSN9MDyhnH5aGWyAObpTz3lUkSoinnF2tYMQIDAQAB\""
+  proxied = false
+  comment = "Google Workspace - outgoing mail signing (DKIM, 2048-bit)"
 }
