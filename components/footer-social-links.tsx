@@ -13,7 +13,7 @@ export function FooterSocialLinks() {
         aria-label={label}
         title={label}
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noopener"
       >
         <PlatformLogo platform={profile.platform} />
       </a>

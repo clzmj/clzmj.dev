@@ -8,15 +8,13 @@ export const socialProfiles = [
   {
     platform: 'instagram',
     label: 'Instagram',
-    handle: '@TODO',
-    // TODO: replace the platform-home placeholder when the handle is supplied.
-    href: 'https://www.instagram.com/',
+    handle: '@clzmj',
+    href: 'https://www.instagram.com/clzmj/',
   },
   {
     platform: 'linkedin',
     label: 'LinkedIn',
-    handle: 'TODO',
-    // TODO: replace the platform-home placeholder when the profile is supplied.
-    href: 'https://www.linkedin.com/',
+    handle: 'clzmj',
+    href: 'https://www.linkedin.com/in/clzmj/',
   },
 ] as const;

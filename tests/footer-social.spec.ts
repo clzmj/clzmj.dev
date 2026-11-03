@@ -5,8 +5,8 @@ import { expect, test } from '@playwright/test';
 
 const profiles = [
   { name: 'X (@clzmj)', href: 'https://x.com/clzmj' },
-  { name: 'Instagram (@TODO)', href: 'https://www.instagram.com/' },
-  { name: 'LinkedIn (TODO)', href: 'https://www.linkedin.com/' },
+  { name: 'Instagram (@clzmj)', href: 'https://www.instagram.com/clzmj/' },
+  { name: 'LinkedIn (clzmj)', href: 'https://www.linkedin.com/in/clzmj/' },
 ];
 
 test('cards and assets are gone and Contributions flows directly into Elsewhere', async ({
@@ -39,7 +39,7 @@ for (const width of [393, 744, 1280]) {
       await expect(link).toHaveAttribute('title', profile.name);
       await expect(link).toHaveAttribute('href', profile.href);
       await expect(link).toHaveAttribute('target', '_blank');
-      await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      await expect(link).toHaveAttribute('rel', 'noopener');
       await expect(link.locator('svg')).toHaveAttribute('width', '16');
       await expect(link.locator('svg')).toHaveAttribute('height', '16');
       const target = await link.evaluate((element) => {
