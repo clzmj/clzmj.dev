@@ -37,10 +37,6 @@ export const metadata: Metadata = {
     title: site.name,
     description: site.description,
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
 };
 
 export const viewport: Viewport = {
