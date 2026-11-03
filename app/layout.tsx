@@ -19,11 +19,6 @@ export const metadata: Metadata = {
   applicationName: site.name,
   authors: [{ name: site.name, url: site.url }],
   creator: site.name,
-  alternates: {
-    types: {
-      'application/rss+xml': '/rss.xml',
-    },
-  },
   openGraph: {
     type: 'website',
     locale: site.locale,

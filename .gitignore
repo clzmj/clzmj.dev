@@ -9,16 +9,7 @@ blob-report
 *.tsbuildinfo
 next-env.d.ts
 shots
-.hidden-build-*
 public/og
-public/diagrams
-public/rss.xml
 public/llms.txt
 public/llms-full.txt
 public/index.md
-public/writings.md
-public/events.md
-public/writings/*.md
-public/writings/*.png
-public/events/*.md
-public/events/*.ics

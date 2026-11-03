@@ -1,10 +1,10 @@
 # Design
 
-Personal site for Carlos Lezama. The layout follows the quiet single column of noechague.com: a floating note, a 16px name and role, a short bio, a contribution year, lists, a tilted photo fan, and a footer cat. There is no components section. The location is Mexico City.
+Personal site for Carlos Lezama. The layout follows the quiet single column of noechague.com: a 16px name and role, a short bio, a contribution year, a tilted photo fan, and a footer cat. There is no components section. The location is Mexico City.
 
 ## Type
 
-The `geist` package supplies the faces. Body copy and headings are Geist Sans: 16px body at `#646464`, 16px medium headings and the name, 14px footer. Geist Serif is only the blockquote accent. Geist Mono is only for code. The footer clock is 12-hour, updates once a minute, and reads `6:34pm in Mexico City, Mexico`.
+The `geist` package supplies the faces. Body copy and headings are Geist Sans: 16px body at `#646464`, 16px medium headings and the name, 14px footer. The footer clock is 12-hour, updates once a minute, and reads `6:34pm in Mexico City, Mexico`.
 
 ## Color
 

@@ -10,20 +10,17 @@ bunx playwright install chromium
 bun run dev
 ```
 
-`bun run dev` sets `SHOW_DEMO_POSTS=true`, generates diagrams, calendar files, feeds, and Open Graph images, then starts Next. The build step needs Playwright's Chromium (`bunx playwright install chromium`). That browser install is part of the app build, not the GitHub Actions workflow.
+`bun run dev` generates profile Markdown and the Open Graph image, then starts Next. The build needs Playwright's Chromium.
 
 ## Build
 
 ```bash
 bun run build
-SHOW_DEMO_POSTS=true bun run build
 ```
 
 The static site is written to `out/`. That directory is the Worker asset bundle. `bun run build` runs `scripts/generate.ts` first (the `prebuild` hook), then `next build` with `output: 'export'`.
 
-Demo posts and example events are hidden unless `SHOW_DEMO_POSTS=true`. A production build leaves them out of the HTML, sitemap, feeds, Open Graph images, diagrams, and the demo figure and event calendar downloads. Empty dynamic-route sentinel files are removed after export so those URLs return 404. `bun run dev` turns them on.
-
-Generation renders Mermaid and Open Graph images in Chromium, so `bunx playwright install chromium` has to have been run first. The contribution snapshot in `content/contributions.json` is reused as-is. Set `REFRESH_CONTRIBUTIONS=true` or `CONTRIBUTIONS_TOKEN` when that file should be fetched again.
+Generation renders the Open Graph image in Chromium. The contribution snapshot in `content/contributions.json` is reused as-is. Set `REFRESH_CONTRIBUTIONS=true` or `CONTRIBUTIONS_TOKEN` when that file should be fetched again.
 
 Check the result locally:
 
@@ -39,8 +36,6 @@ That serves `out/` on port 3000.
 
 ## Content
 
-- Notes: `content/writings/*.mdx`. A post with `demo: true` is omitted unless `SHOW_DEMO_POSTS=true`. With no visible posts, the Writings section and `/writings` are omitted, and the build still succeeds.
-- Events: `content/events/*.md`. See `docs/events.md`.
 - Photos: drop a file in `public/photos/` and point `content/photos.json` at it (`src`, `alt`, `caption`, `width`, `height`). They render as the tilted fan. A click opens that one photo. There are no previous, next, or autoplay controls.
 - Cat: replace `public/cat.png` and `public/cat-dark.png` with sheets of the same size, 128×64 pixels, 4 columns by 2 rows of 32×32 frames. Row 0 is awake, row 1 is asleep. The CSS in `app/globals.css` does not need to change if the grid stays the same.
 
@@ -55,6 +50,6 @@ bun run shots
 
 `bun run lint` is oxlint, and warnings fail the run. `bun run format` writes oxfmt changes. `bun run format:check` checks them.
 
-`bun run test` expects `out/` from `SHOW_DEMO_POSTS=true bun run build`, because those tests open the demo post. `bun run shots` writes light and dark full-page screenshots to `shots/`, which is gitignored.
+`bun run test` expects `out/` from `bun run build`. `bun run shots` writes light and dark home-page screenshots to the gitignored `shots/` directory.
 
 Type, color, and the cat are described in `docs/design.md`.

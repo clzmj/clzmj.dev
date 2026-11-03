@@ -26,10 +26,4 @@ export const viewports: Viewport[] = [
   { name: '2560', width: 2560, height: 1440 },
 ];
 
-export const shotPages = [
-  { name: 'home', path: '/' },
-  { name: 'writings', path: '/writings' },
-  { name: 'markdown-demo', path: '/writings/markdown-demo' },
-  { name: 'events', path: '/events' },
-  { name: 'example-evening', path: '/events/example-evening' },
-];
+export const shotPages = [{ name: 'home', path: '/' }];

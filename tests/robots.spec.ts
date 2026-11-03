@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-for (const path of ['/404.html', '/not-a-real-page', '/writings/empty', '/events/empty']) {
+for (const path of ['/404.html', '/not-a-real-page']) {
   test(`${path} only carries a noindex robots directive`, async ({ page }) => {
     const response = await page.goto(path);
     expect(response?.status()).toBe(path === '/404.html' ? 200 : 404);

@@ -70,22 +70,6 @@ for name, sky, ground, accent, horizon, mark in scenes:
     write_png(photos / name, 960, 1200, scene(960, 1200, sky, ground, accent, horizon, mark))
 
 
-def still(x, y):
-    nx = x / 1200
-    ny = y / 750
-    color = (214, 206, 194) if ny < 0.72 else (126, 116, 104)
-    if 0.12 < nx < 0.4 and 0.18 < ny < 0.7:
-        color = (236, 232, 224)
-    if (nx - 0.68) ** 2 / 0.03 + (ny - 0.58) ** 2 / 0.045 < 1:
-        color = (92, 64, 50)
-    if 0.46 < nx < 0.84 and 0.34 < ny < 0.42:
-        color = (40, 44, 48)
-    return color
-
-
-write_png(ROOT / "public" / "writings" / "demo-still.png", 1200, 750, still)
-
-
 def avatar(x, y):
     cx = cy = 128
     if (x - cx) ** 2 + (y - cy) ** 2 > 118**2:

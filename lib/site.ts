@@ -2,7 +2,7 @@ export const site = {
   name: 'Carlos Lezama',
   url: 'https://clzmj.dev',
   email: 'hello@clzmj.dev',
-  description: 'Notes, events, and pictures from Mexico City.',
+  description: 'Carlos Lezama, ML & Software Engineer in Mexico City.',
   github: 'https://github.com/clzmj',
   locale: 'en_US',
   timezone: 'America/Mexico_City',
@@ -13,10 +13,6 @@ export const site = {
   longitude: -99.13,
   zoneAbbrev: 'CST',
 } as const;
-
-export function showDemoPosts(): boolean {
-  return process.env.SHOW_DEMO_POSTS === 'true';
-}
 
 export function absoluteUrl(path: string): string {
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
