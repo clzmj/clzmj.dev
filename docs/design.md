@@ -24,7 +24,9 @@ The reading column is capped at 43.25rem (692px). Pages keep that cap from a pho
 
 ## Elsewhere
 
-Photos in `content/photos.json` render as a tilted overlapping fan. Hover lifts one card. A click opens that photo alone. There are seven cards, with no autoplay or previous/next control. The selected card animates from its fan position to the dialog and back on close; reduced motion skips this transition.
+`lib/elsewhere.json` contains the 17 real photos in supplied order. The reference has a seven-card fan; ours wraps into 7/7/3 fans to retain its card size, arc and rotation without overflowing or compressing 17 cards into one unreadable strip. The final row is centered.
+
+Sanitized sources and generated WebPs are gitignored. Bun.Image prepares static variants without upscaling or pixel cropping; the wrapper is 4:5 and owns the dominant-color placeholder. Each image fills it with object-fit cover and manifest object-position. Paris is 50% 100%, 13 is 50% 50%, 14 is 50% 0%, and moving day is 80% 50% to preserve the three people (the date can be cut). Other frames are centered. Captions use Geist Mono 12px muted text and appear on hover, focus, and in the tap-opened dialog. A 150ms opacity-only fade follows loading, with no motion for reduced-motion users. Shared photo transitions and Escape/close-button behavior are preserved.
 
 ## Not found
 

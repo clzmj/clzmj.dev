@@ -1,0 +1,352 @@
+[
+  {
+    "id": "01",
+    "caption": "my dad and me by the sea, both squinting professionally.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "01-640.webp",
+    "width": 640,
+    "height": 480,
+    "color": "#858274",
+    "sizes": [
+      {
+        "file": "01-640.webp",
+        "width": 640,
+        "height": 480
+      }
+    ]
+  },
+  {
+    "id": "02",
+    "caption": "cookie, tiny and already in charge. miss you, girl.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "02-480.webp",
+    "width": 480,
+    "height": 360,
+    "color": "#9b9794",
+    "sizes": [
+      {
+        "file": "02-480.webp",
+        "width": 480,
+        "height": 360
+      }
+    ]
+  },
+  {
+    "id": "03",
+    "caption": "my sister and me somewhere in colombia. we weren't lost, we were exploring.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "03-640.webp",
+    "width": 640,
+    "height": 852,
+    "color": "#504338",
+    "sizes": [
+      {
+        "file": "03-640.webp",
+        "width": 640,
+        "height": 852
+      }
+    ]
+  },
+  {
+    "id": "04",
+    "caption": "paris, and a very tall neighbor.",
+    "focal": {
+      "x": 0.5,
+      "y": 1
+    },
+    "objectPosition": "50% 100%",
+    "src": "04-1200.webp",
+    "width": 1200,
+    "height": 1487,
+    "color": "#63748b",
+    "sizes": [
+      {
+        "file": "04-640.webp",
+        "width": 640,
+        "height": 793
+      },
+      {
+        "file": "04-1200.webp",
+        "width": 1200,
+        "height": 1487
+      }
+    ]
+  },
+  {
+    "id": "05",
+    "caption": "my favorite focaccia. focacce, technically, because there were more.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "05-640.webp",
+    "width": 640,
+    "height": 1138,
+    "color": "#937e66",
+    "sizes": [
+      {
+        "file": "05-640.webp",
+        "width": 640,
+        "height": 1138
+      }
+    ]
+  },
+  {
+    "id": "06",
+    "caption": "a good one i took in italy. my photography peaked here.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "06-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "color": "#2e2e2d",
+    "sizes": [
+      {
+        "file": "06-640.webp",
+        "width": 640,
+        "height": 853
+      },
+      {
+        "file": "06-1200.webp",
+        "width": 1200,
+        "height": 1600
+      }
+    ]
+  },
+  {
+    "id": "07",
+    "caption": "the adriatic off croatia. the water really is that color.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "07-640.webp",
+    "width": 640,
+    "height": 853,
+    "color": "#8f867d",
+    "sizes": [
+      {
+        "file": "07-640.webp",
+        "width": 640,
+        "height": 853
+      }
+    ]
+  },
+  {
+    "id": "08",
+    "caption": "me, the second it drops below 20°c.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "08-640.webp",
+    "width": 640,
+    "height": 1138,
+    "color": "#817970",
+    "sizes": [
+      {
+        "file": "08-640.webp",
+        "width": 640,
+        "height": 1138
+      }
+    ]
+  },
+  {
+    "id": "09",
+    "caption": "a souvenir from brazil. no, you can't have it.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "09-360.webp",
+    "width": 360,
+    "height": 480,
+    "color": "#786d6a",
+    "sizes": [
+      {
+        "file": "09-360.webp",
+        "width": 360,
+        "height": 480
+      }
+    ]
+  },
+  {
+    "id": "10",
+    "caption": "bingo, puppy edition. maximum chaos, minimum size.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "10-640.webp",
+    "width": 640,
+    "height": 640,
+    "color": "#6f665c",
+    "sizes": [
+      {
+        "file": "10-640.webp",
+        "width": 640,
+        "height": 640
+      }
+    ]
+  },
+  {
+    "id": "11",
+    "caption": "bingo the other day, clearly plotting something.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "11-640.webp",
+    "width": 640,
+    "height": 1138,
+    "color": "#8d866a",
+    "sizes": [
+      {
+        "file": "11-640.webp",
+        "width": 640,
+        "height": 1138
+      }
+    ]
+  },
+  {
+    "id": "12",
+    "caption": "bingo after a hike. muddy, proud, zero regrets.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "12-640.webp",
+    "width": 640,
+    "height": 1138,
+    "color": "#7c6f67",
+    "sizes": [
+      {
+        "file": "12-640.webp",
+        "width": 640,
+        "height": 1138
+      }
+    ]
+  },
+  {
+    "id": "13",
+    "caption": "bingo and me. she's the main character.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "13-640.webp",
+    "width": 640,
+    "height": 640,
+    "color": "#7f746d",
+    "sizes": [
+      {
+        "file": "13-640.webp",
+        "width": 640,
+        "height": 640
+      }
+    ]
+  },
+  {
+    "id": "14",
+    "caption": "mom, my sister and dad, ready to watch mexico win. still waiting.",
+    "focal": {
+      "x": 0.5,
+      "y": 0
+    },
+    "objectPosition": "50% 0%",
+    "src": "14-640.webp",
+    "width": 640,
+    "height": 473,
+    "color": "#7c6f5f",
+    "sizes": [
+      {
+        "file": "14-640.webp",
+        "width": 640,
+        "height": 473
+      }
+    ]
+  },
+  {
+    "id": "15",
+    "caption": "mom, my sister and me on moving day. the boxes won.",
+    "focal": {
+      "x": 0.8,
+      "y": 0.5
+    },
+    "objectPosition": "80% 50%",
+    "src": "15-640.webp",
+    "width": 640,
+    "height": 480,
+    "color": "#b7b0af",
+    "sizes": [
+      {
+        "file": "15-640.webp",
+        "width": 640,
+        "height": 480
+      }
+    ]
+  },
+  {
+    "id": "16",
+    "caption": "mom and me at my high school graduation. she did most of the work.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "16-640.webp",
+    "width": 640,
+    "height": 640,
+    "color": "#6a6555",
+    "sizes": [
+      {
+        "file": "16-640.webp",
+        "width": 640,
+        "height": 640
+      }
+    ]
+  },
+  {
+    "id": "17",
+    "caption": "mom and me at my itam graduation, powered by four years of exam-week tacos.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "17-360.webp",
+    "width": 360,
+    "height": 360,
+    "color": "#675e4f",
+    "sizes": [
+      {
+        "file": "17-360.webp",
+        "width": 360,
+        "height": 360
+      }
+    ]
+  }
+]

@@ -3,9 +3,9 @@
   "private": true,
   "scripts": {
     "generate": "bun scripts/generate.ts",
-    "prebuild": "bun scripts/generate.ts",
+    "prebuild": "bun scripts/build-photos.ts && bun scripts/generate.ts",
     "build": "next build",
-    "dev": "bun scripts/generate.ts && next dev",
+    "dev": "bun scripts/build-photos.ts && bun scripts/generate.ts && next dev",
     "lint": "oxlint --deny-warnings",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
@@ -33,5 +33,8 @@
     "tailwindcss": "^4.3.4",
     "typescript": "^7.0.2",
     "wrangler": "4.156.2"
+  },
+  "engines": {
+    "bun": ">=1.3.14"
   }
 }

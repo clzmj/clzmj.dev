@@ -23,52 +23,6 @@ def write_png(path: Path, width: int, height: int, pixel) -> None:
     path.write_bytes(png)
 
 
-def mix(a, b, t):
-    return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
-
-
-def scene(width, height, sky, ground, accent, horizon, mark):
-    def pixel(x, y):
-        nx = x / width
-        ny = y / height
-        if ny < horizon:
-            color = mix(sky, mix(sky, (255, 250, 244), 0.35), ny / horizon)
-        else:
-            color = mix(ground, mix(ground, (30, 30, 28), 0.25), (ny - horizon) / (1 - horizon))
-        if mark == "window" and 0.18 < nx < 0.82 and 0.12 < ny < 0.62:
-            color = (244, 241, 234) if (int(nx * 18) + int(ny * 22)) % 7 else (226, 220, 208)
-        if mark == "cup" and (nx - 0.5) ** 2 / 0.08 + (ny - 0.62) ** 2 / 0.05 < 1:
-            color = accent
-        if mark == "street" and abs(nx - 0.5) < 0.04 and ny > horizon:
-            color = accent
-        if mark == "plant" and abs(nx - 0.48) < 0.015 and horizon - 0.28 < ny < horizon:
-            color = accent
-        if mark == "plant" and (nx - 0.42) ** 2 + (ny - (horizon - 0.2)) ** 2 < 0.02:
-            color = accent
-        if mark == "notebook" and 0.22 < nx < 0.78 and 0.28 < ny < 0.78:
-            color = (248, 246, 240) if int(ny * 40) % 3 else (232, 228, 220)
-        if mark == "sky" and abs(ny - horizon) < 0.015:
-            color = accent
-        return color
-
-    return pixel
-
-
-scenes = [
-    ("01.png", (186, 196, 188), (92, 96, 90), (244, 236, 220), 0.62, "window"),
-    ("02.png", (214, 206, 196), (120, 104, 92), (90, 62, 48), 0.7, "cup"),
-    ("03.png", (28, 32, 40), (16, 16, 18), (232, 208, 140), 0.58, "street"),
-    ("04.png", (232, 228, 216), (168, 164, 150), (62, 96, 70), 0.72, "plant"),
-    ("05.png", (196, 188, 176), (120, 112, 100), (40, 40, 38), 0.8, "notebook"),
-    ("07.png", (186, 196, 188), (92, 96, 90), (244, 236, 220), 0.62, "window"),
-    ("06.png", (168, 188, 204), (86, 96, 88), (244, 244, 240), 0.66, "sky"),
-]
-
-photos = ROOT / "public" / "photos"
-for name, sky, ground, accent, horizon, mark in scenes:
-    write_png(photos / name, 960, 1200, scene(960, 1200, sky, ground, accent, horizon, mark))
-
-
 def avatar(x, y):
     cx = cy = 128
     if (x - cx) ** 2 + (y - cy) ** 2 > 118**2:

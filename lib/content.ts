@@ -1,19 +1,22 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-export type Slide = {
-  src: string;
-  alt: string;
-  caption: string;
-  width: number;
-  height: number;
-};
+import type { ElsewherePhoto } from './elsewhere';
+
+export type Slide = ElsewherePhoto & { alt: string; srcSet: string };
 
 export function loadSlides(): Slide[] {
-  const raw = readFileSync(join(process.cwd(), 'content', 'photos.json'), 'utf8');
-  const parsed = JSON.parse(raw) as Slide[];
-  return parsed.map((slide) => ({
-    ...slide,
-    src: slide.src.startsWith('/') ? slide.src : `/photos/${slide.src}`,
+  const base = (process.env.ELSEWHERE_BASE_URL ?? '/elsewhere').replace(/\/$/, '');
+  if (!base.startsWith('/') || base.startsWith('//') || /[?#\\]|\.\./.test(base)) {
+    throw new Error('ELSEWHERE_BASE_URL must be a same-origin path, such as /elsewhere');
+  }
+  const photos = JSON.parse(
+    readFileSync(join(process.cwd(), 'lib', 'elsewhere.json'), 'utf8'),
+  ) as ElsewherePhoto[];
+  return photos.map((photo) => ({
+    ...photo,
+    alt: photo.caption,
+    src: `${base}/${photo.src}`,
+    srcSet: photo.sizes.map((size) => `${base}/${size.file} ${size.width}w`).join(', '),
   }));
 }
