@@ -1,10 +1,10 @@
 import { catState } from '../lib/time';
 import { CatSync } from './cat-sync';
 
-export function Cat() {
-  const state = catState(new Date());
+export function Cat({ awake = false }: { awake?: boolean }) {
+  const state = awake ? 'awake' : catState(new Date());
   return (
-    <span className="cat-anchor" aria-hidden="true">
+    <span className="cat-anchor" aria-hidden="true" data-always-awake={awake || undefined}>
       <span className="cat" id="site-cat" data-state={state} suppressHydrationWarning />
       <span className="cat-zs">
         <span className="cat-z" style={{ ['--rang' as string]: 0 }}>
@@ -17,13 +17,17 @@ export function Cat() {
           z
         </span>
       </span>
-      <script
-        dangerouslySetInnerHTML={{
-          __html:
-            'var c=document.getElementById("site-cat");if(c&&document.documentElement.dataset.cat)c.dataset.state=document.documentElement.dataset.cat;',
-        }}
-      />
-      <CatSync />
+      {!awake ? (
+        <>
+          <script
+            dangerouslySetInnerHTML={{
+              __html:
+                'var c=document.getElementById("site-cat");if(c&&document.documentElement.dataset.cat)c.dataset.state=document.documentElement.dataset.cat;',
+            }}
+          />
+          <CatSync />
+        </>
+      ) : null}
     </span>
   );
 }

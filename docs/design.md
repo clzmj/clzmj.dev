@@ -25,3 +25,7 @@ The reading column is capped at 43.25rem (692px). Pages keep that cap from a pho
 ## Elsewhere
 
 Photos in `content/photos.json` render as a tilted overlapping fan. Hover lifts one card. A click opens that photo alone. There are seven cards, with no autoplay or previous/next control. The selected card animates from its fan position to the dialog and back on close; reduced motion skips this transition.
+
+## Not found
+
+The exported `404.html` keeps the home-page shell and footer. Its 404 numeral uses Geist Serif, followed by “Nothing lives here.” and a Back home link. The footer cat stays awake on this page, including at night. Reduced motion holds its first awake frame. The Worker uses `assets.not_found_handling: "404-page"`; there is no custom 500 page.

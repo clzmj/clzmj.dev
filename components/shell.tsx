@@ -5,7 +5,15 @@ import { Cat } from './cat';
 import { Clock } from './clock';
 import { ThemeToggle } from './theme-toggle';
 
-export function Shell({ markdownHref, children }: { markdownHref: string; children: ReactNode }) {
+export function Shell({
+  markdownHref,
+  children,
+  awakeCat = false,
+}: {
+  markdownHref: string;
+  children: ReactNode;
+  awakeCat?: boolean;
+}) {
   const label = markdownHref.split('/').pop() ?? 'index.md';
   const now = new Date();
   return (
@@ -21,7 +29,7 @@ export function Shell({ markdownHref, children }: { markdownHref: string; childr
         >
           <p className="footer-clock">
             <Clock initial={formatClock(now)} initialIso={now.toISOString()} />
-            <Cat />
+            <Cat awake={awakeCat} />
           </p>
           <div className="footer-actions">
             <ThemeToggle />
