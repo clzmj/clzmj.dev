@@ -87,3 +87,18 @@ test('location labels use Mexico City without a country suffix', async ({ page, 
     expect(await (await request.get(path)).text()).not.toContain('Mexico City, Mexico');
   }
 });
+
+test('the footer uses Geist Mono and tabular digits for its complete clock label', async ({
+  page,
+}) => {
+  await page.clock.install({ time: new Date('2026-06-15T22:12:00-06:00') });
+  await page.goto('/');
+  await expect(page.locator('.footer-time')).toHaveText('22:12 in Mexico City');
+  const font = await page.locator('.footer-time').evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { family: style.fontFamily, numerals: style.fontVariantNumeric };
+  });
+  expect(font.family).toMatch(/Geist.*Mono/i);
+  expect(font.numerals).toContain('tabular-nums');
+  await expect(page.locator('.news-pill')).toHaveCount(0);
+});

@@ -673,6 +673,8 @@ body {
 }
 
 .footer-time {
+  font-family: var(--font-geist-mono), monospace;
+  font-variant-numeric: tabular-nums;
   opacity: 0;
   transition: opacity 300ms;
 }
