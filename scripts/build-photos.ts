@@ -1,4 +1,13 @@
-import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { inflateSync } from 'node:zlib';
 
@@ -54,54 +63,92 @@ async function main() {
     if (![photo.focal.x, photo.focal.y].every((n) => Number.isFinite(n) && n >= 0 && n <= 1))
       throw new Error(`Invalid focal point: ${photo.id}`);
   }
-  rmSync(output, { recursive: true, force: true });
-  mkdirSync(output, { recursive: true });
+  const staging = mkdtempSync(join(tmpdir(), 'elsewhere-encoded-'));
   let total = 0;
   let largest = { file: '', bytes: 0 };
-  for (const photo of photos) {
-    const file = join(source, `${photo.id}.jpg`);
-    const original = await new Bun.Image(file).metadata();
-    const widths = [
-      ...new Set([
-        ...[640, 1080, 1600, 2400].filter((width) => width <= original.width),
-        Math.min(original.width, 2400),
-      ]),
-    ].sort((a, b) => a - b);
-    photo.sizes = [];
-    for (const width of widths) {
-      const height = Math.round((original.height * width) / original.width);
-      // Preserve the native Paris/q85 output; this one measured file needs 811,572 bytes.
-      const budget =
-        photo.id === '04' && width === 1937 ? 850_000 : width <= 640 ? 300_000 : 600_000;
-      const quality = photoQuality(photo.id, width);
-      const bytes = await new Bun.Image(file)
-        .resize(width, height, { fit: 'inside', withoutEnlargement: true })
-        .webp({ quality })
-        .bytes();
-      if (bytes.byteLength > budget)
-        throw new Error(
-          `Photo ${photo.id} at ${width}px/q${quality} is ${bytes.byteLength} bytes, exceeding its ${budget}-byte cap`,
+  try {
+    for (const photo of photos) {
+      const file = join(source, `${photo.id}.jpg`);
+      const original = await new Bun.Image(file).metadata();
+      photo.sourceWidth = original.width;
+      photo.sourceHeight = original.height;
+      const widths = [
+        ...new Set([
+          ...[640, 1080, 1600, 2400].filter((width) => width <= original.width),
+          Math.min(original.width, 2400),
+        ]),
+      ].sort((a, b) => a - b);
+      photo.sizes = [];
+      photo.omitted = [];
+      const encode = async (width: number) => {
+        const height = Math.ceil((original.height * width) / original.width);
+        const budget = width <= 640 ? 300_000 : 600_000;
+        const preferred = photoQuality(photo.id, width);
+        const qualities = [...new Set([preferred, 80, 75])].filter(
+          (quality) => quality <= preferred,
         );
-      const tags = imageMetadataChunks(bytes);
-      if (tags.length)
-        throw new Error(`Bun.Image output unexpectedly retains metadata: ${tags.join(', ')}`);
-      const actual = await new Bun.Image(bytes).metadata();
-      const name = `${photo.id}-${actual.width}.webp`;
-      writeFileSync(join(output, name), bytes);
-      photo.sizes.push({ file: name, width: actual.width, height: actual.height });
-      total += bytes.byteLength;
-      if (bytes.byteLength > largest.bytes) largest = { file: name, bytes: bytes.byteLength };
+        const attempts: { quality: number; bytes: number }[] = [];
+        for (const quality of qualities) {
+          const bytes = await new Bun.Image(file)
+            .resize(width, height, { fit: 'inside', withoutEnlargement: true })
+            .webp({ quality })
+            .bytes();
+          attempts.push({ quality, bytes: bytes.byteLength });
+          if (bytes.byteLength >= budget) continue;
+          const tags = imageMetadataChunks(bytes);
+          if (tags.length) throw new Error(`Bun.Image output retains metadata: ${tags.join(', ')}`);
+          const actual = await new Bun.Image(bytes).metadata();
+          const name = `${photo.id}-${actual.width}.webp`;
+          writeFileSync(join(staging, name), bytes);
+          photo.sizes.push({
+            file: name,
+            width: actual.width,
+            height: actual.height,
+            quality,
+            bytes: bytes.byteLength,
+          });
+          total += bytes.byteLength;
+          if (bytes.byteLength > largest.bytes) largest = { file: name, bytes: bytes.byteLength };
+          return;
+        }
+        photo.omitted!.push({ width, budget, attempts });
+        console.log(
+          `Photo ${photo.id}: omitted ${width}px after q${qualities.join('/q')}; no over-budget file emitted`,
+        );
+      };
+      for (const width of widths) await encode(width);
+      // Try a 1920px-wide HD alternative when a larger requested output cannot fit.
+      if (
+        photo.omitted.some((size) => size.width > 1920) &&
+        original.width >= 1920 &&
+        !widths.includes(1920)
+      )
+        await encode(1920);
+      photo.sizes.sort((a, b) => a.width - b.width);
+      const full = photo.sizes.at(-1);
+      if (!full) throw new Error(`Photo ${photo.id} cannot fit a published size at q75 or better`);
+      if (
+        Math.max(full.width, full.height) <
+        Math.min(1920, Math.max(original.width, original.height))
+      ) {
+        throw new Error(`Photo ${photo.id} cannot remain HD under its size cap at q75 or better`);
+      }
+      photo.src = full.file;
+      photo.width = full.width;
+      photo.height = full.height;
+      photo.objectPosition = `${photo.focal.x * 100}% ${photo.focal.y * 100}%`;
+      photo.color = dominantColor(
+        await new Bun.Image(file).resize(1, 1, { fit: 'fill' }).png().bytes(),
+      );
     }
-    const full = photo.sizes.at(-1)!;
-    photo.src = full.file;
-    photo.width = full.width;
-    photo.height = full.height;
-    photo.objectPosition = `${photo.focal.x * 100}% ${photo.focal.y * 100}%`;
-    photo.color = dominantColor(
-      await new Bun.Image(file).resize(1, 1, { fit: 'fill' }).png().bytes(),
-    );
+    // Publish only after the entire set is valid, preserving a working preview on failure.
+    rmSync(output, { recursive: true, force: true });
+    mkdirSync(output, { recursive: true });
+    cpSync(staging, output, { recursive: true });
+    writeFileSync(manifestPath, `${JSON.stringify(photos, null, 2)}\n`);
+  } finally {
+    rmSync(staging, { recursive: true, force: true });
   }
-  writeFileSync(manifestPath, `${JSON.stringify(photos, null, 2)}\n`);
   console.log(
     `Elsewhere: Bun ${Bun.version}, ${photos.flatMap((p) => p.sizes).length} WebPs, ${total} bytes total; largest ${largest.file}: ${largest.bytes} bytes`,
   );

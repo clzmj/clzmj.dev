@@ -1,4 +1,15 @@
-export type PhotoSize = { file: string; width: number; height: number };
+export type PhotoSize = {
+  file: string;
+  width: number;
+  height: number;
+  quality: number;
+  bytes: number;
+};
+export type OmittedPhotoSize = {
+  width: number;
+  budget: number;
+  attempts: { quality: number; bytes: number }[];
+};
 
 export type ElsewherePhoto = {
   id: string;
@@ -10,5 +21,8 @@ export type ElsewherePhoto = {
   width: number;
   height: number;
   color: string;
+  sourceWidth: number;
+  sourceHeight: number;
   sizes: PhotoSize[];
+  omitted?: OmittedPhotoSize[];
 };

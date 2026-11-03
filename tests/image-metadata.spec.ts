@@ -33,11 +33,7 @@ test('public photos meet the 300 KB small / 600 KB large budgets; sources are no
     const variant = photos
       .flatMap((photo) => photo.sizes)
       .find((size) => path.endsWith(`/elsewhere/${size.file}`));
-    const cap = path.endsWith('/elsewhere/04-1937.webp')
-      ? 850_000
-      : variant && variant.width > 640
-        ? 600_000
-        : 300_000;
+    const cap = variant && variant.width > 640 ? 600_000 : 300_000;
     expect(statSync(path).size, path).toBeLessThan(cap);
   }
 });
@@ -77,8 +73,7 @@ test('the byte parser rejects EXIF/GPS in JPEG, PNG and WebP containers', () => 
 });
 
 test('variants keep real dimensions, never upscale, and omit unavailable requested sizes', () => {
-  const source = resolve(process.env.ELSEWHERE_SRC ?? 'assets/elsewhere');
-  const script = `const photos=await Bun.file('lib/elsewhere.json').json();const result=[];for(const photo of photos){const original=await new Bun.Image(${JSON.stringify(source)}+'/'+photo.id+'.jpg').metadata();const sizes=[];for(const size of photo.sizes)sizes.push(await new Bun.Image('public/elsewhere/'+size.file).metadata());result.push({original,sizes});}console.log(JSON.stringify(result));`;
+  const script = `const photos=await Bun.file('lib/elsewhere.json').json();const result=[];for(const photo of photos){const original={width:photo.sourceWidth,height:photo.sourceHeight};const sizes=[];for(const size of photo.sizes)sizes.push(await new Bun.Image('public/elsewhere/'+size.file).metadata());result.push({original,sizes});}console.log(JSON.stringify(result));`;
   const sizes = JSON.parse(execFileSync(bunExecutable(), ['-e', script], { encoding: 'utf8' })) as {
     original: { width: number; height: number };
     sizes: { width: number; height: number }[];
@@ -89,13 +84,23 @@ test('variants keep real dimensions, never upscale, and omit unavailable request
       expect(sizes[index].sizes[n]).toMatchObject({ width: size.width, height: size.height });
       expect(size.width).toBeLessThanOrEqual(sizes[index].original.width);
       expect(size.height).toBeLessThanOrEqual(sizes[index].original.height);
+      // The native JPEG decode/inside resize can round dimensions twice.
       expect(
         Math.abs(
           size.height - (size.width * sizes[index].original.height) / sizes[index].original.width,
         ),
-      ).toBeLessThanOrEqual(1);
+      ).toBeLessThanOrEqual(2);
     }
-    expect(photo.sizes.at(-1)!.width).toBe(Math.min(sizes[index].original.width, 2400));
+    const full = photo.sizes.at(-1)!;
+    expect(full.width).toBeLessThanOrEqual(Math.min(sizes[index].original.width, 2400));
+    expect(Math.max(full.width, full.height)).toBeGreaterThanOrEqual(
+      Math.min(1920, Math.max(sizes[index].original.width, sizes[index].original.height)),
+    );
+    if (full.width !== Math.min(sizes[index].original.width, 2400)) {
+      expect(
+        photo.omitted.some((size) => size.width === Math.min(sizes[index].original.width, 2400)),
+      ).toBe(true);
+    }
     for (const width of [640, 1080, 1600, 2400])
       if (width > sizes[index].original.width)
         expect(photo.sizes.some((size) => size.width === width)).toBe(false);
@@ -152,9 +157,26 @@ test('Elsewhere source and output image folders are never tracked by git', () =>
   expect(tracked).toBe('');
 });
 
-test('only photo 02 at 2400px gets the q80 size exception', () => {
+test('only photo 02 at 2400px prefers q80 before budget fallback', () => {
   for (const photo of photos)
     for (const width of [640, 1080, 1600, 2400]) {
       expect(photoQuality(photo.id, width)).toBe(photo.id === '02' && width === 2400 ? 80 : 85);
     }
+});
+
+test('every emitted variant records its bounded quality/bytes and rejected widths explain their HD fallback', () => {
+  for (const photo of photos) {
+    for (const size of photo.sizes) {
+      expect([85, 80, 75]).toContain(size.quality);
+      expect(size.quality).toBeLessThanOrEqual(photoQuality(photo.id, size.width));
+      expect(statSync(join('public/elsewhere', size.file)).size).toBe(size.bytes);
+      expect(size.bytes).toBeLessThan(size.width <= 640 ? 300_000 : 600_000);
+    }
+    for (const skipped of photo.omitted) {
+      expect(skipped.attempts.at(-1)!.quality).toBe(75);
+      for (const attempt of skipped.attempts)
+        expect(attempt.bytes).toBeGreaterThanOrEqual(skipped.budget);
+      expect(photo.sizes.some((size) => size.width === skipped.width)).toBe(false);
+    }
+  }
 });

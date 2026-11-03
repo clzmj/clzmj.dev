@@ -204,9 +204,14 @@ test.describe('retina photo sizing', () => {
     await page.goto('/');
     await page.getByRole('button', { name: photos[0].caption, exact: true }).click();
     const image = page.getByRole('dialog').locator('img');
+    const needed = await image.evaluate(
+      (img) => img.getBoundingClientRect().width * devicePixelRatio,
+    );
+    const expected =
+      photos[0].sizes.find((size) => size.width >= needed) ?? photos[0].sizes.at(-1)!;
     await expect
       .poll(() => image.evaluate((img) => (img as HTMLImageElement).currentSrc))
-      .toContain(photos[0].src);
-    expect(photos[0].width).toBeGreaterThan(640);
+      .toContain(expected.file);
+    expect(expected.width).toBeGreaterThan(640);
   });
 });
