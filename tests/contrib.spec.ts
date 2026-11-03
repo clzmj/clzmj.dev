@@ -17,3 +17,42 @@ test('the contribution graph opens on the newest weeks', async ({ page }) => {
   expect(newest.x + newest.width).toBeLessThanOrEqual(port.x + port.width + 1);
   expect(oldest.x + oldest.width).toBeLessThan(port.x);
 });
+
+for (const kind of ['zero', 'positive']) {
+  test(`the ${kind} contribution tooltip shows the actual count and short date`, async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const cell = page
+      .locator(
+        kind === 'zero'
+          ? '.contrib-grid [data-count="0"]'
+          : '.contrib-grid [data-count]:not([data-count="0"])',
+      )
+      .last();
+    await cell.scrollIntoViewIfNeeded();
+    const date = await cell.getAttribute('data-date');
+    const count = Number(await cell.getAttribute('data-count'));
+    const label = new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${date}T00:00:00Z`));
+    await cell.hover();
+    await expect(page.locator('[data-slot="contribution-tip"]')).toHaveText(
+      `${count === 0 ? 'No' : count} contributions on ${label}`,
+    );
+  });
+}
+
+test('the mobile legend stays beside the contribution summary', async ({ page }) => {
+  await page.setViewportSize({ width: 393, height: 852 });
+  await page.goto('/');
+  const summary = await page.locator('.contrib-head > p').first().boundingBox();
+  const legend = await page.locator('.contrib-legend').boundingBox();
+  expect(summary).not.toBeNull();
+  expect(legend).not.toBeNull();
+  expect(legend!.x).toBeGreaterThanOrEqual(summary!.x + summary!.width);
+  expect(legend!.y + legend!.height / 2).toBeCloseTo(summary!.y + summary!.height / 2, 0);
+});

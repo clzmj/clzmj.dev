@@ -26,7 +26,11 @@ export function ContributionCard({ data }: { data: Contributions }) {
       const rect = cell.getBoundingClientRect();
       const parent = card.getBoundingClientRect();
       setTip({
-        text: tipText({ date, level: Number(cell.dataset.level ?? '0') }),
+        text: tipText({
+          date,
+          level: Number(cell.dataset.level ?? '0'),
+          count: cell.dataset.count === undefined ? undefined : Number(cell.dataset.count),
+        }),
         x: rect.left + rect.width / 2 - parent.left,
         y: rect.top - parent.top,
       });
@@ -52,6 +56,7 @@ export function ContributionCard({ data }: { data: Contributions }) {
                   className={`contrib-cell level-${day.level}`}
                   data-date={day.date}
                   data-level={day.level}
+                  data-count={day.count}
                 />
               )),
             )}
@@ -92,11 +97,13 @@ export function ContributionCard({ data }: { data: Contributions }) {
 function tipText(day: ContributionDay): string {
   const [year, month, date] = day.date.split('-').map(Number);
   const label = new Intl.DateTimeFormat('en-US', {
-    month: 'long',
+    month: 'short',
     day: 'numeric',
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(Date.UTC(year, month - 1, date)));
-  if (day.level === 0) return `No contributions on ${label}`;
-  return `Contributions on ${label}`;
+  if (day.count === 0 || day.level === 0) return `No contributions on ${label}`;
+  return day.count === undefined
+    ? `Contributions on ${label}`
+    : `${day.count} contributions on ${label}`;
 }
