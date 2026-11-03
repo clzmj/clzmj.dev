@@ -18,7 +18,7 @@ test('the contribution graph opens on the newest weeks', async ({ page }) => {
   expect(oldest.x + oldest.width).toBeLessThan(port.x);
 });
 
-for (const kind of ['zero', 'positive']) {
+for (const kind of ['zero', 'one', 'positive']) {
   test(`the ${kind} contribution tooltip shows the actual count and short date`, async ({
     page,
   }) => {
@@ -27,7 +27,9 @@ for (const kind of ['zero', 'positive']) {
       .locator(
         kind === 'zero'
           ? '.contrib-grid [data-count="0"]'
-          : '.contrib-grid [data-count]:not([data-count="0"])',
+          : kind === 'one'
+            ? '.contrib-grid [data-count="1"]'
+            : '.contrib-grid [data-count]:not([data-count="0"]):not([data-count="1"])',
       )
       .last();
     await cell.scrollIntoViewIfNeeded();
@@ -41,7 +43,7 @@ for (const kind of ['zero', 'positive']) {
     }).format(new Date(`${date}T00:00:00Z`));
     await cell.hover();
     await expect(page.locator('[data-slot="contribution-tip"]')).toHaveText(
-      `${count === 0 ? 'No' : count} contributions on ${label}`,
+      `${count === 0 ? 'No' : count} ${count === 1 ? 'contribution' : 'contributions'} on ${label}`,
     );
   });
 }

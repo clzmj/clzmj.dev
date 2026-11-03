@@ -105,5 +105,5 @@ function tipText(day: ContributionDay): string {
   if (day.count === 0 || day.level === 0) return `No contributions on ${label}`;
   return day.count === undefined
     ? `Contributions on ${label}`
-    : `${day.count} contributions on ${label}`;
+    : `${day.count} ${day.count === 1 ? 'contribution' : 'contributions'} on ${label}`;
 }
