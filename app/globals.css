@@ -465,7 +465,9 @@ body {
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  vertical-align: -3px;
+  vertical-align: middle;
+  height: 18px;
+  margin-block: -4px;
 }
 
 .avatar-faces {
@@ -743,7 +745,7 @@ body {
 
 .contrib-head {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px 16px;
@@ -764,6 +766,7 @@ body {
 }
 
 .contrib-legend {
+  flex: none;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -845,6 +848,10 @@ body {
   transform: translateY(var(--fan-y)) rotate(var(--fan-r));
   transform-origin: center center;
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fan-card[aria-expanded='true'] {
+  visibility: hidden;
 }
 
 .fan-card img {
@@ -939,6 +946,7 @@ body {
 }
 
 .footer-clock {
+  flex: none;
   display: flex;
   align-items: baseline;
   gap: 8px;
@@ -947,6 +955,7 @@ body {
   font-size: 14px;
   line-height: 1.375;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .footer-time {
@@ -959,10 +968,22 @@ body {
 }
 
 .footer-actions {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
   display: flex;
   align-items: baseline;
   gap: 16px;
   margin-left: auto;
+}
+
+.footer-link {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.theme-toggle {
+  flex: none;
 }
 
 .theme-toggle,
@@ -988,18 +1009,21 @@ body {
 .cat-anchor {
   position: relative;
   display: inline-block;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 24px;
   flex: none;
 }
 
 .cat {
+  position: absolute;
+  left: -12px;
+  bottom: 0;
   display: block;
-  width: 32px;
-  height: 32px;
+  width: 64px;
+  height: 64px;
   background-image: url('/cat.png');
   background-repeat: no-repeat;
-  background-size: 128px 64px;
+  background-size: 256px 128px;
   image-rendering: pixelated;
   background-position: 0 0;
 }
@@ -1020,7 +1044,7 @@ html[data-cat='awake'] .cat {
 }
 
 html[data-cat='asleep'] .cat {
-  background-position-y: -32px;
+  background-position-y: -64px;
   animation: cat-frames 1.8s steps(4, end) infinite;
 }
 
@@ -1029,7 +1053,7 @@ html[data-cat='asleep'] .cat {
     background-position-x: 0;
   }
   to {
-    background-position-x: -128px;
+    background-position-x: -256px;
   }
 }
 
@@ -1346,5 +1370,32 @@ html[data-theme='dark'] .prose pre code span {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+}
+
+.theme-icon {
+  display: none;
+}
+
+@media (max-width: 40rem) {
+  .footer {
+    gap: 4px;
+  }
+  .footer-clock,
+  .footer-actions {
+    gap: 4px;
+  }
+  .theme-label {
+    display: none;
+  }
+  .theme-icon {
+    display: inline-block;
+    vertical-align: -2px;
+  }
+}
+
+@media (max-width: 380px) {
+  .footer {
+    flex-wrap: wrap;
   }
 }

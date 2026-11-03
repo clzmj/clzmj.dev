@@ -73,3 +73,38 @@ test('the demo post renders the supported blocks', async ({ page }) => {
   ).toBeVisible();
   await expect(page.locator('sup a, a[href*="fn"]').first()).toBeAttached();
 });
+
+for (const theme of ['auto', 'light', 'dark']) {
+  test(`the 393px footer stays on one line in ${theme} mode`, async ({ page }) => {
+    await page.setViewportSize({ width: 393, height: 852 });
+    await page.clock.install({ time: new Date('2026-06-15T11:59:00-06:00') });
+    await page.addInitScript((choice) => localStorage.setItem('theme', choice), theme);
+    await page.goto('/');
+    await expect(page.locator('.footer-time')).toContainText('11:59am');
+    const metrics = await page.locator('.footer').evaluate((footer) => {
+      const time = footer.querySelector('.footer-time')!;
+      const range = document.createRange();
+      range.selectNodeContents(time);
+      const rect = footer.getBoundingClientRect();
+      return {
+        height: rect.height,
+        lines: range.getClientRects().length,
+        right: footer.querySelector('.footer-actions')!.getBoundingClientRect().right,
+        edge: rect.right,
+      };
+    });
+    expect(metrics.lines).toBe(1);
+    expect(metrics.height).toBeCloseTo(29, 0);
+    expect(metrics.right).toBeLessThanOrEqual(metrics.edge + 1);
+    await expect(page.getByRole('button', { name: /Color theme/ })).toBeVisible();
+  });
+}
+
+test('inline avatars keep every bio line at 26px', async ({ page }) => {
+  await page.setViewportSize({ width: 393, height: 852 });
+  await page.goto('/');
+  const heights = await page
+    .locator('.bio p')
+    .evaluateAll((paragraphs) => paragraphs.map((p) => p.getBoundingClientRect().height));
+  for (const height of heights) expect(height % 26).toBe(0);
+});
