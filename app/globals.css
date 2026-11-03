@@ -208,6 +208,12 @@ body {
   min-width: 0;
 }
 
+@media (width < 640px) {
+  .identity {
+    margin-bottom: 32px;
+  }
+}
+
 .identity > div {
   min-width: 0;
 }
