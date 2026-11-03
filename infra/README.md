@@ -26,6 +26,18 @@ Pull requests declare `environment: ci` and run `terraform plan -lock=false`. Th
 
 State is the S3 backend in `backend.tf` (R2 bucket `clzmj-dev-tfstate`, native lockfile). Credentials are the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables, mapped from the R2 secrets in CI. They are not in the Terraform files.
 
+## Media bucket
+
+Terraform adopts the existing `clzmj-dev-media` R2 bucket with an import block and `prevent_destroy`. It holds the Elsewhere source photos under `elsewhere/` and stays private, with no custom domain or public `r2.dev` access. Photos must never be committed to git. CI downloads them into `assets/elsewhere/` immediately before the site build.
+
+`CLOUDFLARE_API_TOKEN` has Workers R2 Storage Read in `ci` for plans and Workers R2 Storage Write in `production` for Terraform. Both environments receive `MEDIA_R2_BUCKET`, `MEDIA_R2_ACCESS_KEY_ID`, `MEDIA_R2_SECRET_ACCESS_KEY`, and `CLOUDFLARE_ACCOUNT_ID` from Doppler. The media access key pair is read-only and scoped to this bucket. Upload credentials `MEDIA_R2_UPLOAD_ACCESS_KEY_ID` and `MEDIA_R2_UPLOAD_SECRET_ACCESS_KEY` live only in Doppler config `clzmj-dev/dev`.
+
+Upload from Carlos's Mac:
+
+```sh
+doppler run --project clzmj-dev --config dev -- sh -c 'AWS_ACCESS_KEY_ID=$MEDIA_R2_UPLOAD_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$MEDIA_R2_UPLOAD_SECRET_ACCESS_KEY AWS_DEFAULT_REGION=auto aws s3 sync assets/elsewhere/ s3://clzmj-dev-media/elsewhere/ --endpoint-url https://51d0a4728b8e02a6abfa1e2560252613.r2.cloudflarestorage.com'
+```
+
 ## Workflows
 
 | Workflow | When | What |
