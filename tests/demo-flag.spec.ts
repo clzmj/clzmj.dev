@@ -1,4 +1,6 @@
 import { execFileSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 
 import { expect, test } from '@playwright/test';
 
@@ -43,5 +45,14 @@ test('empty sentinel URLs return 404', async ({ request }) => {
     '/events/empty.html',
   ]) {
     expect((await request.get(path)).status()).toBe(404);
+  }
+});
+
+test('the demo build retains collection index HTML and payloads', async ({ request }) => {
+  for (const collection of ['writings', 'events']) {
+    for (const suffix of ['.html', '.txt']) {
+      expect(existsSync(join(process.cwd(), 'out', `${collection}${suffix}`))).toBe(true);
+    }
+    expect((await request.get(`/${collection}`)).status()).toBe(200);
   }
 });

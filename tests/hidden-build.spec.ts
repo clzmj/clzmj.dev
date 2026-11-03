@@ -54,6 +54,11 @@ test('next build with demos hidden succeeds and omits the demo', () => {
     });
     const out = join(dir, 'out');
     expect(existsSync(join(out, 'index.html'))).toBe(true);
+    for (const collection of ['writings', 'events']) {
+      for (const suffix of ['.html', '.txt']) {
+        expect(existsSync(join(out, `${collection}${suffix}`))).toBe(false);
+      }
+    }
     expect(existsSync(join(out, 'writings', 'markdown-demo.html'))).toBe(false);
     expect(existsSync(join(out, 'writings', 'markdown-demo.md'))).toBe(false);
     expect(existsSync(join(out, 'writings', 'demo-still.png'))).toBe(false);
