@@ -22,3 +22,8 @@ import {
   to = cloudflare_zone_setting.security_header
   id = "${var.cloudflare_zone_id}/security_header"
 }
+
+import {
+  to = cloudflare_r2_bucket.media
+  id = "${var.cloudflare_account_id}/clzmj-dev-media/default"
+}
