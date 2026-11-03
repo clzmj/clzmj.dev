@@ -42,7 +42,9 @@ export function PhotoFan({ photos }: { photos: Slide[] }) {
 function PhotoDialog({ photo, onClose }: { photo: Slide; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   const closeRef = useRef(onClose);
-  closeRef.current = onClose;
+  useEffect(() => {
+    closeRef.current = onClose;
+  });
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;

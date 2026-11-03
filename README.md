@@ -48,9 +48,12 @@ That serves `out/` on port 3000.
 
 ```bash
 bun run lint
+bun run format:check
 bun run test
 bun run shots
 ```
+
+`bun run lint` is oxlint, and warnings fail the run. `bun run format` writes oxfmt changes. `bun run format:check` checks them.
 
 `bun run test` expects `out/` from `SHOW_DEMO_POSTS=true bun run build`, because those tests open the demo post. `bun run shots` writes light and dark full-page screenshots to `shots/`, which is gitignored.
 

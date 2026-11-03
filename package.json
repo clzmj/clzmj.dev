@@ -6,8 +6,9 @@
     "prebuild": "bun scripts/generate.ts",
     "build": "next build",
     "dev": "SHOW_DEMO_POSTS=true bun scripts/generate.ts && SHOW_DEMO_POSTS=true next dev",
-    "lint": "biome check .",
-    "format": "biome check --write .",
+    "lint": "oxlint --deny-warnings",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "typecheck": "tsc --noEmit",
     "start": "bun scripts/serve.ts",
     "shots": "bun scripts/shots.ts",
@@ -31,7 +32,6 @@
     "remark-math": "^6.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.6.4",
     "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4.3.4",
     "@types/mdast": "^4.0.4",
@@ -39,6 +39,8 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "lighthouse": "^13.6.0",
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.90.0",
     "playwright": "^1.64.1",
     "tailwindcss": "^4.3.4",
     "typescript": "^7.0.2",
