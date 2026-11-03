@@ -227,3 +227,17 @@ test('phones choose the small static variant and the placeholder fades without r
     release();
   }
 });
+
+test.describe('retina photo sizing', () => {
+  test.use({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 2 });
+  test('the open viewer requests a larger existing variant on a 2x phone', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    await page.getByRole('button', { name: photos[0].caption, exact: true }).click();
+    const image = page.getByRole('dialog').locator('img');
+    await expect
+      .poll(() => image.evaluate((img) => (img as HTMLImageElement).currentSrc))
+      .toContain(photos[0].src);
+    expect(photos[0].width).toBeGreaterThan(640);
+  });
+});

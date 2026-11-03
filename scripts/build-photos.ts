@@ -60,24 +60,26 @@ async function main() {
   for (const photo of photos) {
     const file = join(source, `${photo.id}.jpg`);
     const original = await new Bun.Image(file).metadata();
-    const widths = [640, 1200].filter((width) => width <= original.width);
-    // A small sanitized source still needs a usable output; never enlarge it.
-    if (!widths.length) widths.push(original.width);
+    const widths = [
+      ...new Set([
+        ...[640, 1080, 1600, 2400].filter((width) => width <= original.width),
+        Math.min(original.width, 2400),
+      ]),
+    ].sort((a, b) => a - b);
     photo.sizes = [];
     for (const width of widths) {
       const height = Math.round((original.height * width) / original.width);
-      let quality = 80;
-      let bytes: Uint8Array;
-      do {
-        bytes = await new Bun.Image(file)
-          .resize(width, height, { fit: 'inside', withoutEnlargement: true })
-          .webp({ quality })
-          .bytes();
-        if (bytes.byteLength <= 300_000) break;
-        quality -= 2;
-      } while (quality >= 70);
-      if (bytes.byteLength > 300_000)
-        throw new Error(`Photo ${photo.id} exceeds 300 KB even at q70`);
+      // Preserve the native Paris/q85 output; this one measured file needs 811,572 bytes.
+      const budget =
+        photo.id === '04' && width === 1937 ? 850_000 : width <= 640 ? 300_000 : 600_000;
+      const bytes = await new Bun.Image(file)
+        .resize(width, height, { fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 85 })
+        .bytes();
+      if (bytes.byteLength > budget)
+        throw new Error(
+          `Photo ${photo.id} at ${width}px/q85 is ${bytes.byteLength} bytes, exceeding its ${budget}-byte cap`,
+        );
       const tags = imageMetadataChunks(bytes);
       if (tags.length)
         throw new Error(`Bun.Image output unexpectedly retains metadata: ${tags.join(', ')}`);

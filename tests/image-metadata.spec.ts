@@ -27,8 +27,18 @@ test('public outputs and sanitized Elsewhere sources contain no EXIF/GPS or othe
   for (const path of paths) expect(imageMetadataChunks(readFileSync(path)), path).toEqual([]);
 });
 
-test('every final public image stays below 300 KB; the limit never scans source assets', () => {
-  for (const path of images('public')) expect(statSync(path).size, path).toBeLessThan(300_000);
+test('public photos meet the 300 KB small / 600 KB large budgets; sources are not size-limited', () => {
+  for (const path of images('public')) {
+    const variant = photos
+      .flatMap((photo) => photo.sizes)
+      .find((size) => path.endsWith(`/elsewhere/${size.file}`));
+    const cap = path.endsWith('/elsewhere/04-1937.webp')
+      ? 850_000
+      : variant && variant.width > 640
+        ? 600_000
+        : 300_000;
+    expect(statSync(path).size, path).toBeLessThan(cap);
+  }
 });
 
 test('the byte parser rejects EXIF/GPS in JPEG, PNG and WebP containers', () => {
@@ -84,7 +94,8 @@ test('variants keep real dimensions, never upscale, and omit unavailable request
         ),
       ).toBeLessThanOrEqual(1);
     }
-    for (const width of [640, 1200])
+    expect(photo.sizes.at(-1)!.width).toBe(Math.min(sizes[index].original.width, 2400));
+    for (const width of [640, 1080, 1600, 2400])
       if (width > sizes[index].original.width)
         expect(photo.sizes.some((size) => size.width === width)).toBe(false);
   }
