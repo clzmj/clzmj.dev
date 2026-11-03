@@ -52,7 +52,7 @@ export function ThemeToggle() {
       type="button"
       className="theme-toggle"
       data-hydrated={ready ? 'true' : 'false'}
-      aria-label={`Color theme: ${choice}. Activate to change.`}
+      aria-label={`Theme: ${choice}`}
       onClick={() => {
         const next = order[(order.indexOf(choice) + 1) % order.length] ?? 'auto';
         setChoice(next);
@@ -60,9 +60,32 @@ export function ThemeToggle() {
       }}
     >
       <span className="theme-label">{labels[choice]}</span>
-      <svg className="theme-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-        <circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" />
-        <path d="M8 2.5a5.5 5.5 0 0 1 0 11z" fill="currentColor" />
+      <svg
+        className="theme-icon"
+        data-theme-icon={choice}
+        viewBox="0 0 16 16"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        {choice === 'auto' ? (
+          <>
+            <circle cx="8" cy="8" r="5.5" />
+            <path d="M8 2.5a5.5 5.5 0 0 1 0 11z" fill="currentColor" stroke="none" />
+          </>
+        ) : choice === 'light' ? (
+          <>
+            <circle cx="8" cy="8" r="3" />
+            <path d="M8 1v1M8 14v1M1 8h1M14 8h1M3 3l.75.75M12.25 12.25 13 13M3 13l.75-.75M12.25 3.75 13 3" />
+          </>
+        ) : (
+          <path d="M13.5 9.1A5.7 5.7 0 0 1 6.9 2.5a5.7 5.7 0 1 0 6.6 6.6Z" />
+        )}
       </svg>
     </button>
   );

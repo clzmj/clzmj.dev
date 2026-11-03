@@ -96,7 +96,7 @@ for (const theme of ['auto', 'light', 'dark']) {
     expect(metrics.lines).toBe(1);
     expect(metrics.height).toBeCloseTo(29, 0);
     expect(metrics.right).toBeLessThanOrEqual(metrics.edge + 1);
-    await expect(page.getByRole('button', { name: /Color theme/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Theme:/ })).toBeVisible();
   });
 }
 

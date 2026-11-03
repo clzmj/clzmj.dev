@@ -1385,6 +1385,18 @@ html[data-theme='dark'] .prose pre code span {
   .footer-actions {
     gap: 4px;
   }
+  .theme-toggle {
+    position: relative;
+  }
+  .theme-toggle::before {
+    content: '';
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    top: 50%;
+    right: -2px;
+    transform: translateY(-50%);
+  }
   .theme-label {
     display: none;
   }
