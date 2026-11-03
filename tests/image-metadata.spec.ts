@@ -8,6 +8,7 @@ import { expect, test } from '@playwright/test';
 import photos from '../lib/elsewhere.json';
 import { bunExecutable } from '../lib/runtime';
 import { imageMetadataChunks } from '../scripts/image-metadata';
+import { photoQuality } from '../scripts/photo-output-policy';
 
 function images(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -149,4 +150,11 @@ test('Elsewhere source and output image folders are never tracked by git', () =>
     { encoding: 'utf8' },
   );
   expect(tracked).toBe('');
+});
+
+test('only photo 02 at 2400px gets the q80 size exception', () => {
+  for (const photo of photos)
+    for (const width of [640, 1080, 1600, 2400]) {
+      expect(photoQuality(photo.id, width)).toBe(photo.id === '02' && width === 2400 ? 80 : 85);
+    }
 });

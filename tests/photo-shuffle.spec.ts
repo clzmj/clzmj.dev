@@ -111,6 +111,7 @@ test('Tab order matches visual order and viewer next/previous follows that seque
   await page.keyboard.press('Enter');
   const dialog = page.getByRole('dialog');
   await expect(dialog).toHaveAccessibleName(expected[0].caption);
+  await dialog.getByRole('button', { name: 'Close photo' }).focus();
   await page.keyboard.press('ArrowRight');
   await expect(dialog).toHaveAccessibleName(expected[1].caption);
   await page.keyboard.press('ArrowLeft');

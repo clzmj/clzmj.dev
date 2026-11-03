@@ -159,7 +159,7 @@ test('phones choose the small static variant and the placeholder fades without r
   });
   try {
     await page.setViewportSize({ width: 393, height: 852 });
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     const frame = page.locator('.fan-card .photo-image').first();
     await frame.scrollIntoViewIfNeeded();
     await expect(frame).toHaveAttribute('data-loaded', 'false');

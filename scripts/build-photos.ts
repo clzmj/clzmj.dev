@@ -4,6 +4,7 @@ import { inflateSync } from 'node:zlib';
 
 import type { ElsewherePhoto } from '../lib/elsewhere';
 import { imageMetadataChunks } from './image-metadata';
+import { photoQuality } from './photo-output-policy';
 
 const source = resolve(process.env.ELSEWHERE_SRC ?? 'assets/elsewhere');
 const output = join(process.cwd(), 'public', 'elsewhere');
@@ -72,13 +73,14 @@ async function main() {
       // Preserve the native Paris/q85 output; this one measured file needs 811,572 bytes.
       const budget =
         photo.id === '04' && width === 1937 ? 850_000 : width <= 640 ? 300_000 : 600_000;
+      const quality = photoQuality(photo.id, width);
       const bytes = await new Bun.Image(file)
         .resize(width, height, { fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: 85 })
+        .webp({ quality })
         .bytes();
       if (bytes.byteLength > budget)
         throw new Error(
-          `Photo ${photo.id} at ${width}px/q85 is ${bytes.byteLength} bytes, exceeding its ${budget}-byte cap`,
+          `Photo ${photo.id} at ${width}px/q${quality} is ${bytes.byteLength} bytes, exceeding its ${budget}-byte cap`,
         );
       const tags = imageMetadataChunks(bytes);
       if (tags.length)
