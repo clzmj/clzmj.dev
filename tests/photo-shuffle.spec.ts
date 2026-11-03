@@ -89,6 +89,7 @@ test('without JavaScript the fan keeps its manifest order', async ({ browser }) 
 
 test('Tab order matches visual order and viewer next/previous follows that sequence', async ({
   page,
+  browserName,
 }) => {
   await page.addInitScript(() => {
     Math.random = () => 0;
@@ -101,7 +102,7 @@ test('Tab order matches visual order and viewer next/previous follows that seque
   const cards = page.locator('.fan-card');
   await cards.first().focus();
   for (const [i, photo] of expected.entries()) {
-    if (i) await page.keyboard.press('Tab');
+    if (i) await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
     await expect(cards.nth(i)).toBeFocused();
     await expect(cards.nth(i)).toHaveAttribute('data-photo-id', photo.id);
     await expect(cards.nth(i)).not.toHaveAttribute('tabindex');

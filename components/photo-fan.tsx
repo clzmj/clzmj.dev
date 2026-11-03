@@ -1,15 +1,38 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'motion/react';
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 
 import type { Slide } from '../lib/content';
 import { orderedPhotos, shuffleScript } from '../lib/elsewhere-shuffle';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  type DialogActions,
+  type DialogChangeDetails,
+} from './ui/dialog';
+
+const glide = { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const };
 
 export function PhotoFan({ photos }: { photos: Slide[] }) {
-  const [open, setOpen] = useState<{ index: number; source: HTMLButtonElement } | null>(null);
-  const [active, setActive] = useState<string | null>(null);
   const [displayed, setDisplayed] = useState(photos);
   const [adopted, setAdopted] = useState(false);
+  const [selected, setSelected] = useState<{ index: number; tilt: number } | null>(null);
+  const [open, setOpen] = useState(false);
+  const trigger = useRef<HTMLButtonElement | null>(null);
+  const actions = useRef<DialogActions | null>(null);
+  const historyEntry = useRef<string | null>(null);
+  const pointer = useRef<{ id: number; x: number; y: number } | null>(null);
+  const group = useId();
+  const reduced = useReducedMotion();
+  const photo = selected ? orderedPhotos(photos)[selected.index] : null;
+  const rows = Array.from({ length: Math.ceil(displayed.length / 7) }, (_, index) =>
+    displayed.slice(index * 7, index * 7 + 7),
+  );
   useEffect(() => {
     setDisplayed(orderedPhotos(photos));
     setAdopted(true);
@@ -17,290 +40,184 @@ export function PhotoFan({ photos }: { photos: Slide[] }) {
   useLayoutEffect(() => {
     if (adopted) document.getElementById('elsewhere-shuffle-style')?.remove();
   }, [adopted]);
-  const rows = Array.from({ length: Math.ceil(displayed.length / 7) }, (_, index) =>
-    displayed.slice(index * 7, index * 7 + 7),
-  );
-  const photo = open === null ? null : orderedPhotos(photos)[open.index];
-  const closeDialog = useCallback(() => setOpen(null), []);
-  const navigate = useCallback(
-    (direction: number) => {
-      setOpen((value) =>
-        value
-          ? { ...value, index: (value.index + direction + photos.length) % photos.length }
-          : value,
-      );
-    },
-    [photos.length],
-  );
+  const popOwnEntry = useCallback(() => {
+    const token = historyEntry.current;
+    historyEntry.current = null;
+    if (token && history.state?.photoViewer === token) history.back();
+  }, []);
+  useEffect(() => {
+    if (!open) return;
+    const back = () => {
+      if (history.state?.photoViewer === historyEntry.current) return;
+      historyEntry.current = null;
+      actions.current?.close();
+    };
+    window.addEventListener('popstate', back);
+    return () => window.removeEventListener('popstate', back);
+  }, [open]);
+  useEffect(() => () => popOwnEntry(), [popOwnEntry]);
+  const changeOpen = (next: boolean, details: DialogChangeDetails) => {
+    if (!next) {
+      details.preventUnmountOnClose();
+      popOwnEntry();
+    }
+    setOpen(next);
+  };
+  const finishExit = () => {
+    actions.current?.unmount();
+    setSelected(null);
+  };
+  const navigate = (direction: number) =>
+    setSelected((value) =>
+      value
+        ? { ...value, index: (value.index + direction + photos.length) % photos.length }
+        : value,
+    );
   return (
-    <>
+    <LayoutGroup id={group}>
       <script
         id="elsewhere-shuffle"
-        dangerouslySetInnerHTML={{ __html: shuffleScript(photos.map((photo) => photo.id)) }}
+        dangerouslySetInnerHTML={{ __html: shuffleScript(photos.map((item) => item.id)) }}
       />
       <div className="photo-eventail">
-        {rows.map((row, rowIndex) => (
-          <div className="photo-fan-row" key={row[0].src}>
+        {rows.map((row) => (
+          <div className="photo-fan-row" key={row[0].id}>
             <div className="photo-piste">
               {row.map((item, column) => {
                 const offset = column - (row.length - 1) / 2;
-                const arc = ((0.6 * offset * offset) / 168) * 100;
                 return (
                   <button
-                    key={item.src}
+                    key={item.id}
                     type="button"
                     className="fan-card"
                     data-photo-id={item.id}
+                    aria-label={item.caption}
                     style={{
                       left: `calc(50% + var(--u) * ${offset * 80 - 68})`,
-                      ['--fan-y' as string]: `${arc}%`,
+                      ['--fan-y' as string]: `${((0.6 * offset * offset) / 168) * 100}%`,
                       ['--fan-r' as string]: `${offset * 3}deg`,
                       ['--fan-i' as string]: String(column),
                     }}
-                    aria-label={item.caption}
-                    aria-expanded={photo?.id === item.id}
-                    onPointerEnter={() => setActive(item.id)}
-                    onPointerLeave={(event) => {
-                      if (document.activeElement !== event.currentTarget) setActive(null);
+                    onClick={(event) => {
+                      trigger.current = event.currentTarget;
+                      setSelected({
+                        index: orderedPhotos(photos).findIndex((entry) => entry.id === item.id),
+                        tilt: offset * 3,
+                      });
+                      if (!historyEntry.current) {
+                        const token = crypto.randomUUID();
+                        historyEntry.current = token;
+                        history.pushState(
+                          { ...history.state, photoViewer: token },
+                          '',
+                          location.href,
+                        );
+                      }
+                      setOpen(true);
                     }}
-                    onFocus={() => setActive(item.id)}
-                    onBlur={() => setActive(null)}
-                    onClick={(event) =>
-                      setOpen({
-                        index: orderedPhotos(photos).findIndex((photo) => photo.id === item.id),
-                        source: event.currentTarget,
-                      })
-                    }
                   >
-                    <PhotoImage photo={item} />
+                    <motion.div
+                      className="photo-shared"
+                      layoutId={reduced ? undefined : `photo-${item.id}`}
+                      transition={glide}
+                      data-shared-photo={item.id}
+                    >
+                      <PhotoImage photo={item} />
+                    </motion.div>
                   </button>
                 );
               })}
             </div>
-            <p className="fan-caption" data-slot="fan-caption">
-              {active !== null &&
-              Math.floor(orderedPhotos(photos).findIndex((photo) => photo.id === active) / 7) ===
-                rowIndex
-                ? photos.find((photo) => photo.id === active)!.caption
-                : '\u00a0'}
-            </p>
+            <div className="fan-captions">
+              {row.map((item) => (
+                <p key={item.id} className="fan-caption" data-slot="fan-caption">
+                  {item.caption}
+                </p>
+              ))}
+            </div>
           </div>
         ))}
       </div>
-      {photo ? (
-        <PhotoDialog
-          photo={photo}
-          source={open?.source ?? null}
-          onClose={closeDialog}
-          onNavigate={navigate}
-        />
-      ) : null}
-    </>
-  );
-}
-
-function PhotoDialog({
-  photo,
-  source,
-  onClose,
-  onNavigate,
-}: {
-  photo: Slide;
-  source: HTMLButtonElement | null;
-  onClose: () => void;
-  onNavigate: (direction: number) => void;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const frameRef = useRef<HTMLElement>(null);
-  const closeRef = useRef<() => void>(() => {});
-  useLayoutEffect(() => {
-    const dialog = ref.current;
-    const frame = frameRef.current;
-    if (!dialog || !frame || !source) return;
-    const trigger = source;
-    const html = document.documentElement;
-    const body = document.body;
-    const previous = {
-      html: html.getAttribute('style'),
-      body: body.getAttribute('style'),
-      x: scrollX,
-      y: scrollY,
-    };
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const token = crypto.randomUUID();
-    let ownsHistory = true;
-    let released = false;
-    let closing = false;
-    let finished = false;
-    let closeAnimationStarted = false;
-    let animation: Animation | undefined;
-    let pointer: { id: number; x: number; y: number } | null = null;
-
-    function restore() {
-      if (released) return;
-      released = true;
-      for (const [element, style] of [
-        [html, previous.html],
-        [body, previous.body],
-      ] as const) {
-        if (style === null) element.removeAttribute('style');
-        else element.setAttribute('style', style);
-      }
-      window.scrollTo({ left: previous.x, top: previous.y, behavior: 'instant' });
-      requestAnimationFrame(() => trigger.focus({ preventScroll: true }));
-    }
-    function popOwnHistory() {
-      if (ownsHistory && history.state?.photoViewer === token) {
-        ownsHistory = false;
-        history.back();
-      }
-    }
-    function sourceTransform() {
-      const start = trigger.getBoundingClientRect();
-      const end = frame!.getBoundingClientRect();
-      const matrix = new DOMMatrixReadOnly(getComputedStyle(trigger).transform);
-      const scale = Math.hypot(matrix.a, matrix.b);
-      const angle = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
-      const x = start.x + start.width / 2 - (end.x + end.width / 2);
-      const y = start.y + start.height / 2 - (end.y + end.height / 2);
-      return `translate(${x}px, ${y}px) rotate(${angle}deg) scale(${(trigger.offsetWidth * scale) / end.width}, ${(trigger.offsetHeight * scale) / end.height})`;
-    }
-    // Every user/native close path enters here; finalization and unmount share restore().
-    function close({ fromHistory = false, immediate = false } = {}) {
-      if (finished) return;
-      if (!closing) {
-        closing = true;
-        if (!fromHistory) popOwnHistory();
-      }
-      if (immediate || reducedMotion.matches || !dialog!.open) {
-        finished = true;
-        animation?.cancel();
-        if (dialog!.open) dialog!.close();
-        restore();
-        onClose();
-        return;
-      }
-      if (closeAnimationStarted) return;
-      closeAnimationStarted = true;
-      const currentTransform = getComputedStyle(frame!).transform;
-      animation?.cancel();
-      const style = getComputedStyle(dialog!);
-      const durationValue = style.getPropertyValue('--photo-close-duration').trim();
-      const duration = Number.parseFloat(durationValue) * (durationValue.endsWith('ms') ? 1 : 1000);
-      getComputedStyle(dialog!, '::backdrop').getPropertyValue('opacity');
-      dialog!.dataset.closing = 'true';
-      animation = frame!.animate(
-        [{ transform: currentTransform }, { transform: sourceTransform() }],
-        {
-          duration,
-          easing: style.getPropertyValue('--photo-close-easing').trim(),
-          fill: 'forwards',
-        },
-      );
-    }
-    closeRef.current = close;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-        event.preventDefault();
-        onNavigate(event.key === 'ArrowRight' ? 1 : -1);
-      }
-    };
-    const onCancel = (event: Event) => {
-      event.preventDefault();
-      close();
-    };
-    const onNativeClose = () => close({ immediate: true });
-    const onClick = (event: MouseEvent) => {
-      if (event.target === dialog) close();
-    };
-    const onPopState = () => {
-      if (history.state?.photoViewer === token) return;
-      ownsHistory = false;
-      close({ fromHistory: true });
-    };
-    const onTransitionEnd = (event: TransitionEvent) => {
-      if (closing && event.pseudoElement === '::backdrop' && event.propertyName === 'opacity')
-        close({ fromHistory: true, immediate: true });
-    };
-    const onPointerDown = (event: PointerEvent) => {
-      if (event.pointerType === 'touch' && event.isPrimary)
-        pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
-    };
-    const onPointerUp = (event: PointerEvent) => {
-      if (!pointer || pointer.id !== event.pointerId) return;
-      const dy = event.clientY - pointer.y;
-      const dx = event.clientX - pointer.x;
-      pointer = null;
-      if (dy > 64 && dy > Math.abs(dx) * 1.2) close();
-    };
-    const onPointerCancel = () => {
-      pointer = null;
-    };
-    dialog.addEventListener('keydown', onKeyDown);
-    dialog.addEventListener('cancel', onCancel);
-    dialog.addEventListener('close', onNativeClose);
-    dialog.addEventListener('click', onClick);
-    dialog.addEventListener('transitionend', onTransitionEnd);
-    dialog.addEventListener('pointerdown', onPointerDown);
-    dialog.addEventListener('pointerup', onPointerUp);
-    dialog.addEventListener('pointercancel', onPointerCancel);
-    window.addEventListener('popstate', onPopState);
-    html.style.setProperty('overflow', 'hidden', 'important');
-    dialog.showModal();
-    history.pushState({ ...history.state, photoViewer: token }, '', location.href);
-    if (!reducedMotion.matches) {
-      animation = frame.animate([{ transform: sourceTransform() }, { transform: 'none' }], {
-        duration: 420,
-        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-      });
-    }
-    return () => {
-      dialog.removeEventListener('keydown', onKeyDown);
-      dialog.removeEventListener('cancel', onCancel);
-      dialog.removeEventListener('close', onNativeClose);
-      dialog.removeEventListener('click', onClick);
-      dialog.removeEventListener('transitionend', onTransitionEnd);
-      dialog.removeEventListener('pointerdown', onPointerDown);
-      dialog.removeEventListener('pointerup', onPointerUp);
-      dialog.removeEventListener('pointercancel', onPointerCancel);
-      window.removeEventListener('popstate', onPopState);
-      animation?.cancel();
-      popOwnHistory();
-      if (dialog.open) dialog.close();
-      restore();
-    };
-  }, [source, onClose, onNavigate]);
-  return (
-    <dialog ref={ref} className="photo-dialog" aria-label={photo.caption}>
-      <button
-        type="button"
-        className="sr-only"
-        aria-label="Close photo"
-        onClick={() => closeRef.current()}
-      >
-        Close photo
-      </button>
-      <button
-        type="button"
-        className="sr-only"
-        aria-label="Previous photo"
-        onClick={() => onNavigate(-1)}
-      >
-        Previous photo
-      </button>
-      <button
-        type="button"
-        className="sr-only"
-        aria-label="Next photo"
-        onClick={() => onNavigate(1)}
-      >
-        Next photo
-      </button>
-      <figure ref={frameRef} className="photo-frame">
-        <PhotoImage key={photo.id} photo={photo} full />
-        <figcaption>{photo.caption}</figcaption>
-      </figure>
-    </dialog>
+      <Dialog open={open} onOpenChange={changeOpen} actionsRef={actions}>
+        <DialogPortal>
+          <DialogOverlay
+            render={
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: open ? 1 : 0 }}
+                transition={reduced ? { duration: 0.12 } : glide}
+              />
+            }
+          />
+          <DialogContent
+            finalFocus={trigger}
+            aria-describedby={undefined}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                event.preventDefault();
+                navigate(event.key === 'ArrowRight' ? 1 : -1);
+              }
+            }}
+            onPointerDown={(event) => {
+              if (event.pointerType === 'touch' && event.isPrimary)
+                pointer.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
+            }}
+            onPointerCancel={() => {
+              pointer.current = null;
+            }}
+            onPointerUp={(event) => {
+              const start = pointer.current;
+              pointer.current = null;
+              if (
+                start &&
+                start.id === event.pointerId &&
+                event.clientY - start.y > 64 &&
+                event.clientY - start.y > Math.abs(event.clientX - start.x) * 1.2
+              )
+                actions.current?.close();
+            }}
+          >
+            <DialogTitle className="sr-only">{photo?.caption}</DialogTitle>
+            <DialogClose className="sr-only" aria-label="Close photo">
+              Close photo
+            </DialogClose>
+            <button
+              type="button"
+              className="sr-only"
+              aria-label="Previous photo"
+              onClick={() => navigate(-1)}
+            >
+              Previous photo
+            </button>
+            <button
+              type="button"
+              className="sr-only"
+              aria-label="Next photo"
+              onClick={() => navigate(1)}
+            >
+              Next photo
+            </button>
+            <AnimatePresence onExitComplete={finishExit}>
+              {open && photo && (
+                <motion.figure
+                  key="viewer"
+                  className="photo-frame"
+                  layoutId={reduced ? undefined : `photo-${photo.id}`}
+                  data-shared-photo={photo.id}
+                  initial={reduced ? { opacity: 0 } : { opacity: 1, rotate: selected?.tilt ?? 0 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={reduced ? { opacity: 0 } : { opacity: 0, rotate: selected?.tilt ?? 0 }}
+                  transition={reduced ? { duration: 0.12 } : glide}
+                >
+                  <PhotoImage key={photo.id} photo={photo} full />
+                  <figcaption>{photo.caption}</figcaption>
+                </motion.figure>
+              )}
+            </AnimatePresence>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+    </LayoutGroup>
   );
 }
 

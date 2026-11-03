@@ -38,7 +38,7 @@ The social glyphs are X, Instagram, LinkedIn, then the theme toggle. All are 16p
 
 ## Photo viewer cleanup
 
-All viewer exits use one close function: the sr-only keyboard/screen-reader control, backdrop tap, swipe down, Escape, browser back, and native dialog close. The HTML element is locked with overflow hidden; body is never fixed. The viewer contains overscroll, is capped to 90vw/85vh, and restores the exact prior root/body inline styles, scroll position, and trigger focus on close or unmount. A same-URL history entry lets browser back close the viewer; other exits consume it. Image taps leave the viewer open. The close control stays visually clipped even while focused.
+The viewer uses the shadcn Base UI Dialog primitive for portal, outside press, Escape, focus return, inertness and scroll locking. Grid buttons never receive an open state or imperative transforms; a separate Motion layoutId figure grows from and returns to the source image. Closing waits for Motion exit completion, then calls Base UI unmount so neither overlay nor popup remains in the DOM. Reduced motion uses a plain fade. The close control is always visually hidden but remains focusable. Back history and swipe down request the same Base UI close action. There is no native dialog, manual body/html style lock, fixed-body workaround or pseudo-element transitionend dependency.
 
 ## Photo shuffle
 

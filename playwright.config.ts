@@ -1,9 +1,20 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 import { bunExecutable } from './lib/runtime';
 
 export default defineConfig({
   testDir: 'tests',
+  projects: [
+    { name: 'chromium', use: { browserName: 'chromium' } },
+    {
+      name: 'webkit-iphone15',
+      use: {
+        ...devices['iPhone 15'],
+        browserName: 'webkit',
+        viewport: { width: 393, height: 852 },
+      },
+    },
+  ],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

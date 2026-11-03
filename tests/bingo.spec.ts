@@ -10,6 +10,10 @@ for (const width of [393, 820, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
       await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
       await page.goto('/');
+      await page.locator('.identity').evaluate((element) => {
+        for (const node of [element, element.nextElementSibling])
+          for (const animation of node?.getAnimations() ?? []) animation.finish();
+      });
       const bingo = page.getByRole('img', { name, exact: true });
       await expect(bingo).toBeVisible();
       await expect(bingo).not.toHaveAttribute('aria-hidden');

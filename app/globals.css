@@ -543,8 +543,8 @@ body {
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.fan-card[aria-expanded='true'] {
-  visibility: hidden;
+.photo-shared {
+  pointer-events: none;
 }
 
 .photo-image {
@@ -580,9 +580,17 @@ body {
   text-align: center;
 }
 
-.fan-caption {
+.fan-captions {
+  position: relative;
   min-height: 36px;
   margin: 8px 0 0;
+}
+
+.fan-caption {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  visibility: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -599,40 +607,30 @@ body {
   }
 }
 
-.photo-dialog {
-  --photo-close-duration: 320ms;
-  --photo-close-easing: cubic-bezier(0.22, 1, 0.36, 1);
-  width: min(520px, 90vw, calc((85vh - 96px) * 0.8));
-  max-width: 90vw;
-  max-height: 85vh;
-  overscroll-behavior: contain;
-  touch-action: pan-x pinch-zoom;
-  margin: auto;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--gray-1000);
-  overflow: visible;
-}
-
-.photo-dialog::backdrop {
-  opacity: 1;
-  transition: opacity var(--photo-close-duration) var(--photo-close-easing);
+.photo-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
   background: color-mix(in srgb, var(--preview-bg) 75%, transparent);
   backdrop-filter: blur(12px);
 }
 
-.photo-dialog[data-closing='true']::backdrop {
-  opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .photo-dialog::backdrop {
-    transition: none;
-  }
+.photo-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 61;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  outline: none;
+  overscroll-behavior: contain;
+  touch-action: pan-x pinch-zoom;
 }
 
 .photo-frame {
+  width: min(520px, 90vw, calc((85vh - 96px) * 0.8));
+  max-height: 85vh;
+  pointer-events: auto;
   margin: 0;
   padding: 4px;
   border-radius: 16px;
@@ -932,4 +930,28 @@ html[data-theme='dark'] .bingo {
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-color: var(--gray-600);
+}
+
+.photo-fan-row:has(.fan-card:nth-child(1):hover) .fan-caption:nth-child(1),
+.photo-fan-row:not(:has(.fan-card:hover)):has(.fan-card:nth-child(1):focus)
+  .fan-caption:nth-child(1),
+.photo-fan-row:has(.fan-card:nth-child(2):hover) .fan-caption:nth-child(2),
+.photo-fan-row:not(:has(.fan-card:hover)):has(.fan-card:nth-child(2):focus)
+  .fan-caption:nth-child(2),
+.photo-fan-row:has(.fan-card:nth-child(3):hover) .fan-caption:nth-child(3),
+.photo-fan-row:not(:has(.fan-card:hover)):has(.fan-card:nth-child(3):focus)
+  .fan-caption:nth-child(3),
+.photo-fan-row:has(.fan-card:nth-child(4):hover) .fan-caption:nth-child(4),
+.photo-fan-row:not(:has(.fan-card:hover)):has(.fan-card:nth-child(4):focus)
+  .fan-caption:nth-child(4),
+.photo-fan-row:has(.fan-card:nth-child(5):hover) .fan-caption:nth-child(5),
+.photo-fan-row:not(:has(.fan-card:hover)):has(.fan-card:nth-child(5):focus)
+  .fan-caption:nth-child(5),
+.photo-fan-row:has(.fan-card:nth-child(6):hover) .fan-caption:nth-child(6),
+.photo-fan-row:not(:has(.fan-card:hover)):has(.fan-card:nth-child(6):focus)
+  .fan-caption:nth-child(6),
+.photo-fan-row:has(.fan-card:nth-child(7):hover) .fan-caption:nth-child(7),
+.photo-fan-row:not(:has(.fan-card:hover)):has(.fan-card:nth-child(7):focus)
+  .fan-caption:nth-child(7) {
+  visibility: visible;
 }

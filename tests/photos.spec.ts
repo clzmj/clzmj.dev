@@ -8,128 +8,86 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('a fan photo opens by itself', async ({ page }) => {
+test.use({ viewport: { width: 393, height: 852 }, hasTouch: true, isMobile: true });
+
+test('a separate dialog photo opens with caption and sr-only controls', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: photos[0].caption, exact: true }).click();
-  const dialog = page.getByRole('dialog', { name: photos[0].caption, exact: true });
-  await expect(dialog).toBeVisible();
+  await page.getByRole('button', { name: photos[0].caption, exact: true }).tap();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toHaveAccessibleName(photos[0].caption);
   await expect(dialog.locator('img')).toHaveAttribute('alt', photos[0].caption);
-  await expect(dialog.locator('figcaption')).toHaveText(photos[0].caption);
-  await expect(page.getByRole('button', { name: 'Previous photo' })).toHaveClass('sr-only');
-  await expect(page.getByRole('button', { name: 'Next photo' })).toHaveClass('sr-only');
-  await expect(page.getByRole('button', { name: /photo \d/ })).toHaveCount(0);
+  for (const name of ['Close photo', 'Previous photo', 'Next photo'])
+    await expect(dialog.getByRole('button', { name })).toHaveClass('sr-only');
   await dialog.getByRole('button', { name: 'Close photo' }).focus();
   await page.keyboard.press('Enter');
-  await expect(dialog).toHaveCount(0);
+  await expect(page.locator('[data-slot="dialog-portal"]')).toHaveCount(0);
 });
 
-test('seventeen wrapped fan cards animate from the selected card and back on Escape', async ({
+test('the dialog shares its photo id while grid cards keep their original boxes and styles', async ({
   page,
 }) => {
   await page.goto('/');
-  const cards = page.locator('.fan-card');
-  await expect(cards).toHaveCount(17);
+  await page.waitForTimeout(1600);
+  await page.locator('.fan-card').nth(10).scrollIntoViewIfNeeded();
+  const before = await page.locator('.fan-card').evaluateAll((cards) =>
+    cards.map((card) => ({
+      id: card.getAttribute('data-photo-id'),
+      rect: card.getBoundingClientRect().toJSON(),
+      style: card.getAttribute('style'),
+    })),
+  );
   const card = page.locator('.fan-card').nth(10);
-  await card.click();
-  const frame = page.locator('.photo-frame');
-  const opening = await frame.evaluate((element) => {
-    const animation = element.getAnimations()[0];
-    animation.pause();
-    animation.currentTime = 0;
-    return {
-      duration: animation.effect!.getTiming().duration,
-      rect: element.getBoundingClientRect().toJSON(),
-    };
-  });
-  const source = await card.boundingBox();
-  expect(opening.duration).toBeGreaterThan(0);
-  expect(opening.rect.x + opening.rect.width / 2).toBeCloseTo(source!.x + source!.width / 2, 0);
-  expect(opening.rect.y + opening.rect.height / 2).toBeCloseTo(source!.y + source!.height / 2, 0);
-  await frame.evaluate((element) => element.getAnimations()[0].finish());
+  const id = await card.getAttribute('data-photo-id');
+  await card.tap();
+  await expect(page.getByRole('dialog').locator('.photo-frame')).toHaveAttribute(
+    'data-shared-photo',
+    id!,
+  );
   await page.keyboard.press('Escape');
-  const closing = await frame.evaluate((element) => {
-    const animation = element.getAnimations()[0];
-    animation.pause();
-    animation.currentTime = Number(animation.effect!.getTiming().duration);
-    return element.getBoundingClientRect().toJSON();
-  });
-  const destination = await card.boundingBox();
-  expect(closing.x + closing.width / 2).toBeCloseTo(destination!.x + destination!.width / 2, 0);
-  expect(closing.y + closing.height / 2).toBeCloseTo(destination!.y + destination!.height / 2, 0);
-  await frame.evaluate((element) => element.getAnimations()[0].finish());
-  await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(card).toBeVisible();
+  await expect(page.locator('[data-slot="dialog-portal"]')).toHaveCount(0);
+  const after = await page.locator('.fan-card').evaluateAll((cards) =>
+    cards.map((card) => ({
+      id: card.getAttribute('data-photo-id'),
+      rect: card.getBoundingClientRect().toJSON(),
+      style: card.getAttribute('style'),
+    })),
+  );
+  for (const [i, entry] of after.entries()) {
+    expect(entry.style).toBe(before[i].style);
+    for (const axis of ['x', 'y', 'width', 'height'] as const)
+      expect(entry.rect[axis]).toBeCloseTo(before[i].rect[axis], 1);
+  }
   await expect(card).toBeFocused();
 });
 
-test('reduced motion opens and closes immediately without a shared-element animation', async ({
-  page,
-}) => {
+test('reduced motion uses a plain fade without shared projection', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   const card = page.getByRole('button', { name: photos[6].caption, exact: true });
-  await card.focus();
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('dialog')).toBeVisible();
-  expect(
-    await page.locator('.photo-frame').evaluate((element) => element.getAnimations().length),
-  ).toBe(0);
-  expect(
-    await page
-      .getByRole('dialog')
-      .evaluate((element) => getComputedStyle(element, '::backdrop').transitionDuration),
-  ).toBe('0s');
+  await card.tap();
+  const frame = page.getByRole('dialog').locator('.photo-frame');
+  await expect(frame).toHaveCSS('transform', 'none');
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.locator('[data-slot="dialog-portal"]')).toHaveCount(0);
   await expect(card).toBeFocused();
 });
 
-test('the backdrop fades with the card and keeps the dialog mounted until transitionend', async ({
-  page,
-}) => {
+test('the backdrop fades and is fully unmounted after the photo closes', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: photos[10].caption, exact: true }).click();
-  const dialog = page.getByRole('dialog');
-  await dialog.locator('.photo-frame').evaluate((element) => element.getAnimations()[0].finish());
-  await dialog.getByRole('button', { name: 'Close photo' }).focus();
-  await page.keyboard.press('Enter');
-  const timing = await dialog.evaluate((element) => {
-    const fade = element
-      .getAnimations({ subtree: true })
-      .find(
-        (animation) =>
-          animation instanceof CSSTransition && animation.transitionProperty === 'opacity',
-      )!;
-    const card = element.querySelector('.photo-frame')!.getAnimations()[0];
-    fade.pause();
-    card.pause();
-    fade.currentTime = 160;
-    card.currentTime = 160;
-    return {
-      fadeDuration: fade.effect!.getTiming().duration,
-      cardDuration: card.effect!.getTiming().duration,
-      fadeEasing: fade.effect!.getTiming().easing,
-      cardEasing: card.effect!.getTiming().easing,
-      opacity: Number(getComputedStyle(element, '::backdrop').opacity),
-    };
-  });
-  expect(timing.fadeDuration).toBe(320);
-  expect(timing.fadeDuration).toBe(timing.cardDuration);
-  expect(timing.fadeEasing).toBe(timing.cardEasing);
-  expect(timing.opacity).toBeGreaterThan(0);
-  expect(timing.opacity).toBeLessThan(1);
-  await dialog.locator('.photo-frame').evaluate((element) => element.getAnimations()[0].finish());
-  await expect(dialog).toBeVisible();
-  await dialog.evaluate((element) => {
-    element
-      .getAnimations({ subtree: true })
-      .find(
-        (animation) =>
-          animation instanceof CSSTransition && animation.transitionProperty === 'opacity',
-      )!
-      .finish();
-  });
-  await expect(dialog).toHaveCount(0);
+  await page.getByRole('button', { name: photos[10].caption, exact: true }).tap();
+  await page.waitForTimeout(450);
+  await page.touchscreen.tap(8, 8);
+  await expect
+    .poll(async () => {
+      const overlay = page.locator('[data-slot="dialog-overlay"]');
+      if (!(await overlay.count())) return false;
+      const opacity = await overlay.evaluate((element) =>
+        Number(getComputedStyle(element).opacity),
+      );
+      return opacity > 0 && opacity < 1;
+    })
+    .toBe(true);
+  await expect(page.locator('[data-slot="dialog-portal"]')).toHaveCount(0);
 });
 
 test('all 17 photos retain order, caption alt text, dimensions, lazy loading, and 4:5 frames', async ({
@@ -164,17 +122,20 @@ test('all 17 photos retain order, caption alt text, dimensions, lazy loading, an
   }
 });
 
-test('keyboard focus reaches every visible Mono caption in order', async ({ page }) => {
+test('keyboard focus reaches every visible Mono caption in order', async ({
+  page,
+  browserName,
+}) => {
   await page.goto('/');
   const cards = page.locator('.fan-card');
   await cards.first().focus();
   for (const [index, photo] of photos.entries()) {
-    if (index) await page.keyboard.press('Tab');
+    if (index) await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
     await expect(cards.nth(index)).toBeFocused();
     const caption = page
       .locator('.photo-fan-row')
       .nth(Math.floor(index / 7))
-      .locator('.fan-caption');
+      .locator('.fan-caption:visible');
     await expect(caption).toHaveText(photo.caption);
     expect(await caption.evaluate((element) => getComputedStyle(element).fontFamily)).toMatch(
       /Geist.*Mono/i,
