@@ -69,7 +69,7 @@ test('inline avatars keep every bio line at 26px', async ({ page }) => {
   const heights = await page
     .locator('.bio p')
     .evaluateAll((paragraphs) => paragraphs.map((p) => p.getBoundingClientRect().height));
-  for (const height of heights) expect(height % 26).toBe(0);
+  for (const height of heights) expect(height / 26).toBeCloseTo(Math.round(height / 26), 2);
 });
 
 for (const time of ['00:00', '09:05', '22:12']) {

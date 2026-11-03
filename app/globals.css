@@ -253,14 +253,6 @@ body {
   text-decoration-color: var(--gray-1100);
 }
 
-.org-logo {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  margin-right: 0.2rem;
-  vertical-align: -2px;
-}
-
 .preview-wrap {
   position: relative;
   display: inline-block;
@@ -370,11 +362,6 @@ body {
 
 .avatar-faces:hover .mini-avatar:first-child {
   margin-left: 0;
-}
-
-.avatar-count {
-  color: var(--gray-1200);
-  font-weight: 500;
 }
 
 .section {

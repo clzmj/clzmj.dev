@@ -4,8 +4,7 @@ import { join } from 'node:path';
 export type ProfileLink = {
   label: string;
   href: string;
-  logo: 'square' | 'plus' | 'wave';
-  previews: string[];
+  previews?: string[];
 };
 
 export type ProfilePart =
@@ -15,11 +14,11 @@ export type ProfilePart =
   | { avatars: true }
   | ProfileLink;
 
+export type ProfileAvatar = { label: string; href?: string; src?: string };
+
 export type Profile = {
-  placeholder: boolean;
-  note: string;
   role: string;
-  community: { count: string; avatars: { label: string }[] };
+  avatarStack: ProfileAvatar[];
   paragraphs: ProfilePart[][];
 };
 

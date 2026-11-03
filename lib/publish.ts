@@ -1,19 +1,17 @@
-import { loadProfile } from './profile';
+import { isProfileLink, loadProfile, type ProfilePart } from './profile';
 import { absoluteUrl, site } from './site';
 
 export function homeMarkdown(): string {
   const profile = loadProfile();
-  const lines = [
-    `# ${site.name}`,
-    '',
-    profile.role,
-    '',
-    `I'm ${site.name}. I live in ${site.locationLabel}. The employers, logos, and community count on the site are placeholders.`,
-    '',
-    `You can reach me at [${site.email}](mailto:${site.email}), or see my code on [GitHub](${site.github}).`,
-    '',
-  ];
-  return `${lines.join('\n')}\n`;
+  return `# ${site.name}\n\n${profile.role}\n\n${profile.paragraphs.map((parts) => parts.map(partMarkdown).join('')).join('\n\n')}\n`;
+}
+
+function partMarkdown(part: ProfilePart): string {
+  if (typeof part === 'string') return part;
+  if ('mail' in part) return `[${site.email}](mailto:${site.email})`;
+  if ('github' in part) return `[GitHub](${site.github})`;
+  if (isProfileLink(part)) return `[${part.label}](${part.href})`;
+  return '';
 }
 
 export function llmsText(): string {

@@ -1,5 +1,7 @@
 import { isProfileLink, loadProfile, type ProfileLink, type ProfilePart } from '../lib/profile';
+import type { ProfileAvatar } from '../lib/profile';
 import { site } from '../lib/site';
+import { AvatarStack } from './avatar-stack';
 import { LinkPreview } from './link-preview';
 
 export function Bio() {
@@ -9,12 +11,7 @@ export function Bio() {
       {profile.paragraphs.map((paragraph) => (
         <p key={paragraphKey(paragraph)}>
           {paragraph.map((part) => (
-            <Part
-              key={partKey(part)}
-              part={part}
-              count={profile.community.count}
-              avatars={profile.community.avatars}
-            />
+            <Part key={partKey(part)} part={part} avatars={profile.avatarStack} />
           ))}
         </p>
       ))}
@@ -22,15 +19,7 @@ export function Bio() {
   );
 }
 
-function Part({
-  part,
-  count,
-  avatars,
-}: {
-  part: ProfilePart;
-  count: string;
-  avatars: { label: string }[];
-}) {
+function Part({ part, avatars }: { part: ProfilePart; avatars: ProfileAvatar[] }) {
   if (typeof part === 'string') return part;
   if ('mail' in part) {
     return <a href={`mailto:${site.email}`}>{site.email}</a>;
@@ -43,20 +32,7 @@ function Part({
       </a>
     );
   }
-  if ('avatars' in part) {
-    return (
-      <span className="avatar-group">
-        <span className="avatar-faces" aria-hidden="true">
-          {avatars.map((avatar) => (
-            <span key={avatar.label} className="mini-avatar">
-              {avatar.label}
-            </span>
-          ))}
-        </span>
-        <span className="avatar-count">{count}</span>
-      </span>
-    );
-  }
+  if ('avatars' in part) return <AvatarStack avatars={avatars} />;
   if (isProfileLink(part)) return <OrgLink link={part} />;
   return null;
 }
