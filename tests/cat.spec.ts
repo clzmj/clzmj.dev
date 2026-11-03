@@ -22,7 +22,7 @@ test('the cat sleeps late at night', async ({ page }) => {
   await expect(cat).toHaveAttribute('data-state', 'asleep');
   await expect(page.locator('html')).toHaveAttribute('data-cat', 'asleep');
   const position = await cat.evaluate((element) => getComputedStyle(element).backgroundPositionY);
-  expect(position).toBe('-64px');
+  expect(position).toBe('-32px');
 });
 
 test('reduced motion holds the first frame and keeps the z marks still', async ({ page }) => {

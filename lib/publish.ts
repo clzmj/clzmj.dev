@@ -1,4 +1,5 @@
 import type { SiteEvent, Writing } from './content';
+import { loadProfile } from './profile';
 import { canonical, type PageRoute } from './routes';
 import { absoluteUrl, site } from './site';
 import { formatLongDate, formatMonthYear } from './time';
@@ -8,16 +9,13 @@ function bullet(label: string, href: string, note?: string): string {
 }
 
 export function homeMarkdown(writings: Writing[], events: SiteEvent[]): string {
+  const profile = loadProfile();
   const lines = [
     `# ${site.name}`,
     '',
-    site.locationLabel,
+    profile.role,
     '',
-    `${site.locationLabel} · ${site.latitudeLabel} ${site.longitudeLabel}`,
-    '',
-    `I'm ${site.name}. I live in ${site.locationLabel}.`,
-    '',
-    'This is a quiet home for notes, events, and a few pictures.',
+    `I'm ${site.name}. I live in ${site.locationLabel}. The employers, logos, and community count on the site are placeholders.`,
     '',
     `You can reach me at [${site.email}](mailto:${site.email}), or see my code on [GitHub](${site.github}).`,
     '',

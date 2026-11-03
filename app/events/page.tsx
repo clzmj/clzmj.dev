@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { RowList } from '../../components/row-list';
 import { DateChip, ItemRow } from '../../components/rows';
 import { Shell } from '../../components/shell';
 import { loadEvents } from '../../lib/content';
@@ -42,11 +43,7 @@ export default function EventsPage() {
         />
       </a>
       <h1 className="page-title">Events</h1>
-      <p className="lede">
-        One Markdown file per event. The build writes a calendar file for each one. RSVPs are not
-        collected on this static site. A later Worker route will store them in Cloudflare D1.
-      </p>
-      <div className="stack">
+      <RowList>
         {events.map((event) => {
           const chip = monthDay(event.start);
           return (
@@ -60,7 +57,7 @@ export default function EventsPage() {
             />
           );
         })}
-      </div>
+      </RowList>
     </Shell>
   );
 }

@@ -21,7 +21,7 @@ function apply(choice: Choice) {
   root.style.colorScheme = theme;
   localStorage.setItem('theme', choice);
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', theme === 'dark' ? '#111111' : '#f4f4f2');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#0f0f0f' : '#fcfcfc');
 }
 
 function readChoice(): Choice {

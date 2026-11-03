@@ -1,0 +1,47 @@
+{
+  "placeholder": true,
+  "note": "Placeholder bio, logos, preview photos, and community avatars. Swap these for Carlos's real words and assets. Nothing here is a real employer or community.",
+  "role": "ML & Software Engineer",
+  "community": {
+    "count": "1,200+",
+    "avatars": [{ "label": "A1" }, { "label": "A2" }, { "label": "A3" }]
+  },
+  "paragraphs": [
+    [
+      "I'm Carlos Lezama. I live in Mexico City. This placeholder says I work at ",
+      {
+        "label": "Northwind",
+        "href": "https://example.com",
+        "logo": "square",
+        "previews": ["/previews/northwind-1.png", "/previews/northwind-2.png"]
+      },
+      ", where the words and pictures are stand-ins."
+    ],
+    [
+      "I also keep a placeholder community of ",
+      { "avatars": true },
+      " people around a lab called ",
+      {
+        "label": "Lumen",
+        "href": "https://example.com",
+        "logo": "plus",
+        "previews": ["/previews/lumen-1.png", "/previews/lumen-2.png"]
+      },
+      "."
+    ],
+    [
+      "Previously, a placeholder stop at ",
+      {
+        "label": "Harbor",
+        "href": "https://example.com",
+        "logo": "wave",
+        "previews": ["/previews/harbor-1.png", "/previews/harbor-2.png"]
+      },
+      ". You can reach me at ",
+      { "mail": true },
+      ", or see my code on ",
+      { "github": true },
+      "."
+    ]
+  ]
+}

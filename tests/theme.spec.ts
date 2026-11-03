@@ -7,7 +7,7 @@ test('a stored dark theme is applied before paint', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   const background = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  expect(background).toBe('rgb(17, 17, 17)');
+  expect(background).toBe('rgb(15, 15, 15)');
 });
 
 test('the theme toggle persists across reload', async ({ page }) => {

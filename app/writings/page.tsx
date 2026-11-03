@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { RowList } from '../../components/row-list';
 import { ItemRow, NoteIcon } from '../../components/rows';
 import { Shell } from '../../components/shell';
 import { visibleWritings } from '../../lib/content';
@@ -42,7 +43,7 @@ export default function WritingsPage() {
         />
       </a>
       <h1 className="page-title">Writings</h1>
-      <div className="stack">
+      <RowList>
         {posts.map((post) => (
           <ItemRow
             key={post.slug}
@@ -53,7 +54,7 @@ export default function WritingsPage() {
             badge={post.demo ? 'Demo' : undefined}
           />
         ))}
-      </div>
+      </RowList>
     </Shell>
   );
 }

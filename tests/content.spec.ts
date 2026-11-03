@@ -47,11 +47,13 @@ test('agent files, calendar, and the only public email', async ({ request }) => 
   }
 });
 
-test('the header line names Mexico City and the clock', async ({ page }) => {
+test('the footer clock names Mexico City', async ({ page }) => {
   await page.goto('/');
-  const line = page.locator('.place');
-  await expect(line).toContainText('Mexico City · 19.43°N 99.13°W');
-  await expect(line).toContainText('CST');
+  const line = page.locator('.footer-clock');
+  await expect(line).toContainText('in Mexico City, Mexico');
+  await expect(page.locator('.role')).toHaveText('ML & Software Engineer');
+  await expect(page.getByRole('region', { name: 'Photos' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Previous photo' })).toHaveCount(0);
 });
 
 test('the demo post renders the supported blocks', async ({ page }) => {

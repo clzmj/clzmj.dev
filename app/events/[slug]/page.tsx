@@ -80,7 +80,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       <article>
         <h1 className="page-title">
           {event.title}
-          {event.example ? <span className="badge"> Example</span> : null}
+          {event.example ? <span className="badge badge-muted">Example</span> : null}
         </h1>
         <div className="event-facts">
           <p>{formatLongDate(event.start)}</p>
