@@ -5,7 +5,6 @@ import { ContributionGraph } from '../components/contribution-graph';
 import { JsonLd } from '../components/json-ld';
 import { PhotoFan } from '../components/photo-fan';
 import { Shell } from '../components/shell';
-import { SocialCards } from '../components/social-cards';
 import { loadSlides } from '../lib/content';
 import { site } from '../lib/site';
 
@@ -81,7 +80,6 @@ export default function HomePage() {
         <Bio />
       </div>
       <ContributionGraph />
-      <SocialCards />
       <section
         className="section section-elsewhere animate-enter animate-enter-individual"
         style={{ ['--stagger' as string]: 3 }}

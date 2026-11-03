@@ -36,8 +36,6 @@ That serves `out/` on port 3000.
 
 ## Content
 
-Social handles and destinations live in `lib/social.ts`. X is configured; Instagram remains an explicit TODO. Banners and avatars are local files in `public/social/`. Missing images use neutral fallbacks without changing the card layout. The build never fetches social images.
-
 - Photos: drop a file in `public/photos/` and point `content/photos.json` at it (`src`, `alt`, `caption`, `width`, `height`). They render as the tilted fan. A click opens that one photo. There are no previous, next, or autoplay controls.
 - Cat: replace `public/cat.png` and `public/cat-dark.png` with sheets of the same size, 128×64 pixels, 4 columns by 2 rows of 32×32 frames. Row 0 is awake, row 1 is asleep. The CSS in `app/globals.css` does not need to change if the grid stays the same.
 
