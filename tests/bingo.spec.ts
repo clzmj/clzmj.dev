@@ -3,50 +3,101 @@ import { expect, test } from '@playwright/test';
 const name = "Bingo, Carlos's border collie";
 
 for (const width of [393, 820, 1440]) {
-  test(`Bingo occupies the original profile slot at ${width}px without clipping`, async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width, height: 1000 });
-    await page.goto('/');
-    const bingo = page.getByRole('img', { name, exact: true });
-    await expect(bingo).toBeVisible();
-    await expect(bingo).not.toHaveAttribute('aria-hidden');
-    await expect(bingo).toHaveAttribute('data-state', 'idle');
-    const metrics = await bingo.evaluate((element) => {
-      const slot = element.parentElement!;
-      const style = getComputedStyle(element);
-      const slotStyle = getComputedStyle(slot);
-      const frame = element.getBoundingClientRect();
-      const anchor = slot.getBoundingClientRect();
-      const identity = slot.closest('.identity')!;
-      return {
-        frame: frame.toJSON(),
-        anchor: anchor.toJSON(),
-        header: identity.getBoundingClientRect().toJSON(),
-        nameX: identity.querySelector('.site-name')!.getBoundingClientRect().x,
-        background: style.backgroundSize,
-        rendering: style.imageRendering,
-        radius: slotStyle.borderRadius,
-        border: slotStyle.borderWidth,
-        overflow: slotStyle.overflow,
-      };
+  for (const theme of ['light', 'dark']) {
+    test(`Bingo's visible pixels align with the name block at ${width}px in ${theme}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+      await page.goto('/');
+      const bingo = page.getByRole('img', { name, exact: true });
+      await expect(bingo).toBeVisible();
+      await expect(bingo).not.toHaveAttribute('aria-hidden');
+      const metrics = await bingo.evaluate((element) => {
+        const slot = element.parentElement!;
+        const style = getComputedStyle(element);
+        const slotStyle = getComputedStyle(slot);
+        const anchor = slot.getBoundingClientRect();
+        const identity = slot.closest('.identity')!;
+        const identityStyle = getComputedStyle(identity);
+        return {
+          frameWidth: element.getBoundingClientRect().width,
+          anchor: anchor.toJSON(),
+          nameX: identity.querySelector('.site-name')!.getBoundingClientRect().x,
+          margin: identityStyle.marginBottom,
+          gap: identityStyle.gap,
+          background: style.backgroundSize,
+          rendering: style.imageRendering,
+          radius: slotStyle.borderRadius,
+          border: slotStyle.borderWidth,
+          overflow: slotStyle.overflow,
+        };
+      });
+      expect(metrics.anchor.width).toBe(44);
+      expect(metrics.anchor.height).toBeCloseTo(44, 3);
+      expect(metrics.nameX).toBeCloseTo(metrics.anchor.right + 16, 0);
+      expect(metrics.margin).toBe('32px');
+      expect(metrics.gap).toBe('16px');
+      expect(metrics.frameWidth).toBe(96);
+      expect(metrics.background).toBe('384px 192px');
+      expect(metrics.rendering).toBe('pixelated');
+      expect(metrics.radius).toBe('0px');
+      expect(metrics.border).toBe('0px');
+      expect(metrics.overflow).toBe('visible');
+      for (const state of ['idle', 'running']) {
+        if (state === 'running') await page.getByRole('button', { name, exact: true }).focus();
+        await expect(bingo).toHaveAttribute('data-state', state);
+        const frames = await bingo.evaluate(async (element) => {
+          const animation = element.getAnimations()[0];
+          animation.pause();
+          const image = new Image();
+          image.src = getComputedStyle(element).backgroundImage.match(/url\(["']?(.*?)["']?\)/)![1];
+          await image.decode();
+          const canvas = document.createElement('canvas');
+          canvas.width = canvas.height = 32;
+          const context = canvas.getContext('2d')!;
+          const row = element.getAttribute('data-state') === 'running' ? 1 : 0;
+          const duration = Number(animation.effect!.getTiming().duration);
+          return [0, 1, 2, 3].map((column) => {
+            animation.currentTime = (column * duration) / 4;
+            context.clearRect(0, 0, 32, 32);
+            context.drawImage(image, column * 32, row * 32, 32, 32, 0, 0, 32, 32);
+            const pixels = context.getImageData(0, 0, 32, 32).data;
+            let left = 32,
+              top = 32,
+              bottom = 0;
+            for (let y = 0; y < 32; y += 1) {
+              for (let x = 0; x < 32; x += 1) {
+                if (pixels[(y * 32 + x) * 4 + 3] > 0) {
+                  left = Math.min(left, x);
+                  top = Math.min(top, y);
+                  bottom = Math.max(bottom, y + 1);
+                }
+              }
+            }
+            const frame = element.getBoundingClientRect();
+            const identity = element.closest('.identity')!;
+            const nameBlock = identity.querySelector('div')!.getBoundingClientRect();
+            const contentLeft = identity.getBoundingClientRect().left;
+            const scale = frame.width / 32;
+            return {
+              leftError: Math.abs(frame.left + left * scale - contentLeft),
+              centerError: Math.abs(
+                frame.top + ((top + bottom) * scale) / 2 - (nameBlock.top + nameBlock.height / 2),
+              ),
+              scale,
+            };
+          });
+        });
+        for (const frame of frames) {
+          expect(frame.scale).toBe(3);
+          expect(frame.leftError).toBeLessThanOrEqual(0.1);
+          expect(frame.centerError).toBeLessThanOrEqual(2);
+        }
+      }
+      await expect(page.locator('footer .bingo, footer .bingo-slot')).toHaveCount(0);
     });
-    expect(metrics.anchor.width).toBe(44);
-    expect(metrics.anchor.height).toBeCloseTo(44, 3);
-    expect(metrics.header.height).toBeCloseTo(44, 3);
-    expect(metrics.anchor.x).toBeCloseTo(metrics.header.x, 0);
-    expect(metrics.nameX).toBeCloseTo(metrics.anchor.right + 16, 0);
-    expect(metrics.frame.width).toBe(96);
-    expect(metrics.frame.height).toBeCloseTo(96, 3);
-    expect(metrics.frame.x + 48).toBeCloseTo(metrics.anchor.x + 22, 0);
-    expect(metrics.frame.y + 48).toBeCloseTo(metrics.anchor.y + 22, 0);
-    expect(metrics.background).toBe('384px 192px');
-    expect(metrics.rendering).toBe('pixelated');
-    expect(metrics.radius).toBe('0px');
-    expect(metrics.border).toBe('0px');
-    expect(metrics.overflow).toBe('visible');
-    await expect(page.locator('footer .bingo, footer .bingo-slot')).toHaveCount(0);
-  });
+  }
 }
 
 for (const theme of ['light', 'dark']) {
