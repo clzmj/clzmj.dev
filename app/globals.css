@@ -872,6 +872,8 @@ body {
 }
 
 .photo-dialog {
+  --photo-close-duration: 320ms;
+  --photo-close-easing: cubic-bezier(0.22, 1, 0.36, 1);
   width: min(520px, calc(100vw - 48px), calc((100vh - 104px) * 0.8));
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 48px);
@@ -884,8 +886,20 @@ body {
 }
 
 .photo-dialog::backdrop {
+  opacity: 1;
+  transition: opacity var(--photo-close-duration) var(--photo-close-easing);
   background: color-mix(in srgb, var(--preview-bg) 75%, transparent);
   backdrop-filter: blur(12px);
+}
+
+.photo-dialog[data-closing='true']::backdrop {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-dialog::backdrop {
+    transition: none;
+  }
 }
 
 .photo-frame {

@@ -87,17 +87,27 @@ function PhotoDialog({
     closeRef.current = () => {
       if (closing) return;
       closing = true;
+      const currentTransform = getComputedStyle(frame).transform;
       animation?.cancel();
       if (reducedMotion.matches) {
         onClose();
         return;
       }
-      animation = frame.animate([{ transform: 'none' }, { transform: sourceTransform() }], {
-        duration: 320,
-        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-        fill: 'forwards',
-      });
-      animation.onfinish = onClose;
+      const style = getComputedStyle(dialog);
+      const durationValue = style.getPropertyValue('--photo-close-duration').trim();
+      const duration = Number.parseFloat(durationValue) * (durationValue.endsWith('ms') ? 1 : 1000);
+      const easing = style.getPropertyValue('--photo-close-easing').trim();
+      // Establish the visible backdrop before changing its transition target.
+      getComputedStyle(dialog, '::backdrop').getPropertyValue('opacity');
+      dialog.dataset.closing = 'true';
+      animation = frame.animate(
+        [{ transform: currentTransform }, { transform: sourceTransform() }],
+        {
+          duration,
+          easing,
+          fill: 'forwards',
+        },
+      );
     };
     const onCancel = (event: Event) => {
       event.preventDefault();
@@ -106,11 +116,18 @@ function PhotoDialog({
     const onClick = (event: MouseEvent) => {
       if (event.target === dialog) closeRef.current();
     };
+    const onTransitionEnd = (event: TransitionEvent) => {
+      if (closing && event.pseudoElement === '::backdrop' && event.propertyName === 'opacity') {
+        onClose();
+      }
+    };
+    dialog.addEventListener('transitionend', onTransitionEnd);
     dialog.addEventListener('cancel', onCancel);
     dialog.addEventListener('click', onClick);
     return () => {
       animation?.cancel();
       document.body.style.overflow = overflow;
+      dialog.removeEventListener('transitionend', onTransitionEnd);
       dialog.removeEventListener('cancel', onCancel);
       dialog.removeEventListener('click', onClick);
       dialog.close();

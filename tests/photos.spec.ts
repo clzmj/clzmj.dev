@@ -63,7 +63,59 @@ test('reduced motion opens and closes immediately without a shared-element anima
   expect(
     await page.locator('.photo-frame').evaluate((element) => element.getAnimations().length),
   ).toBe(0);
+  expect(
+    await page
+      .getByRole('dialog')
+      .evaluate((element) => getComputedStyle(element, '::backdrop').transitionDuration),
+  ).toBe('0s');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(card).toBeFocused();
+});
+
+test('the backdrop fades with the card and keeps the dialog mounted until transitionend', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Plant', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.locator('.photo-frame').evaluate((element) => element.getAnimations()[0].finish());
+  await dialog.getByRole('button', { name: 'Close photo' }).click();
+  const timing = await dialog.evaluate((element) => {
+    const fade = element
+      .getAnimations({ subtree: true })
+      .find(
+        (animation) =>
+          animation instanceof CSSTransition && animation.transitionProperty === 'opacity',
+      )!;
+    const card = element.querySelector('.photo-frame')!.getAnimations()[0];
+    fade.pause();
+    card.pause();
+    fade.currentTime = 160;
+    card.currentTime = 160;
+    return {
+      fadeDuration: fade.effect!.getTiming().duration,
+      cardDuration: card.effect!.getTiming().duration,
+      fadeEasing: fade.effect!.getTiming().easing,
+      cardEasing: card.effect!.getTiming().easing,
+      opacity: Number(getComputedStyle(element, '::backdrop').opacity),
+    };
+  });
+  expect(timing.fadeDuration).toBe(320);
+  expect(timing.fadeDuration).toBe(timing.cardDuration);
+  expect(timing.fadeEasing).toBe(timing.cardEasing);
+  expect(timing.opacity).toBeGreaterThan(0);
+  expect(timing.opacity).toBeLessThan(1);
+  await dialog.locator('.photo-frame').evaluate((element) => element.getAnimations()[0].finish());
+  await expect(dialog).toBeVisible();
+  await dialog.evaluate((element) => {
+    element
+      .getAnimations({ subtree: true })
+      .find(
+        (animation) =>
+          animation instanceof CSSTransition && animation.transitionProperty === 'opacity',
+      )!
+      .finish();
+  });
+  await expect(dialog).toHaveCount(0);
 });
