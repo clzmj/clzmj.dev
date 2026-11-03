@@ -29,7 +29,7 @@ test('agent files and the only public email', async ({ request }) => {
 test('the footer clock names Mexico City', async ({ page }) => {
   await page.goto('/');
   const line = page.locator('.footer-clock');
-  await expect(line).toContainText('in Mexico City, Mexico');
+  await expect(line).toContainText('in Mexico City');
   await expect(page.locator('.role')).toHaveText('ML & Software Engineer');
   await expect(page.getByRole('region', { name: 'Photos' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Previous photo' })).toHaveCount(0);
@@ -74,7 +74,16 @@ for (const time of ['00:00', '09:05', '22:12']) {
   test(`the footer displays ${time} in 24-hour time`, async ({ page }) => {
     await page.clock.install({ time: new Date(`2026-06-15T${time}:00-06:00`) });
     await page.goto('/');
-    await expect(page.locator('.footer-time')).toHaveText(`${time} in Mexico City, Mexico`);
+    await expect(page.locator('.footer-time')).toHaveText(`${time} in Mexico City`);
     await expect(page.locator('.footer-time')).not.toContainText(/am|pm/i);
   });
 }
+
+test('location labels use Mexico City without a country suffix', async ({ page, request }) => {
+  await page.goto('/');
+  await expect(page.locator('.footer-time')).toContainText('in Mexico City');
+  await expect(page.locator('body')).not.toContainText('Mexico City, Mexico');
+  for (const path of ['/', '/index.md', '/llms.txt', '/llms-full.txt']) {
+    expect(await (await request.get(path)).text()).not.toContain('Mexico City, Mexico');
+  }
+});

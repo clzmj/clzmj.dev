@@ -23,7 +23,7 @@ export function formatClock(date: Date): string {
     minute: '2-digit',
     hourCycle: 'h23',
   }).format(date);
-  return `${time} in Mexico City, Mexico`;
+  return `${time} in Mexico City`;
 }
 
 export function initScript(): string {
