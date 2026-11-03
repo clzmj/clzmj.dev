@@ -15,7 +15,7 @@ test('a separate dialog photo opens with caption and sr-only controls', async ({
   await page.getByRole('button', { name: photos[0].caption, exact: true }).tap();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toHaveAccessibleName(photos[0].caption);
-  await expect(dialog.locator('img')).toHaveAttribute('alt', photos[0].caption);
+  await expect(dialog.locator('img')).toHaveAttribute('alt', photos[0].alt);
   for (const name of ['Close photo', 'Previous photo', 'Next photo'])
     await expect(dialog.getByRole('button', { name })).toHaveClass('sr-only');
   await dialog.getByRole('button', { name: 'Close photo' }).focus();
@@ -105,7 +105,7 @@ test('all 17 photos retain order, caption alt text, dimensions, lazy loading, an
     const card = cards.nth(index);
     const image = card.locator('img');
     await expect(card).toHaveAccessibleName(photo.caption);
-    await expect(image).toHaveAttribute('alt', photo.caption);
+    await expect(image).toHaveAttribute('alt', photo.alt);
     await expect(image).toHaveAttribute('width', String(photo.width));
     await expect(image).toHaveAttribute('height', String(photo.height));
     await expect(image).toHaveAttribute('loading', 'lazy');

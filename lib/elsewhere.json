@@ -1,7 +1,8 @@
 [
   {
     "id": "01",
-    "caption": "my dad and me by the sea, both squinting professionally.",
+    "caption": "dad and me, squinting professionally.",
+    "alt": "my dad and me by the sea, both squinting professionally.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -26,7 +27,8 @@
   },
   {
     "id": "02",
-    "caption": "cookie, tiny and already in charge. miss you, girl.",
+    "caption": "cookie, tiny boss. miss you.",
+    "alt": "cookie, tiny and already in charge. miss you, girl.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -46,7 +48,8 @@
   },
   {
     "id": "03",
-    "caption": "my sister and me somewhere in colombia. we weren't lost, we were exploring.",
+    "caption": "sis and me, \"exploring\" colombia.",
+    "alt": "my sister and me somewhere in colombia. we weren't lost, we were exploring.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -71,7 +74,8 @@
   },
   {
     "id": "04",
-    "caption": "paris, and a very tall neighbor.",
+    "caption": "paris and a tall neighbor.",
+    "alt": "paris, and a very tall neighbor.",
     "focal": {
       "x": 0.5,
       "y": 1
@@ -106,7 +110,8 @@
   },
   {
     "id": "05",
-    "caption": "my favorite focaccia. focacce, technically, because there were more.",
+    "caption": "focaccia. focacce, technically.",
+    "alt": "my favorite focaccia. focacce, technically, because there were more.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -131,7 +136,8 @@
   },
   {
     "id": "06",
-    "caption": "a good one i took in italy. my photography peaked here.",
+    "caption": "italy. my photography peaked.",
+    "alt": "a good one i took in italy. my photography peaked here.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -161,7 +167,8 @@
   },
   {
     "id": "07",
-    "caption": "the adriatic off croatia. the water really is that color.",
+    "caption": "the adriatic, no filter.",
+    "alt": "the adriatic off croatia. the water really is that color.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -186,7 +193,8 @@
   },
   {
     "id": "08",
-    "caption": "me, the second it drops below 20°c.",
+    "caption": "me below 20°c.",
+    "alt": "me, the second it drops below 20°c.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -211,7 +219,8 @@
   },
   {
     "id": "09",
-    "caption": "a souvenir from brazil. no, you can't have it.",
+    "caption": "brazil souvenir. it's mine.",
+    "alt": "a souvenir from brazil. no, you can't have it.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -231,7 +240,8 @@
   },
   {
     "id": "10",
-    "caption": "bingo, puppy edition. maximum chaos, minimum size.",
+    "caption": "bingo, puppy edition.",
+    "alt": "bingo, puppy edition. maximum chaos, minimum size.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -256,7 +266,8 @@
   },
   {
     "id": "11",
-    "caption": "bingo the other day, clearly plotting something.",
+    "caption": "bingo, clearly plotting something.",
+    "alt": "bingo the other day, clearly plotting something.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -286,7 +297,8 @@
   },
   {
     "id": "12",
-    "caption": "bingo after a hike. muddy, proud, zero regrets.",
+    "caption": "bingo after a hike.",
+    "alt": "bingo after a hike. muddy, proud, zero regrets.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -311,7 +323,8 @@
   },
   {
     "id": "13",
-    "caption": "bingo and me. she's the main character.",
+    "caption": "bingo and her sidekick.",
+    "alt": "bingo and me. she's the main character.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -336,7 +349,8 @@
   },
   {
     "id": "14",
-    "caption": "mom, my sister and dad, ready to watch mexico win. still waiting.",
+    "caption": "waiting for mexico to win.",
+    "alt": "mom, my sister and dad, ready to watch mexico win. still waiting.",
     "focal": {
       "x": 0.5,
       "y": 0
@@ -361,7 +375,8 @@
   },
   {
     "id": "15",
-    "caption": "mom, my sister and me on moving day. the boxes won.",
+    "caption": "moving day. the boxes won.",
+    "alt": "mom, my sister and me on moving day. the boxes won.",
     "focal": {
       "x": 0.8,
       "y": 0.5
@@ -386,7 +401,8 @@
   },
   {
     "id": "16",
-    "caption": "mom and me at my high school graduation. she did most of the work.",
+    "caption": "high school, mostly mom's work.",
+    "alt": "mom and me at my high school graduation. she did most of the work.",
     "focal": {
       "x": 0.5,
       "y": 0.5
@@ -411,7 +427,8 @@
   },
   {
     "id": "17",
-    "caption": "mom and me at my itam graduation, powered by four years of exam-week tacos.",
+    "caption": "itam grad, powered by tacos.",
+    "alt": "mom and me at my itam graduation, powered by four years of exam-week tacos.",
     "focal": {
       "x": 0.5,
       "y": 0.5

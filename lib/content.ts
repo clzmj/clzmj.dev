@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import type { ElsewherePhoto } from './elsewhere';
 
-export type Slide = ElsewherePhoto & { alt: string; srcSet: string };
+export type Slide = ElsewherePhoto & { srcSet: string };
 
 export function loadSlides(): Slide[] {
   const base = (process.env.ELSEWHERE_BASE_URL ?? '/elsewhere').replace(/\/$/, '');
@@ -15,7 +15,6 @@ export function loadSlides(): Slide[] {
   ) as ElsewherePhoto[];
   return photos.map((photo) => ({
     ...photo,
-    alt: photo.caption,
     src: `${base}/${photo.src}`,
     srcSet: photo.sizes.map((size) => `${base}/${size.file} ${size.width}w`).join(', '),
   }));

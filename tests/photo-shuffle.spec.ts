@@ -43,7 +43,7 @@ test('the inline permutation hands off to React DOM order without hydration warn
   for (const photo of photos) {
     const card = page.locator(`.fan-card[data-photo-id="${photo.id}"]`);
     await expect(card).toHaveAccessibleName(photo.caption);
-    await expect(card.locator('img')).toHaveAttribute('alt', photo.caption);
+    await expect(card.locator('img')).toHaveAttribute('alt', photo.alt);
     expect(
       await card.locator('img').evaluate((image) => getComputedStyle(image).objectPosition),
     ).toBe(photo.objectPosition);
@@ -53,7 +53,7 @@ test('the inline permutation hands off to React DOM order without hydration warn
   const tapped = photos[1];
   await page.locator(`.fan-card[data-photo-id="${tapped.id}"]`).click();
   await expect(page.getByRole('dialog')).toHaveAccessibleName(tapped.caption);
-  await expect(page.getByRole('dialog').locator('img')).toHaveAttribute('alt', tapped.caption);
+  await expect(page.getByRole('dialog').locator('img')).toHaveAttribute('alt', tapped.alt);
   expect(warnings).toEqual([]);
 });
 

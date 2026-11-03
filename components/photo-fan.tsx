@@ -236,7 +236,7 @@ function PhotoImage({ photo, full = false }: { photo: Slide; full?: boolean }) {
         sizes={
           full ? '(max-width: 640px) calc(100vw - 48px), 520px' : '(max-width: 640px) 20vw, 128px'
         }
-        alt={photo.caption}
+        alt={photo.alt}
         width={photo.width}
         height={photo.height}
         loading="lazy"
