@@ -7,4 +7,4 @@ Source notes from the supplied SOURCES.md:
 
 - Zillow: official Zillow Real Estate & Rentals app icon from Apple's App Store
   (https://apps.apple.com/app/id310738695), resized to 64px PNG with its original
-  proportions, colors and spacing preserved.
+  proportions, colors and spacing preserved. Descriptive metadata removed.
