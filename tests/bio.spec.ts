@@ -44,7 +44,10 @@ test('official company logos keep their order, links, full-bleed circles and ove
   page,
 }) => {
   await page.goto('/');
-  const logos = page.locator('.bio .mini-avatar');
+  const zillowLogo = page.locator('.bio p').first().locator('.mini-avatar');
+  await expect(zillowLogo).toHaveAttribute('href', 'https://www.zillow.com/');
+  await expect(zillowLogo.locator('img')).toHaveAttribute('src', '/logos/zillow.png');
+  const logos = page.locator('.bio p').nth(1).locator('.mini-avatar');
   expect(
     await logos.evaluateAll((links) => links.map((link) => link.getAttribute('aria-label'))),
   ).toEqual(companies.slice(1).map(([name]) => name));

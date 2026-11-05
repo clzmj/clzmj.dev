@@ -16,6 +16,13 @@ export function Bio() {
               const punctuation = typeof next === 'string' ? next.match(/^[,.;:!?]+/)?.[0] : '';
               return (
                 <span className="company-link whitespace-nowrap" key={partKey(part)}>
+                  {part.src ? (
+                    <>
+                      <AvatarStack
+                        avatars={[{ label: part.label, href: part.href, src: part.src }]}
+                      />{' '}
+                    </>
+                  ) : null}
                   <Part part={part} avatars={profile.avatarStack} />
                   {punctuation}
                 </span>
