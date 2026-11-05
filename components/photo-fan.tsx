@@ -228,7 +228,14 @@ function PhotoImage({ photo, full = false }: { photo: Slide; full?: boolean }) {
     if (ref.current?.complete && ref.current.naturalWidth > 0) setLoaded(true);
   }, []);
   return (
-    <span className="photo-image" style={{ backgroundColor: photo.color }} data-loaded={loaded}>
+    <span
+      className="photo-image"
+      style={{
+        backgroundColor: photo.color,
+        aspectRatio: full && photo.id === '14' ? `${photo.width} / ${photo.height}` : undefined,
+      }}
+      data-loaded={loaded}
+    >
       <img
         ref={ref}
         src={photo.src}
@@ -241,7 +248,10 @@ function PhotoImage({ photo, full = false }: { photo: Slide; full?: boolean }) {
         height={photo.height}
         loading="lazy"
         decoding="async"
-        style={{ objectPosition: photo.objectPosition }}
+        style={{
+          objectPosition: photo.objectPosition,
+          objectFit: full && photo.id === '14' ? 'contain' : undefined,
+        }}
         onLoad={() => setLoaded(true)}
       />
     </span>

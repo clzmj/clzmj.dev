@@ -215,3 +215,25 @@ test.describe('retina photo sizing', () => {
     expect(expected.width).toBeGreaterThan(640);
   });
 });
+
+for (const width of [393, 1440]) {
+  test(`photo 14 uses the approved crop and shows the full photo in its viewer at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    const card = page.locator('.fan-card[data-photo-id="14"]');
+    await expect(card.locator('img')).toHaveCSS('object-position', '35% 0%');
+    await card.tap();
+    const frame = page.getByRole('dialog').locator('.photo-image');
+    await expect
+      .poll(async () =>
+        frame.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          const img = element.querySelector('img')!;
+          return Math.abs(rect.width / rect.height - img.naturalWidth / img.naturalHeight);
+        }),
+      )
+      .toBeLessThan(0.005);
+  });
+}
