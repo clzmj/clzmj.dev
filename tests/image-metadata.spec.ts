@@ -23,7 +23,15 @@ function images(dir: string): string[] {
 
 test('public outputs and sanitized Elsewhere sources contain no EXIF/GPS or other descriptive metadata', () => {
   const source = resolve(process.env.ELSEWHERE_SRC ?? 'assets/elsewhere');
-  const paths = [...images('public'), ...images(source)];
+  // Only NN.jpg files are build inputs in an external source directory.
+  // Keep scanning every repository asset/output so a stray raw original cannot slip in.
+  const paths = [
+    ...new Set([
+      ...images('public'),
+      ...images('assets/elsewhere'),
+      ...photos.map((photo) => join(source, `${photo.id}.jpg`)),
+    ]),
+  ];
   expect(paths.length).toBeGreaterThanOrEqual(36);
   for (const path of paths) expect(imageMetadataChunks(readFileSync(path)), path).toEqual([]);
 });
@@ -179,4 +187,21 @@ test('every emitted variant records its bounded quality/bytes and rejected width
       expect(photo.sizes.some((size) => size.width === skipped.width)).toBe(false);
     }
   }
+});
+
+test('approved smaller edits retain native resolution and photo 14 stays above its 1000px minimum', () => {
+  const exceptions = new Map([
+    ['10', 1289],
+    ['12', 720],
+    ['13', 1290],
+    ['16', 822],
+  ]);
+  for (const [id, width] of exceptions) {
+    const photo = photos.find((photo) => photo.id === id)!;
+    expect(photo.sourceWidth).toBe(width);
+    expect(photo.sizes.at(-1)!.width).toBe(width);
+  }
+  const photo = photos.find((photo) => photo.id === '14')!;
+  expect(photo.sizes.at(-1)!.width).toBeGreaterThanOrEqual(1000);
+  expect(photo.sizes.at(-1)!.width).toBeLessThanOrEqual(photo.sourceWidth);
 });

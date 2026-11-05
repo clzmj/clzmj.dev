@@ -223,7 +223,7 @@ for (const width of [393, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto('/');
     const card = page.locator('.fan-card[data-photo-id="14"]');
-    await expect(card.locator('img')).toHaveCSS('object-position', '35% 0%');
+    await expect(card.locator('img')).toHaveCSS('object-position', '50% 50%');
     await card.tap();
     const frame = page.getByRole('dialog').locator('.photo-image');
     await expect

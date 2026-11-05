@@ -11,35 +11,35 @@
     "src": "01-2400.webp",
     "width": 2400,
     "height": 1800,
-    "color": "#848271",
+    "color": "#858172",
     "sizes": [
       {
         "file": "01-640.webp",
         "width": 640,
         "height": 480,
         "quality": 85,
-        "bytes": 47318
+        "bytes": 47214
       },
       {
         "file": "01-1080.webp",
         "width": 1080,
         "height": 810,
         "quality": 85,
-        "bytes": 98308
+        "bytes": 99340
       },
       {
         "file": "01-1600.webp",
         "width": 1600,
         "height": 1200,
         "quality": 85,
-        "bytes": 176706
+        "bytes": 183540
       },
       {
         "file": "01-2400.webp",
         "width": 2400,
         "height": 1800,
         "quality": 85,
-        "bytes": 420138
+        "bytes": 443254
       }
     ],
     "omitted": [],
@@ -65,28 +65,28 @@
         "width": 640,
         "height": 480,
         "quality": 85,
-        "bytes": 57176
+        "bytes": 57366
       },
       {
         "file": "02-1080.webp",
         "width": 1080,
         "height": 810,
         "quality": 85,
-        "bytes": 166892
+        "bytes": 165812
       },
       {
         "file": "02-1600.webp",
         "width": 1600,
         "height": 1200,
         "quality": 85,
-        "bytes": 333420
+        "bytes": 336352
       },
       {
         "file": "02-2400.webp",
         "width": 2400,
         "height": 1800,
         "quality": 80,
-        "bytes": 577370
+        "bytes": 589976
       }
     ],
     "omitted": [],
@@ -105,35 +105,35 @@
     "src": "03-2320.webp",
     "width": 2320,
     "height": 3088,
-    "color": "#514335",
+    "color": "#514235",
     "sizes": [
       {
         "file": "03-640.webp",
         "width": 640,
         "height": 852,
         "quality": 85,
-        "bytes": 56094
+        "bytes": 55092
       },
       {
         "file": "03-1080.webp",
         "width": 1080,
         "height": 1438,
         "quality": 85,
-        "bytes": 124582
+        "bytes": 130212
       },
       {
         "file": "03-1600.webp",
         "width": 1600,
         "height": 2130,
         "quality": 85,
-        "bytes": 240364
+        "bytes": 238044
       },
       {
         "file": "03-2320.webp",
         "width": 2320,
         "height": 3088,
         "quality": 85,
-        "bytes": 418368
+        "bytes": 424216
       }
     ],
     "omitted": [],
@@ -146,34 +146,41 @@
     "alt": "paris, and a very tall neighbor.",
     "focal": {
       "x": 0.5,
-      "y": 1
+      "y": 0.5
     },
-    "objectPosition": "50% 100%",
-    "src": "04-1600.webp",
-    "width": 1600,
-    "height": 2133,
-    "color": "#5d7389",
+    "objectPosition": "50% 50%",
+    "src": "04-1920.webp",
+    "width": 1920,
+    "height": 2380,
+    "color": "#5e748c",
     "sizes": [
       {
         "file": "04-640.webp",
         "width": 640,
-        "height": 853,
+        "height": 793,
         "quality": 85,
-        "bytes": 123360
+        "bytes": 111264
       },
       {
         "file": "04-1080.webp",
         "width": 1080,
-        "height": 1440,
+        "height": 1339,
         "quality": 85,
-        "bytes": 327650
+        "bytes": 297734
       },
       {
         "file": "04-1600.webp",
         "width": 1600,
-        "height": 2133,
-        "quality": 80,
-        "bytes": 550170
+        "height": 1983,
+        "quality": 85,
+        "bytes": 588276
+      },
+      {
+        "file": "04-1920.webp",
+        "width": 1920,
+        "height": 2380,
+        "quality": 75,
+        "bytes": 561804
       }
     ],
     "omitted": [
@@ -183,39 +190,21 @@
         "attempts": [
           {
             "quality": 85,
-            "bytes": 1256642
+            "bytes": 1142034
           },
           {
             "quality": 80,
-            "bytes": 1045344
+            "bytes": 955338
           },
           {
             "quality": 75,
-            "bytes": 863752
-          }
-        ]
-      },
-      {
-        "width": 1920,
-        "budget": 600000,
-        "attempts": [
-          {
-            "quality": 85,
-            "bytes": 882442
-          },
-          {
-            "quality": 80,
-            "bytes": 739264
-          },
-          {
-            "quality": 75,
-            "bytes": 618100
+            "bytes": 790092
           }
         ]
       }
     ],
     "sourceWidth": 3024,
-    "sourceHeight": 4032
+    "sourceHeight": 3747
   },
   {
     "id": "05",
@@ -236,28 +225,28 @@
         "width": 640,
         "height": 1138,
         "quality": 85,
-        "bytes": 78496
+        "bytes": 78852
       },
       {
         "file": "05-1080.webp",
         "width": 1080,
         "height": 1920,
         "quality": 85,
-        "bytes": 165652
+        "bytes": 172686
       },
       {
         "file": "05-1600.webp",
         "width": 1600,
         "height": 2844,
         "quality": 85,
-        "bytes": 314070
+        "bytes": 312180
       },
       {
         "file": "05-2160.webp",
         "width": 2160,
         "height": 3840,
         "quality": 85,
-        "bytes": 519582
+        "bytes": 485986
       }
     ],
     "omitted": [],
@@ -276,35 +265,35 @@
     "src": "06-2400.webp",
     "width": 2400,
     "height": 3200,
-    "color": "#52514d",
+    "color": "#2f2e2e",
     "sizes": [
       {
         "file": "06-640.webp",
         "width": 640,
         "height": 853,
         "quality": 85,
-        "bytes": 54460
+        "bytes": 36166
       },
       {
         "file": "06-1080.webp",
         "width": 1080,
         "height": 1440,
         "quality": 85,
-        "bytes": 117272
+        "bytes": 79124
       },
       {
         "file": "06-1600.webp",
         "width": 1600,
         "height": 2133,
         "quality": 85,
-        "bytes": 221916
+        "bytes": 140416
       },
       {
         "file": "06-2400.webp",
         "width": 2400,
         "height": 3200,
         "quality": 85,
-        "bytes": 454844
+        "bytes": 265764
       }
     ],
     "omitted": [],
@@ -323,35 +312,35 @@
     "src": "07-2400.webp",
     "width": 2400,
     "height": 3200,
-    "color": "#7f756c",
+    "color": "#8e847b",
     "sizes": [
       {
         "file": "07-640.webp",
         "width": 640,
         "height": 853,
         "quality": 85,
-        "bytes": 56576
+        "bytes": 62068
       },
       {
         "file": "07-1080.webp",
         "width": 1080,
         "height": 1440,
         "quality": 85,
-        "bytes": 134648
+        "bytes": 148606
       },
       {
         "file": "07-1600.webp",
         "width": 1600,
         "height": 2133,
         "quality": 85,
-        "bytes": 263476
+        "bytes": 304550
       },
       {
         "file": "07-2400.webp",
         "width": 2400,
         "height": 3200,
-        "quality": 85,
-        "bytes": 522656
+        "quality": 80,
+        "bytes": 483152
       }
     ],
     "omitted": [],
@@ -370,35 +359,35 @@
     "src": "08-2062.webp",
     "width": 2062,
     "height": 3664,
-    "color": "#807970",
+    "color": "#817970",
     "sizes": [
       {
         "file": "08-640.webp",
         "width": 640,
         "height": 1136,
         "quality": 85,
-        "bytes": 63194
+        "bytes": 64610
       },
       {
         "file": "08-1080.webp",
         "width": 1080,
         "height": 1919,
         "quality": 85,
-        "bytes": 174018
+        "bytes": 177468
       },
       {
         "file": "08-1600.webp",
         "width": 1600,
         "height": 2842,
         "quality": 85,
-        "bytes": 393668
+        "bytes": 370666
       },
       {
         "file": "08-2062.webp",
         "width": 2062,
         "height": 3664,
-        "quality": 80,
-        "bytes": 506192
+        "quality": 85,
+        "bytes": 553628
       }
     ],
     "omitted": [],
@@ -414,43 +403,43 @@
       "y": 0.5
     },
     "objectPosition": "50% 50%",
-    "src": "09-2400.webp",
-    "width": 2400,
-    "height": 3200,
-    "color": "#776663",
+    "src": "09-2184.webp",
+    "width": 2184,
+    "height": 2912,
+    "color": "#796c6a",
     "sizes": [
       {
         "file": "09-640.webp",
         "width": 640,
         "height": 853,
         "quality": 85,
-        "bytes": 72530
+        "bytes": 74848
       },
       {
         "file": "09-1080.webp",
         "width": 1080,
         "height": 1440,
         "quality": 85,
-        "bytes": 164646
+        "bytes": 160670
       },
       {
         "file": "09-1600.webp",
         "width": 1600,
         "height": 2133,
         "quality": 85,
-        "bytes": 322654
+        "bytes": 297898
       },
       {
-        "file": "09-2400.webp",
-        "width": 2400,
-        "height": 3200,
-        "quality": 80,
-        "bytes": 438292
+        "file": "09-2184.webp",
+        "width": 2184,
+        "height": 2912,
+        "quality": 85,
+        "bytes": 434368
       }
     ],
     "omitted": [],
-    "sourceWidth": 3024,
-    "sourceHeight": 4032
+    "sourceWidth": 2184,
+    "sourceHeight": 2912
   },
   {
     "id": "10",
@@ -461,36 +450,36 @@
       "y": 0.5
     },
     "objectPosition": "50% 50%",
-    "src": "10-1275.webp",
-    "width": 1275,
-    "height": 1275,
-    "color": "#70655a",
+    "src": "10-1289.webp",
+    "width": 1289,
+    "height": 1289,
+    "color": "#70665a",
     "sizes": [
       {
         "file": "10-640.webp",
         "width": 640,
         "height": 640,
         "quality": 85,
-        "bytes": 24344
+        "bytes": 22816
       },
       {
         "file": "10-1080.webp",
         "width": 1080,
         "height": 1080,
         "quality": 85,
-        "bytes": 49582
+        "bytes": 47790
       },
       {
-        "file": "10-1275.webp",
-        "width": 1275,
-        "height": 1275,
+        "file": "10-1289.webp",
+        "width": 1289,
+        "height": 1289,
         "quality": 85,
-        "bytes": 60420
+        "bytes": 61514
       }
     ],
     "omitted": [],
-    "sourceWidth": 1275,
-    "sourceHeight": 1275
+    "sourceWidth": 1289,
+    "sourceHeight": 1289
   },
   {
     "id": "11",
@@ -501,36 +490,43 @@
       "y": 0.5
     },
     "objectPosition": "50% 50%",
-    "src": "11-1350.webp",
-    "width": 1350,
-    "height": 2400,
-    "color": "#8d8669",
+    "src": "11-2340.webp",
+    "width": 2340,
+    "height": 4160,
+    "color": "#8e8566",
     "sizes": [
       {
         "file": "11-640.webp",
         "width": 640,
-        "height": 1138,
+        "height": 1137,
         "quality": 85,
-        "bytes": 47272
+        "bytes": 50236
       },
       {
         "file": "11-1080.webp",
         "width": 1080,
-        "height": 1919,
+        "height": 1920,
         "quality": 85,
-        "bytes": 96094
+        "bytes": 98808
       },
       {
-        "file": "11-1350.webp",
-        "width": 1350,
-        "height": 2400,
+        "file": "11-1600.webp",
+        "width": 1600,
+        "height": 2844,
         "quality": 85,
-        "bytes": 130994
+        "bytes": 162742
+      },
+      {
+        "file": "11-2340.webp",
+        "width": 2340,
+        "height": 4160,
+        "quality": 85,
+        "bytes": 275686
       }
     ],
     "omitted": [],
-    "sourceWidth": 1350,
-    "sourceHeight": 2400
+    "sourceWidth": 2340,
+    "sourceHeight": 4160
   },
   {
     "id": "12",
@@ -541,29 +537,29 @@
       "y": 0.5
     },
     "objectPosition": "50% 50%",
-    "src": "12-665.webp",
-    "width": 665,
-    "height": 1182,
-    "color": "#7c6f67",
+    "src": "12-720.webp",
+    "width": 720,
+    "height": 1280,
+    "color": "#7e6e65",
     "sizes": [
       {
         "file": "12-640.webp",
         "width": 640,
         "height": 1138,
         "quality": 85,
-        "bytes": 134948
+        "bytes": 139834
       },
       {
-        "file": "12-665.webp",
-        "width": 665,
-        "height": 1182,
+        "file": "12-720.webp",
+        "width": 720,
+        "height": 1280,
         "quality": 85,
-        "bytes": 141522
+        "bytes": 159314
       }
     ],
     "omitted": [],
-    "sourceWidth": 665,
-    "sourceHeight": 1182
+    "sourceWidth": 720,
+    "sourceHeight": 1280
   },
   {
     "id": "13",
@@ -574,69 +570,76 @@
       "y": 0.5
     },
     "objectPosition": "50% 50%",
-    "src": "13-1265.webp",
-    "width": 1265,
-    "height": 1265,
-    "color": "#82756c",
+    "src": "13-1290.webp",
+    "width": 1290,
+    "height": 1290,
+    "color": "#81746b",
     "sizes": [
       {
         "file": "13-640.webp",
         "width": 640,
         "height": 640,
         "quality": 85,
-        "bytes": 51388
+        "bytes": 50942
       },
       {
         "file": "13-1080.webp",
         "width": 1080,
         "height": 1080,
         "quality": 85,
-        "bytes": 88494
+        "bytes": 92950
       },
       {
-        "file": "13-1265.webp",
-        "width": 1265,
-        "height": 1265,
+        "file": "13-1290.webp",
+        "width": 1290,
+        "height": 1290,
         "quality": 85,
-        "bytes": 106650
+        "bytes": 112340
       }
     ],
     "omitted": [],
-    "sourceWidth": 1265,
-    "sourceHeight": 1265
+    "sourceWidth": 1290,
+    "sourceHeight": 1290
   },
   {
     "id": "14",
     "caption": "waiting for mexico to win.",
     "alt": "mom, my sister and dad, ready to watch mexico win. still waiting.",
     "focal": {
-      "x": 0.35,
-      "y": 0
+      "x": 0.5,
+      "y": 0.5
     },
-    "objectPosition": "35% 0%",
-    "src": "14-776.webp",
-    "width": 776,
-    "height": 574,
-    "color": "#7d6d5c",
+    "objectPosition": "50% 50%",
+    "src": "14-1123.webp",
+    "width": 1123,
+    "height": 1022,
+    "color": "#49443b",
     "sizes": [
       {
         "file": "14-640.webp",
         "width": 640,
-        "height": 474,
+        "height": 583,
         "quality": 85,
-        "bytes": 44510
+        "bytes": 39576
       },
       {
-        "file": "14-776.webp",
-        "width": 776,
-        "height": 574,
+        "file": "14-1080.webp",
+        "width": 1080,
+        "height": 983,
         "quality": 85,
-        "bytes": 58254
+        "bytes": 78274
+      },
+      {
+        "file": "14-1123.webp",
+        "width": 1123,
+        "height": 1022,
+        "quality": 85,
+        "bytes": 81976
       }
     ],
     "omitted": [],
-    "sourceWidth": 776,
-    "sourceHeight": 574
+    "sourceWidth": 1123,
+    "sourceHeight": 1022
   },
   {
     "id": "15",
@@ -657,28 +660,28 @@
         "width": 640,
         "height": 480,
         "quality": 85,
-        "bytes": 33180
+        "bytes": 33232
       },
       {
         "file": "15-1080.webp",
         "width": 1080,
         "height": 810,
         "quality": 85,
-        "bytes": 72172
+        "bytes": 72308
       },
       {
         "file": "15-1600.webp",
         "width": 1600,
         "height": 1200,
         "quality": 85,
-        "bytes": 129396
+        "bytes": 127834
       },
       {
         "file": "15-2048.webp",
         "width": 2048,
         "height": 1536,
         "quality": 85,
-        "bytes": 184606
+        "bytes": 184384
       }
     ],
     "omitted": [],
@@ -694,101 +697,75 @@
       "y": 0.5
     },
     "objectPosition": "50% 50%",
-    "src": "16-1536.webp",
-    "width": 1536,
-    "height": 2048,
-    "color": "#6d6a5d",
+    "src": "16-822.webp",
+    "width": 822,
+    "height": 1096,
+    "color": "#6c6552",
     "sizes": [
       {
         "file": "16-640.webp",
         "width": 640,
-        "height": 853,
+        "height": 852,
         "quality": 85,
-        "bytes": 90732
+        "bytes": 71516
       },
       {
-        "file": "16-1080.webp",
-        "width": 1080,
-        "height": 1440,
+        "file": "16-822.webp",
+        "width": 822,
+        "height": 1096,
         "quality": 85,
-        "bytes": 212040
-      },
-      {
-        "file": "16-1536.webp",
-        "width": 1536,
-        "height": 2048,
-        "quality": 85,
-        "bytes": 367990
+        "bytes": 102998
       }
     ],
     "omitted": [],
-    "sourceWidth": 1536,
-    "sourceHeight": 2048
+    "sourceWidth": 822,
+    "sourceHeight": 1096
   },
   {
     "id": "17",
     "caption": "itam grad, powered by jovitacos.",
     "alt": "mom and me at my itam graduation, powered by jovitacos from near campus.",
     "focal": {
-      "x": 0.5,
+      "x": 0.45,
       "y": 0.5
     },
-    "objectPosition": "50% 50%",
-    "src": "17-1920.webp",
-    "width": 1920,
-    "height": 2560,
-    "color": "#80786c",
+    "objectPosition": "45% 50%",
+    "src": "17-2400.webp",
+    "width": 2400,
+    "height": 2400,
+    "color": "#665c4e",
     "sizes": [
       {
         "file": "17-640.webp",
         "width": 640,
-        "height": 853,
+        "height": 640,
         "quality": 85,
-        "bytes": 97452
+        "bytes": 60702
       },
       {
         "file": "17-1080.webp",
         "width": 1080,
-        "height": 1440,
+        "height": 1080,
         "quality": 85,
-        "bytes": 294928
+        "bytes": 177600
       },
       {
         "file": "17-1600.webp",
         "width": 1600,
-        "height": 2133,
-        "quality": 80,
-        "bytes": 493500
+        "height": 1600,
+        "quality": 85,
+        "bytes": 358900
       },
       {
-        "file": "17-1920.webp",
-        "width": 1920,
-        "height": 2560,
-        "quality": 75,
-        "bytes": 534052
-      }
-    ],
-    "omitted": [
-      {
+        "file": "17-2400.webp",
         "width": 2400,
-        "budget": 600000,
-        "attempts": [
-          {
-            "quality": 85,
-            "bytes": 1357270
-          },
-          {
-            "quality": 80,
-            "bytes": 1033166
-          },
-          {
-            "quality": 75,
-            "bytes": 823788
-          }
-        ]
+        "height": 2400,
+        "quality": 80,
+        "bytes": 486676
       }
     ],
-    "sourceWidth": 4284,
-    "sourceHeight": 5712
+    "omitted": [],
+    "sourceWidth": 3041,
+    "sourceHeight": 3041
   }
 ]
