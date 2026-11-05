@@ -1,67 +1,93 @@
-# clzmj.dev infrastructure
+# Infrastructure
 
-Terraform manages the clzmj.dev zone edge. Wrangler deploys the site.
+Terraform owns Cloudflare resources around the Worker; Wrangler uploads the static site.
 
-## What Terraform owns
+```mermaid
+flowchart LR
+  W["Wrangler: clzmj-dev and out/"] --> D["Terraform: apex custom domain"]
+  T["Terraform apply"] --> E["DNS, redirect, HTTPS settings, media bucket"]
+  T --> S["R2: state and lockfile"]
+```
 
-- DNS that was already on the zone: `www` AAAA, Google MX, SPF, site verification, DMARC, and the Google DKIM TXT record.
-- The existing `http_request_dynamic_redirect` ruleset (`www` to the apex).
-- Free zone settings: Always Use HTTPS, minimum TLS 1.2, and HSTS.
-- The Workers custom domain that routes `clzmj.dev` to the Worker `clzmj-dev`.
+| Owner                    | Source                                                                  |
+| ------------------------ | ----------------------------------------------------------------------- |
+| Worker script / assets   | Root `wrangler.jsonc`; deploy command in `.github/workflows/deploy.yml` |
+| Edge and media resources | `infra/*.tf`; apply runs only after Worker deploy on a `main` push      |
+| Existing zone            | `infra/zone.tf` reads it as a data source and verifies the name         |
 
-Terraform does not create the zone, and it does not define the Worker script, versions, or assets. The root `wrangler.jsonc` is the only Worker config. The apex DNS record created by the custom domain is left to that resource.
+## Resources and buckets
 
-## Secrets
+| Resource           | Terraform address / file                                          | Behavior                                                                   |
+| ------------------ | ----------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Apex custom domain | `cloudflare_workers_custom_domain.apex`, `infra/custom_domain.tf` | `clzmj.dev` → `clzmj-dev`; custom domain handles apex DNS                  |
+| www DNS            | `cloudflare_dns_record.www_aaaa`, `infra/dns.tf`                  | Proxied AAAA `100::`, TTL auto; redirect placeholder                       |
+| www redirect       | `cloudflare_ruleset.www_redirect`, `infra/redirects.tf`           | Single rule: 301 to HTTPS apex, keeping path and query                     |
+| HTTPS enforcement  | `cloudflare_zone_setting.always_use_https`, `infra/settings.tf`   | `on`                                                                       |
+| Minimum TLS        | `cloudflare_zone_setting.min_tls_version`, `infra/settings.tf`    | `1.2`                                                                      |
+| HSTS               | `cloudflare_zone_setting.security_header`, `infra/settings.tf`    | 31536000 seconds, include subdomains, nosniff; preload off                 |
+| Media R2 bucket    | `cloudflare_r2_bucket.media`, `infra/r2.tf`                       | `clzmj-dev-media`, default jurisdiction, WNAM, Standard; `prevent_destroy` |
+| State R2 bucket    | Backend in `infra/backend.tf`; not a managed bucket resource      | `clzmj-dev-tfstate`, key `clzmj.dev/terraform.tfstate`, native lockfile    |
 
-Doppler is the source of truth. It syncs two GitHub environments that use the same secret names. Edit secrets in Doppler, never in GitHub.
+`infra/imports.tf` adopts the existing www record, redirect ruleset, zone settings and media bucket.
+Mail and domain-verification DNS records are not declared in `infra/*.tf`.
 
-| GitHub environment | Tokens                                      | Branch limit |
-| ------------------ | ------------------------------------------- | ------------ |
-| `ci`               | Read-only Cloudflare and read-only R2 state | None         |
-| `production`       | Write Cloudflare and write R2 state         | `main` only  |
+No public media domain or runtime R2 binding is configured in `infra/` or `wrangler.jsonc`.
 
-There are no repository-level secrets. Both environments provide `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`, `TF_STATE_BUCKET`, `TF_STATE_R2_ACCESS_KEY_ID`, and `TF_STATE_R2_SECRET_ACCESS_KEY`.
+## Credential contract
 
-Pull requests declare `environment: ci` and run `terraform plan -lock=false`. The read-only R2 token cannot write the lock object. Pushes to `main`, the daily rebuild, and `workflow_dispatch` declare `environment: production`.
+Doppler is the source of truth and syncs GitHub environment secrets automatically. Change the source
+in Doppler, not the synced destination in GitHub. The documented setup uses environment secrets,
+with no repository-level secrets.
 
-State is the S3 backend in `backend.tf` (R2 bucket `clzmj-dev-tfstate`, native lockfile). Credentials are the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables, mapped from the R2 secrets in CI. They are not in the Terraform files.
+The integration configuration is not versioned in this repository.
 
-## Media bucket
+| Destination             | Access                                                                                                | Workflow                                             |
+| ----------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| GitHub `ci`             | Read-only Cloudflare and state; no branch restriction documented by the existing infrastructure setup | PR build and `terraform plan -lock=false`            |
+| GitHub `production`     | Write Cloudflare and state; `main` only in the documented environment setup                           | Worker deploy; Terraform apply only on `main` pushes |
+| Doppler `clzmj-dev/dev` | Local media upload keys; no GitHub sync target recorded                                               | Mac upload command below                             |
 
-Terraform adopts the existing `clzmj-dev-media` R2 bucket with an import block and `prevent_destroy`. It holds the Elsewhere source photos under `elsewhere/` and stays private, with no custom domain or public `r2.dev` access. Photos must never be committed to git. CI downloads them into `assets/elsewhere/` immediately before the site build.
+Both GitHub environments receive the nine Doppler-synced names listed in
+[environments](../docs/environments.md#every-secret-read-by-workflows).
 
-`CLOUDFLARE_API_TOKEN` has Workers R2 Storage Read in `ci` for plans and Workers R2 Storage Write in `production` for Terraform. Both environments receive `MEDIA_R2_BUCKET`, `MEDIA_R2_ACCESS_KEY_ID`, `MEDIA_R2_SECRET_ACCESS_KEY`, and `CLOUDFLARE_ACCOUNT_ID` from Doppler. The media access key pair is read-only and scoped to this bucket. Upload credentials `MEDIA_R2_UPLOAD_ACCESS_KEY_ID` and `MEDIA_R2_UPLOAD_SECRET_ACCESS_KEY` live only in Doppler config `clzmj-dev/dev`.
+The media read pair is scoped to `clzmj-dev-media`; both environments use read-only media
+credentials. Cloudflare tokens include Workers R2 Storage Read in `ci` and Workers R2 Storage Write
+in production.
 
-Upload from Carlos's Mac:
+Actual token policies and branch restrictions must be verified outside the repository.
+
+The state pair maps to `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in Terraform steps. `ci` cannot
+write the state lock, so PR plans use `-lock=false`; production apply takes the lock.
+
+Sources: `.github/workflows/pull-request.yml`, `.github/workflows/deploy.yml`, `infra/backend.tf`.
+
+## Upload sanitized media from the Mac
+
+`MEDIA_R2_UPLOAD_ACCESS_KEY_ID` and `MEDIA_R2_UPLOAD_SECRET_ACCESS_KEY` live only in Doppler
+`clzmj-dev/dev`. The private bucket holds `elsewhere/01.jpg`–`17.jpg`; `.gitignore` excludes both
+source photos and generated WebPs.
 
 ```sh
 doppler run --project clzmj-dev --config dev -- sh -c 'AWS_ACCESS_KEY_ID=$MEDIA_R2_UPLOAD_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$MEDIA_R2_UPLOAD_SECRET_ACCESS_KEY AWS_DEFAULT_REGION=auto aws s3 sync assets/elsewhere/ s3://clzmj-dev-media/elsewhere/ --endpoint-url https://51d0a4728b8e02a6abfa1e2560252613.r2.cloudflarestorage.com'
 ```
 
-## Workflows
+See [photos](../docs/photos.md) for metadata checks, crops and safe replacement steps. Workflows
+fetch sources before building; browsers receive generated files from `out/`.
 
-| Workflow           | When                                     | What                                                                                                                                                                                      |
-| ------------------ | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pull-request.yml` | Pull request                             | `bun run lint`, `bun run format:check`, install Playwright Chromium, and build the site. `terraform fmt -check`, `validate`, and `plan -lock=false`. Update one PR comment with the plan. |
-| `deploy.yml`       | Push to `main`                           | Install Playwright Chromium, build, `wrangler deploy`, then `terraform apply`. A concurrency group keeps applies from overlapping.                                                        |
-| `deploy.yml`       | Daily 08:00 UTC, and `workflow_dispatch` | Build and `wrangler deploy` only. The contributions graph is rendered at build time.                                                                                                      |
+## Local Terraform checks
 
-The build fails if `package.json` or a Bun lockfile is missing, or if `bun run build` does not write `out/`. Production deploy also fails if `wrangler.jsonc` is missing. Build steps do not receive Cloudflare or R2 credentials.
-
-Deploy uses `bunx wrangler@4.156.2 deploy` from the repository root. The `cf` CLI is not used: it does not read `wrangler.jsonc`.
-
-On `main`, Wrangler runs before `terraform apply`, so the custom domain is attached only after the Worker exists.
-
-## Local checks
-
-These do not need Cloudflare credentials:
+Run from the repository root; these commands avoid remote state access. Versions:
+`infra/versions.tf`; CI pins Terraform 1.17.1 in both workflow files.
 
 ```sh
-terraform -chdir=infra fmt -check
+terraform -chdir=infra fmt -check -recursive
 terraform -chdir=infra init -backend=false
 terraform -chdir=infra validate
-tflint --chdir=infra --init
-tflint --chdir=infra
 ```
 
-A real plan runs in the pull request workflow.
+A real PR plan runs fmt → init → validate → `plan -lock=false -out=tfplan`. A `main` push deploys
+the Worker first, then runs fmt → init → validate → plan → apply. Scheduled and manual deploys skip
+apply (`.github/workflows/deploy.yml`).
+
+[All environment secrets](../docs/environments.md) · [CI failures](../docs/ci.md) · [Deployment and
+rollback](../docs/operations.md) · [ADRs](../docs/adr/README.md)
