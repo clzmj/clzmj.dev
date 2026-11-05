@@ -45,13 +45,12 @@ body{width:1200px;height:630px;background:#fcfcfc;font-family:G;color:#171717;po
 h1{font-size:76px;font-weight:600;letter-spacing:-0.035em;line-height:1}
 .role{font-size:32px;color:#525252;margin-top:18px;letter-spacing:-0.01em}
 .foot{position:absolute;left:80px;bottom:56px;font-family:GM;font-size:22px;color:#737373;display:flex;gap:14px;align-items:center}
-.dot{width:8px;height:8px;border-radius:9px;background:#22c55e}
 .fan{position:absolute;right:64px;top:50%;width:520px;height:420px;transform:translateY(-50%)}
 .c{position:absolute;width:210px;height:262px;border-radius:14px;overflow:hidden;border:5px solid #fff;box-shadow:0 18px 40px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.08)}
 .c img{width:100%;height:100%;object-fit:cover}
 </style></head><body>
 <div class="l"><div class="bingo"></div><h1>Carlos Lezama</h1><div class="role">ML &amp; Software Engineer</div></div>
-<div class="foot"><span>clzmj.dev</span><span>·</span><span>Mexico City</span><span class="dot"></span></div>
+<div class="foot"><span>clzmj.dev</span><span>·</span><span>Mexico City</span></div>
 <div class="fan">${cards}</div></body></html>`,
     { waitUntil: 'load' },
   );
