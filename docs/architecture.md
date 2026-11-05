@@ -37,18 +37,18 @@ flowchart TD
   N --> O["out/: uploaded by Wrangler"]
 ```
 
-| Stage         | Details                                                                                                                                           |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Fetch         | Build/Test in `.github/workflows/checks.yml` and production deploy download the `elsewhere/` prefix; source bucket declared in `infra/r2.tf`      |
-| Photos        | `scripts/build-photos.ts` audits metadata, writes WebPs and updates `lib/elsewhere.json`; see [photos](photos.md)                                 |
-| Generate      | `scripts/generate.ts`: `homeMarkdown()`, `llmsText()`, Chromium-rendered `public/og/home.png`                                                     |
-| Contributions | `refreshContributions()` refreshes only with `REFRESH_CONTRIBUTIONS=true` or `CONTRIBUTIONS_TOKEN`; otherwise reuses `content/contributions.json` |
-| Build hook    | `package.json`: `prebuild` runs photo build then generation before `next build`                                                                   |
-| Export        | `next.config.ts`: `output: 'export'`, unoptimized Next images; `wrangler.jsonc` uploads `out/`                                                    |
+| Stage         | Details                                                                                                                                      |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fetch         | Build/Test in `.github/workflows/checks.yml` and production deploy download the `elsewhere/` prefix; source bucket declared in `infra/r2.tf` |
+| Photos        | `scripts/build-photos.ts` audits metadata, writes WebPs and updates `lib/elsewhere.json`; see [photos](photos.md)                            |
+| Generate      | `scripts/generate.ts`: `homeMarkdown()`, `llmsText()`, Chromium-rendered `public/og/home.png`                                                |
+| Contributions | Each generation fetches public GitHub and GitLab calendars without credentials, sums counts by date and saves `content/contributions.json`   |
+| Build hook    | `package.json`: `prebuild` runs photo build then generation before `next build`                                                              |
+| Export        | `next.config.ts`: `output: 'export'`, unoptimized Next images; `wrangler.jsonc` uploads `out/`                                               |
 
-The daily workflow rebuilds but does **not** set either contribution refresh variable. Its build
-receives `GITHUB_TOKEN`, which `refreshContributions()` does not read
-(`.github/workflows/deploy.yml`, `scripts/generate.ts`).
+The daily workflow refreshes contributions during generation. If one source is unavailable,
+the graph uses the other source and labels it accordingly. If both are unavailable, generation
+keeps the saved snapshot. Contribution requests never use tokens, including `GITHUB_TOKEN`.
 
 ## Ownership
 

@@ -56,14 +56,17 @@ token policies and Doppler integration settings are not versioned here.
 
 ## Local-only credentials and build switches
 
-| Name                                                                 | Where / purpose                                                                       | Access                                                         |
-| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `MEDIA_R2_UPLOAD_ACCESS_KEY_ID`, `MEDIA_R2_UPLOAD_SECRET_ACCESS_KEY` | Doppler `clzmj-dev/dev`; upload sanitized sources (`infra/README.md`)                 | Media write; not consumed by workflows                         |
-| `CONTRIBUTIONS_TOKEN`                                                | Optional local process variable; presence enables refresh (`scripts/generate.ts`)     | Not sent to GitHub by the script; no storage location recorded |
-| `REFRESH_CONTRIBUTIONS`                                              | Optional process variable; `true` enables refresh                                     | Not a secret                                                   |
-| `ELSEWHERE_SRC`, `ELSEWHERE_BASE_URL`                                | Source directory / same-origin URL path (`scripts/build-photos.ts`, `lib/content.ts`) | Not secrets                                                    |
+| Name                                                                 | Where / purpose                                                                       | Access                                 |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | -------------------------------------- |
+| `MEDIA_R2_UPLOAD_ACCESS_KEY_ID`, `MEDIA_R2_UPLOAD_SECRET_ACCESS_KEY` | Doppler `clzmj-dev/dev`; upload sanitized sources (`infra/README.md`)                 | Media write; not consumed by workflows |
+| `ELSEWHERE_SRC`, `ELSEWHERE_BASE_URL`                                | Source directory / same-origin URL path (`scripts/build-photos.ts`, `lib/content.ts`) | Not secrets                            |
 
 Production does not fetch R2 at request time: CI packages the photos into `out/`
 (`.github/workflows/deploy.yml`, `wrangler.jsonc`).
+
+Contribution generation fetches the public GitHub calendar and
+`https://gitlab.com/users/clzmj/calendar.json` on every build without authentication.
+Never configure a GitLab token for this feature. An unavailable or private GitLab calendar is
+skipped; either available source can supply the graph, with the saved snapshot as a final fallback.
 
 Static response headers are defined in `public/_headers`, copied to `out/_headers` by the export; HSTS and nosniff remain in `infra/settings.tf`.

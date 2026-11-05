@@ -114,12 +114,12 @@ curl -i https://clzmj.dev/does-not-exist
 
 ## Troubleshooting
 
-| Symptom                                        | Next action                                                                                                        |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Local photo folder missing / metadata rejected | Follow [photo preparation](photos.md); the builder audits sources before encoding.                                 |
-| Chromium executable missing                    | `bunx playwright install chromium`; generation uses it for OG images (`scripts/generate.ts`).                      |
-| Preview shows stale content                    | Rebuild `out/` before `bun run start`; it is a static server (`scripts/serve.ts`).                                 |
-| Daily rebuild leaves contributions unchanged   | Expected without refresh flags; `scripts/generate.ts` only checks `REFRESH_CONTRIBUTIONS` / `CONTRIBUTIONS_TOKEN`. |
-| Worker deployed but domain/resources wrong     | Inspect the separate Terraform apply job; manual/scheduled deploys skip it (`.github/workflows/deploy.yml`).       |
-| Viewer leaves scrolling blocked                | Reproduce the dismissal path with `tests/viewer-scroll.spec.ts`; see [known issues](photos.md#known-issues).       |
-| CI fails                                       | Use the step-by-step [CI failure table](ci.md#failures).                                                           |
+| Symptom                                        | Next action                                                                                                                                              |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local photo folder missing / metadata rejected | Follow [photo preparation](photos.md); the builder audits sources before encoding.                                                                       |
+| Chromium executable missing                    | `bunx playwright install chromium`; generation uses it for OG images (`scripts/generate.ts`).                                                            |
+| Preview shows stale content                    | Rebuild `out/` before `bun run start`; it is a static server (`scripts/serve.ts`).                                                                       |
+| Daily rebuild leaves contributions unchanged   | Check generation warnings: an unavailable source is skipped; if both fail, the saved contribution snapshot is retained. No contribution tokens are used. |
+| Worker deployed but domain/resources wrong     | Inspect the separate Terraform apply job; manual/scheduled deploys skip it (`.github/workflows/deploy.yml`).                                             |
+| Viewer leaves scrolling blocked                | Reproduce the dismissal path with `tests/viewer-scroll.spec.ts`; see [known issues](photos.md#known-issues).                                             |
+| CI fails                                       | Use the step-by-step [CI failure table](ci.md#failures).                                                                                                 |

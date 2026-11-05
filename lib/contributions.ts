@@ -5,11 +5,14 @@ export type ContributionDay = {
   date: string;
   level: number;
   count?: number;
+  github?: number;
+  gitlab?: number;
 };
 
 export type Contributions = {
   total: number;
   weeks: ContributionDay[][];
+  sources?: ('github' | 'gitlab')[];
 };
 
 export function parseContributions(html: string): Contributions | null {
@@ -59,7 +62,38 @@ export function parseContributions(html: string): Contributions | null {
 export function loadContributions(): Contributions | null {
   const path = join(process.cwd(), 'content', 'contributions.json');
   if (!existsSync(path)) return null;
-  const parsed = JSON.parse(readFileSync(path, 'utf8')) as Contributions;
-  if (!parsed.weeks || parsed.weeks.length === 0) return null;
-  return parsed;
+  try {
+    const parsed = JSON.parse(readFileSync(path, 'utf8')) as Partial<Contributions>;
+    const validCount = (value: unknown) =>
+      value === undefined || (Number.isInteger(value) && (value as number) >= 0);
+    if (
+      !Number.isFinite(parsed.total) ||
+      (parsed.total ?? -1) < 0 ||
+      !Array.isArray(parsed.weeks) ||
+      parsed.weeks.length === 0 ||
+      (parsed.sources !== undefined &&
+        (!Array.isArray(parsed.sources) ||
+          parsed.sources.some((source) => source !== 'github' && source !== 'gitlab'))) ||
+      !parsed.weeks.every(
+        (week) =>
+          Array.isArray(week) &&
+          week.every(
+            (day) =>
+              day &&
+              typeof day.date === 'string' &&
+              /^\d{4}-\d{2}-\d{2}$/.test(day.date) &&
+              new Date(`${day.date}T00:00:00.000Z`).toISOString().slice(0, 10) === day.date &&
+              Number.isInteger(day.level) &&
+              day.level >= 0 &&
+              validCount(day.count) &&
+              validCount(day.github) &&
+              validCount(day.gitlab),
+          ),
+      )
+    )
+      return null;
+    return parsed as Contributions;
+  } catch {
+    return null;
+  }
 }

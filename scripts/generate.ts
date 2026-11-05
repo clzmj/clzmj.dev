@@ -1,9 +1,10 @@
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
 import { chromium } from 'playwright';
 
-import { parseContributions } from '../lib/contributions';
+import { fetchContributions } from '../lib/contribution-fetch';
+import { loadContributions } from '../lib/contributions';
 import { homeMarkdown, llmsText } from '../lib/publish';
 import { renderShareCard } from './share-card';
 
@@ -22,26 +23,19 @@ function resetGenerated() {
 }
 
 async function refreshContributions() {
-  const refresh =
-    process.env.REFRESH_CONTRIBUTIONS === 'true' || Boolean(process.env.CONTRIBUTIONS_TOKEN);
-  if (!refresh) return;
   const target = join(process.cwd(), 'content', 'contributions.json');
-  try {
-    const response = await fetch('https://github.com/users/clzmj/contributions', {
-      headers: { 'user-agent': 'clzmj-dev-build' },
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!response.ok) throw new Error(`GitHub contributions returned ${response.status}`);
-    const parsed = parseContributions(await response.text());
-    if (!parsed) throw new Error('Could not read the contribution graph');
+  const parsed = await fetchContributions();
+  if (parsed) {
     writeFileSync(target, JSON.stringify(parsed));
-  } catch (error) {
-    try {
-      readFileSync(target, 'utf8');
-      console.error('Using the saved contribution graph.');
-    } catch {
-      throw error;
+    if (parsed.sources?.length === 1) {
+      console.warn(
+        `Only ${parsed.sources[0]} contributions are available; the other source was skipped.`,
+      );
     }
+  } else if (loadContributions()) {
+    console.error('Both contribution sources failed; using the saved contribution graph.');
+  } else {
+    console.error('Both contribution sources failed and no saved contribution graph is available.');
   }
 }
 
