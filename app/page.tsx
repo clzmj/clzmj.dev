@@ -8,6 +8,7 @@ import { PhotoFan } from '../components/photo-fan';
 import { Shell } from '../components/shell';
 import { loadSlides } from '../lib/content';
 import { site } from '../lib/site';
+import { socialProfiles } from '../lib/social';
 
 export const metadata: Metadata = {
   alternates: {
@@ -15,18 +16,6 @@ export const metadata: Metadata = {
     types: {
       'text/markdown': `${site.url}/index.md`,
     },
-  },
-  openGraph: {
-    url: site.url,
-    title: site.name,
-    description: site.description,
-    images: [{ url: '/og/home.png', width: 1200, height: 630, alt: site.name }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: site.name,
-    description: site.description,
-    images: ['/og/home.png'],
   },
 };
 
@@ -42,14 +31,14 @@ export default function HomePage() {
         name: site.name,
         url: site.url,
         email: site.email,
-        jobTitle: role,
+        jobTitle: site.jobTitle,
         homeLocation: {
           '@type': 'Place',
           name: site.locationLabel,
           latitude: site.latitude,
           longitude: site.longitude,
         },
-        sameAs: [site.github],
+        sameAs: [...socialProfiles.map(({ href }) => href), site.github],
       },
       {
         '@type': 'WebSite',

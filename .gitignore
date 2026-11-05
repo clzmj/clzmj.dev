@@ -9,7 +9,7 @@ blob-report
 *.tsbuildinfo
 next-env.d.ts
 shots
-public/og
+public/opengraph-image.jpg
 public/llms.txt
 public/llms-full.txt
 public/index.md
