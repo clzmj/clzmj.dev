@@ -96,7 +96,7 @@ async function restored(page: Page, before: Awaited<ReturnType<typeof snapshot>>
 }
 
 for (const method of ['sr-only', 'backdrop', 'Escape', 'back', 'swipe']) {
-  test(`${method} closes fully and restores the page and every tile`, async ({ page }) => {
+  test(`${method} closes fully and restores the page and every tile`, async ({ page, baseURL }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
     await page.waitForTimeout(1600);
@@ -111,7 +111,7 @@ for (const method of ['sr-only', 'backdrop', 'Escape', 'back', 'swipe']) {
     if (method === 'Escape') await page.keyboard.press('Escape');
     if (method === 'back') {
       await page.goBack();
-      await expect(page).toHaveURL('http://127.0.0.1:3000/');
+      await expect(page).toHaveURL(new URL('/', baseURL).href);
     }
     if (method === 'swipe') {
       const image = dialog.locator('.photo-image');

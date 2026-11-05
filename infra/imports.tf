@@ -4,6 +4,21 @@ import {
 }
 
 import {
+  to = cloudflare_dns_record.google_site_verification
+  id = "${var.cloudflare_zone_id}/${local.dns_record_ids.google_site_verification}"
+}
+
+import {
+  to = cloudflare_dns_record.google_workspace_verification
+  id = "${var.cloudflare_zone_id}/${local.dns_record_ids.google_workspace_verification}"
+}
+
+import {
+  to = cloudflare_dns_record.spf
+  id = "${var.cloudflare_zone_id}/${local.dns_record_ids.spf}"
+}
+
+import {
   to = cloudflare_ruleset.www_redirect
   id = "zones/${var.cloudflare_zone_id}/${local.redirect_ruleset_id}"
 }

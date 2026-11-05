@@ -9,7 +9,6 @@ import type { ReactNode } from 'react';
 
 import { site } from '../lib/site';
 import { initScript } from '../lib/time';
-import appleTouchIcon from './apple-touch-icon.png';
 import icon16 from './icon-16.png';
 import icon32 from './icon-32.png';
 import icon192 from './icon-192.png';
@@ -25,6 +24,7 @@ const shareImageUrl = `${site.url}/opengraph-image.jpg?v=${shareImageVersion}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
+  manifest: '/site.webmanifest',
   title: {
     default: site.title,
     template: `%s · ${site.name}`,
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
       { url: icon192.src, sizes: '192x192', type: 'image/png' },
       { url: icon512.src, sizes: '512x512', type: 'image/png' },
     ],
-    apple: [{ url: appleTouchIcon.src, sizes: '180x180', type: 'image/png' }],
+    apple: [{ url: '/manifest/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   openGraph: {
     type: 'website',

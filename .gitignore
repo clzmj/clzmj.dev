@@ -13,6 +13,10 @@ public/opengraph-image.jpg
 public/llms.txt
 public/llms-full.txt
 public/index.md
+public/site.webmanifest
+public/pwa-192.png
+public/pwa-512.png
+public/manifest/
 
 assets/elsewhere/
 public/elsewhere/

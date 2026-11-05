@@ -65,3 +65,5 @@ token policies and Doppler integration settings are not versioned here.
 
 Production does not fetch R2 at request time: CI packages the photos into `out/`
 (`.github/workflows/deploy.yml`, `wrangler.jsonc`).
+
+Static response headers are defined in `public/_headers`, copied to `out/_headers` by the export; HSTS and nosniff remain in `infra/settings.tf`.
