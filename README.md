@@ -4,11 +4,12 @@ Carlos Lezama’s personal site at **https://clzmj.dev** (`lib/site.ts`, `app/pa
 
 ```mermaid
 flowchart LR
-  M["Mac: edit and preview"] --> G["GitHub Actions: build and deploy"]
+  M["Mac: edit and preview"] --> G["GitHub Actions: checks, build, deploy"]
   G --> C["Cloudflare: clzmj-dev static assets"] --> B["Browser: clzmj.dev"]
 ```
 
-Sources: `package.json`, `.github/workflows/deploy.yml`, `wrangler.jsonc`, `infra/custom_domain.tf`.
+Sources: `.github/workflows/checks.yml`, `package.json`, `.github/workflows/deploy.yml`,
+`wrangler.jsonc`, `infra/custom_domain.tf`.
 
 | Task                        | Command from repo root                           |
 | --------------------------- | ------------------------------------------------ |

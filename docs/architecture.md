@@ -39,7 +39,7 @@ flowchart TD
 
 | Stage         | Details                                                                                                                                           |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Fetch         | Both workflows download the `elsewhere/` prefix before building; source bucket declared in `infra/r2.tf`                                          |
+| Fetch         | Build/Test in `.github/workflows/checks.yml` and production deploy download the `elsewhere/` prefix; source bucket declared in `infra/r2.tf`      |
 | Photos        | `scripts/build-photos.ts` audits metadata, writes WebPs and updates `lib/elsewhere.json`; see [photos](photos.md)                                 |
 | Generate      | `scripts/generate.ts`: `homeMarkdown()`, `llmsText()`, Chromium-rendered `public/og/home.png`                                                     |
 | Contributions | `refreshContributions()` refreshes only with `REFRESH_CONTRIBUTIONS=true` or `CONTRIBUTIONS_TOKEN`; otherwise reuses `content/contributions.json` |

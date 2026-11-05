@@ -12,8 +12,11 @@ repository-level secrets (`infra/README.md`, `.github/workflows/pull-request.yml
 
 ## Decision
 
-Manage secret values in Doppler and sync the required values to GitHub environments. Pull request
-jobs use `ci`; deployment and apply jobs use `production`.
+Manage secret values in Doppler and sync the required values to GitHub environments.
+
+Reusable site checks and PR plans use `ci`; deployment and apply jobs use `production`
+(`.github/workflows/checks.yml`, `.github/workflows/pull-request.yml`,
+`.github/workflows/deploy.yml`).
 
 The repository documents the required GitHub secret names and environment permissions, but does not
 define the Doppler configuration names or a verifiable name-to-environment mapping

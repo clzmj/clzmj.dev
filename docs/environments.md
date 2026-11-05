@@ -11,8 +11,12 @@ Choose credentials by operation; local preview and production are the only site 
 | `prd` (production context; GitHub name `production`) | Cloudflare, R2 state, private media                               | Worker/assets, Terraform resources and state                 | `clzmj.dev`; production environment is documented as `main` only |
 
 Sources: `package.json`, `scripts/serve.ts`, `.github/workflows/pull-request.yml`,
-`.github/workflows/deploy.yml`, `infra/README.md`. `ci` is a validation credential context, not a
-deployed preview.
+`.github/workflows/deploy.yml`, `.github/workflows/checks.yml`, `infra/README.md`. `ci` is a
+validation credential context, not a deployed preview.
+
+The reusable site checks use `ci` on PRs and before production deploys. The Terraform, Workflows and
+Secrets checks declare no environment and receive no explicit environment secrets
+(`.github/workflows/checks.yml`).
 
 ## Doppler configs and GitHub sync
 
@@ -33,22 +37,22 @@ Doppler is the source of truth for the environment secrets; update it and let it
 propagate changes (`infra/README.md`). `GITHUB_TOKEN` is supplied by GitHub Actions. Identifiers
 below select resources; they grant no access by themselves.
 
-| Name                            | Where it lives / used                                                  | Scope and access                                                                                          |
-| ------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `CLOUDFLARE_API_TOKEN`          | Doppler → GitHub `ci`, `production`; Terraform and production Wrangler | `ci`: read-only, including Workers R2 Storage Read; production: write, including Workers R2 Storage Write |
-| `CLOUDFLARE_ACCOUNT_ID`         | Doppler → both environments; media fetch, Wrangler, Terraform          | Account selector; mapped to `TF_VAR_cloudflare_account_id` for Terraform                                  |
-| `CLOUDFLARE_ZONE_ID`            | Doppler → both environments; Terraform                                 | Zone selector; mapped to `TF_VAR_cloudflare_zone_id`; `infra/zone.tf` checks `clzmj.dev`                  |
-| `TF_STATE_BUCKET`               | Doppler → both environments; Terraform                                 | Bucket selector; must equal `clzmj-dev-tfstate`                                                           |
-| `TF_STATE_R2_ACCESS_KEY_ID`     | Doppler → both environments; Terraform as `AWS_ACCESS_KEY_ID`          | State bucket: read-only in `ci`; read/write in production                                                 |
-| `TF_STATE_R2_SECRET_ACCESS_KEY` | Doppler → both environments; Terraform as `AWS_SECRET_ACCESS_KEY`      | Paired state credential; same scope as preceding row                                                      |
-| `MEDIA_R2_BUCKET`               | Doppler → both environments; photo fetch                               | Media bucket selector (`clzmj-dev-media`)                                                                 |
-| `MEDIA_R2_ACCESS_KEY_ID`        | Doppler → both environments; fetch as `AWS_ACCESS_KEY_ID`              | Read-only, scoped to media bucket                                                                         |
-| `MEDIA_R2_SECRET_ACCESS_KEY`    | Doppler → both environments; fetch as `AWS_SECRET_ACCESS_KEY`          | Paired read-only media credential                                                                         |
-| `GITHUB_TOKEN`                  | GitHub Actions; build step and PR comment action                       | Build jobs: `contents: read`; plan job additionally `pull-requests: write`                                |
+| Name                            | Where it lives / used                                                          | Scope and access                                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`          | Doppler → GitHub `ci`, `production`; Terraform and production Wrangler         | `ci`: read-only, including Workers R2 Storage Read; production: write, including Workers R2 Storage Write |
+| `CLOUDFLARE_ACCOUNT_ID`         | Doppler → both environments; media fetch, Wrangler, Terraform                  | Account selector; mapped to `TF_VAR_cloudflare_account_id` for Terraform                                  |
+| `CLOUDFLARE_ZONE_ID`            | Doppler → both environments; Terraform                                         | Zone selector; mapped to `TF_VAR_cloudflare_zone_id`; `infra/zone.tf` checks `clzmj.dev`                  |
+| `TF_STATE_BUCKET`               | Doppler → both environments; Terraform                                         | Bucket selector; must equal `clzmj-dev-tfstate`                                                           |
+| `TF_STATE_R2_ACCESS_KEY_ID`     | Doppler → both environments; Terraform as `AWS_ACCESS_KEY_ID`                  | State bucket: read-only in `ci`; read/write in production                                                 |
+| `TF_STATE_R2_SECRET_ACCESS_KEY` | Doppler → both environments; Terraform as `AWS_SECRET_ACCESS_KEY`              | Paired state credential; same scope as preceding row                                                      |
+| `MEDIA_R2_BUCKET`               | Doppler → both environments; photo fetch                                       | Media bucket selector (`clzmj-dev-media`)                                                                 |
+| `MEDIA_R2_ACCESS_KEY_ID`        | Doppler → both environments; fetch as `AWS_ACCESS_KEY_ID`                      | Read-only, scoped to media bucket                                                                         |
+| `MEDIA_R2_SECRET_ACCESS_KEY`    | Doppler → both environments; fetch as `AWS_SECRET_ACCESS_KEY`                  | Paired read-only media credential                                                                         |
+| `GITHUB_TOKEN`                  | GitHub Actions; Build/Test build steps, production build and PR comment action | Check jobs and deploy: `contents: read`; PR plan additionally `pull-requests: write`                      |
 
-Sources: `.github/workflows/pull-request.yml`, `.github/workflows/deploy.yml`, `infra/backend.tf`,
-`infra/variables.tf`, `infra/README.md`. Actual token policies and Doppler integration settings are
-not versioned here.
+Sources: `.github/workflows/checks.yml`, `.github/workflows/pull-request.yml`,
+`.github/workflows/deploy.yml`, `infra/backend.tf`, `infra/variables.tf`, `infra/README.md`. Actual
+token policies and Doppler integration settings are not versioned here.
 
 ## Local-only credentials and build switches
 

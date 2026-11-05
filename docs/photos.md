@@ -29,7 +29,7 @@ flowchart LR
      --endpoint-url "https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com" --only-show-errors
    ```
 
-   Source: `.github/workflows/pull-request.yml`. The credentials are process variables;
+   Source: `.github/workflows/checks.yml`. The credentials are process variables;
    this command does not configure Doppler or store secrets.
 
 2. **Sanitize before upload.** Prepare `01.jpg`–`17.jpg` with EXIF/GPS and descriptive metadata removed.
@@ -78,7 +78,8 @@ flowchart LR
    the old sanitized source for recovery; neither photo directory belongs in Git (`.gitignore`).
 
 8. **Deploy.** Commit the changed `lib/elsewhere.json` in a PR; merge to `main` after review.
-   CI fetches originals, generates variants, builds `out/` and deploys Worker assets.
+   All reusable checks must pass before the production job fetches originals, rebuilds `out/`
+   and deploys Worker assets (`.github/workflows/checks.yml`, `.github/workflows/deploy.yml`).
 
    R2 remains private source storage; workflows do not set `ELSEWHERE_BASE_URL`.
    (`.github/workflows/deploy.yml`, `README.md`, `infra/README.md`, `lib/content.ts`)
@@ -125,6 +126,10 @@ bunx playwright install chromium webkit
 bun run build
 bun run test tests/image-metadata.spec.ts tests/photos.spec.ts tests/short-captions.spec.ts tests/photo-shuffle.spec.ts tests/viewer-scroll.spec.ts
 ```
+
+CI builds again in the Test job and runs Chromium only with `bun run test --project=chromium
+--reporter=line,html`. On failure, its Playwright report is kept for seven days
+(`.github/workflows/checks.yml`); run WebKit locally for mobile coverage.
 
 ## Known issues
 

@@ -16,7 +16,7 @@ Store Elsewhere source photos in the private `clzmj-dev-media` R2 bucket. Do not
 Git. CI downloads the objects into `assets/elsewhere/` before the site build.
 
 Keep the bucket private, with no custom domain or public `r2.dev` access (`infra/README.md`,
-`infra/r2.tf`, `.github/workflows/pull-request.yml`, `.github/workflows/deploy.yml`).
+`infra/r2.tf`, `.github/workflows/checks.yml`, `.github/workflows/deploy.yml`).
 
 ## Alternatives considered
 

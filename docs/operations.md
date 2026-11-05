@@ -32,14 +32,14 @@ it.
 
 ## Deploy
 
-| Route     | Action                                           | Effect                                      |
-| --------- | ------------------------------------------------ | ------------------------------------------- |
-| Normal    | Merge a reviewed PR into `main`                  | Build, Worker upload, then Terraform apply  |
-| Rebuild   | GitHub Actions → Deploy → Run workflow on `main` | Build and Worker upload; no Terraform apply |
-| Scheduled | Daily 08:00 UTC                                  | Same as rebuild                             |
+| Route     | Action                                           | Effect                                                 |
+| --------- | ------------------------------------------------ | ------------------------------------------------------ |
+| Normal    | Merge a reviewed PR into `main`                  | All checks → build → Worker upload → Terraform apply   |
+| Rebuild   | GitHub Actions → Deploy → Run workflow on `main` | All checks → build → Worker upload; no Terraform apply |
+| Scheduled | Daily 08:00 UTC                                  | Same as rebuild                                        |
 
-Source: `.github/workflows/deploy.yml`. PRs build and plan; they do not deploy a preview
-(`.github/workflows/pull-request.yml`).
+Source: `.github/workflows/deploy.yml`. PRs run all checks before the Terraform plan; they do not
+deploy a preview (`.github/workflows/pull-request.yml`, `.github/workflows/checks.yml`).
 
 For a direct Worker upload, first build, then run with the production Cloudflare token/account
 available as `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the process environment:
@@ -49,9 +49,9 @@ bun run build
 bunx wrangler@4.156.2 deploy
 ```
 
-This is the Worker command used by `.github/workflows/deploy.yml`; it does not apply Terraform.
-Production credentials come through Doppler sync; source config mappings are not versioned
-([environments](environments.md)).
+This is the Worker command used by `.github/workflows/deploy.yml`; it bypasses the workflow checks
+and does not apply Terraform. Production credentials come through Doppler sync; source config
+mappings are not versioned ([environments](environments.md)).
 
 ## Roll back
 
@@ -81,7 +81,7 @@ Photo source replacements in R2 need separate recovery; Git does not store them 
 
 | Credential           | Update location                                                                                                   | Verify afterward                                                        |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Media read pair      | Doppler source synced to GitHub `ci` and `production`                                                             | PR and production “Fetch Elsewhere photos” steps                        |
+| Media read pair      | Doppler source synced to GitHub `ci` and `production`                                                             | Build/Test check jobs and production “Fetch Elsewhere photos” steps     |
 | Media upload pair    | Doppler `clzmj-dev/dev`: `MEDIA_R2_UPLOAD_ACCESS_KEY_ID`, `MEDIA_R2_UPLOAD_SECRET_ACCESS_KEY`                     | Upload/download using [photos](photos.md)                               |
 | State R2 pair        | Doppler source synced to GitHub `ci` / `production`: `TF_STATE_R2_ACCESS_KEY_ID`, `TF_STATE_R2_SECRET_ACCESS_KEY` | PR read-only plan; production state lock and apply on a `main` push     |
 | Cloudflare API token | Doppler source synced to GitHub `ci` / `production`: `CLOUDFLARE_API_TOKEN`                                       | PR plan with read token; production Wrangler and apply with write token |

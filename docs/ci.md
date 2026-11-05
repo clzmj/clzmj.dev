@@ -1,94 +1,104 @@
 # CI checks and deployment
 
-Find the failing step, reproduce its command, and rerun the workflow after fixing its inputs.
+Pull requests and every production deployment trigger call the reusable workflow in
+`.github/workflows/checks.yml`. Resolve a failing step at its source, then push the fix or rerun the
+workflow if the failure was transient.
 
-This section will be refreshed after the ci-gates PR.
+## Shared checks
+
+```mermaid
+flowchart TD
+  PR["Pull request"] --> CHECKS["Reusable Checks workflow"]
+  PUSH["Push to main"] --> CHECKS
+  CRON["Scheduled deployment"] --> CHECKS
+  MANUAL["Manual deployment"] --> CHECKS
+  CHECKS --> LINT["Lint job"]
+  CHECKS --> FORMAT["Format job"]
+  CHECKS --> TYPECHECK["Typecheck job"]
+  CHECKS --> BUILD["Build job"]
+  CHECKS --> TEST["Test job"]
+  CHECKS --> TF["Terraform job"]
+  CHECKS --> WF["Workflows job"]
+  CHECKS --> SECRETS["Secrets job"]
+```
+
+| Job       | What it runs                                                                      | Environment |
+| --------- | --------------------------------------------------------------------------------- | ----------- |
+| Lint      | Bun 1.4.4, frozen install, `bun run lint`                                         | `ci`        |
+| Format    | Bun 1.4.4, frozen install, `bun run format:check`                                 | `ci`        |
+| Typecheck | Bun 1.4.4, frozen install, `bun run typecheck`                                    | `ci`        |
+| Build     | Fetch private Elsewhere photos, install Chromium, `bun run build`, require `out/` | `ci`        |
+| Test      | Independently fetch photos and build `out/`, then run Playwright Chromium tests   | `ci`        |
+| Terraform | Format, backend-free init, validate, and TFLint                                   | None        |
+| Workflows | actionlint and zizmor audits                                                      | None        |
+| Secrets   | Full Git history scan with Gitleaks                                               | None        |
+
+Each site job installs dependencies with `bun install --frozen-lockfile`; missing `package.json` or
+both Bun lockfile forms (`bun.lock`, `bun.lockb`) fails the job. `Test` uploads `playwright-report/`
+only after failure, ignores a missing report, and retains it for 7 days.
+
+`bun run typecheck` runs `next typegen && tsc --noEmit` (`package.json`). The Terraform check uses
+Terraform 1.17.1 and TFLint 0.65.0 (`.github/workflows/checks.yml`).
 
 ## Pull requests
 
 ```mermaid
 flowchart TD
-  PR["Pull request"] --> B["Build job: ci"]
-  PR --> T["Terraform plan job: ci"]
-  B --> C["Checkout; Bun 1.4.4; require package and lockfile"]
-  C --> I["Cache Bun; bun install --frozen-lockfile"]
-  I --> L["bun run lint"] --> F["bun run format:check"]
-  F --> P["Cache browsers; install Playwright Chromium"]
-  P --> R["Check media secrets; aws s3 sync"]
-  R --> N["bun run build; require out/"]
-  T --> S["Checkout; Terraform 1.17.1"]
-  S --> V["Check secrets and state bucket name"]
-  V --> TF["terraform fmt -check -recursive"]
-  TF --> INIT["terraform init; terraform validate"]
-  INIT --> PLAN["terraform plan -lock=false; save tfplan"]
-  PLAN --> COMMENT["Create or update PR plan comment, even on failure"]
+  PR["Pull request"] --> CHECKS["Reusable Checks workflow"]
+  CHECKS --> PLAN["Terraform plan job (ci)"]
+  PLAN --> COMMENT["Create or update PR plan comment"]
 ```
 
-| Job     | Result / permissions                                                                                               |
-| ------- | ------------------------------------------------------------------------------------------------------------------ |
-| `build` | Lint, formatting and static build; `contents: read`                                                                |
-| `plan`  | No state lock; captures `infra/plan.txt`, posts or updates one marked comment; additionally `pull-requests: write` |
-| Both    | Independent jobs, GitHub environment `ci`; newer PR runs cancel older runs                                         |
+Terraform plan waits for all reusable checks, validates the six required `ci` environment values,
+and verifies the state bucket. It runs `terraform plan -lock=false`, saves the output, and creates
+or updates a PR comment even when planning fails.
 
-Source: `.github/workflows/pull-request.yml`. Neither job runs `bun run test` or `bun run
-typecheck`. Chromium installation supports build-time OG rendering, not a browser test step
-(`scripts/generate.ts`).
+| Job            | Dependency and access                                                           |
+| -------------- | ------------------------------------------------------------------------------- |
+| Checks         | Shared jobs run concurrently; `contents: read`                                  |
+| Terraform plan | Needs Checks; `contents: read`, `pull-requests: write`; GitHub environment `ci` |
 
 ## Production
 
 ```mermaid
 flowchart TD
-  PUSH["Push to main"] --> D["Build and deploy: production"]
-  CRON["Daily 08:00 UTC"] --> D
-  MANUAL["workflow_dispatch"] --> D
-  D --> C["Checkout; Bun 1.4.4; require package and lockfile"]
-  C --> I["Cache Bun; bun install --frozen-lockfile"]
-  I --> P["Cache browsers; install Playwright Chromium"]
-  P --> R["Check media secrets; aws s3 sync"]
-  R --> B["bun run build; require out/"]
-  B --> W["Check wrangler.jsonc and Cloudflare secrets; wrangler deploy"]
-  W --> G{"Push to main?"}
-  G -->|"No"| DONE["Worker deployed; no Terraform apply"]
-  G -->|"Yes"| A["Terraform apply job: production"]
-  A --> S["Checkout; Terraform 1.17.1; check secrets and bucket"]
-  S --> F["fmt -check -recursive; init; validate"]
-  F --> PLAN["plan -out=tfplan"] --> APPLY["apply -auto-approve tfplan"]
-  APPLY --> STATE["R2 state and native lockfile"]
+  PUSH["Push to main"] --> CHECKS["Reusable Checks workflow"]
+  CRON["Daily schedule"] --> CHECKS
+  MANUAL["workflow_dispatch"] --> CHECKS
+  CHECKS --> DEPLOY["Build and deploy (production)"]
+  CHECKS --> APPLY_GATE["Terraform apply requires Checks and deploy"]
+  DEPLOY --> APPLY_GATE
+  APPLY_GATE -->|"Push to main only"| APPLY["Terraform apply (production)"]
 ```
 
-| Trigger             | Runs today                                                                          |
-| ------------------- | ----------------------------------------------------------------------------------- |
-| Push to `main`      | Build → `bunx wrangler@4.156.2 deploy` → Terraform fmt/init/validate/plan/apply     |
-| Daily `0 8 * * *`   | Build → Wrangler deploy; no Terraform job                                           |
-| Manual dispatch     | Build → Wrangler deploy; no Terraform job                                           |
-| All production runs | Shared `clzmj-dev-production` concurrency group; in-progress runs are not cancelled |
+The production deploy job needs Checks; Terraform apply needs both Checks and a successful deploy,
+and runs only on a push to `main`. Scheduled and manual runs deploy the Worker but skip Terraform
+apply; production runs share a non-cancelling concurrency group.
 
-Source: `.github/workflows/deploy.yml`. Production runs no lint, format, typecheck or test command.
-The daily build reuses the saved contributions unless refresh is explicitly enabled in the build
-process (`scripts/generate.ts`); the workflow does not enable it.
+| Trigger           | Result                                              |
+| ----------------- | --------------------------------------------------- |
+| Push to `main`    | Checks → Worker build/deploy → Terraform plan/apply |
+| Daily `0 8 * * *` | Checks → Worker build/deploy; no apply              |
+| Manual dispatch   | Checks → Worker build/deploy; no apply              |
 
 ## Failures
 
-| Failing check or step        | What to do                                                                                                                                                     |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Checkout, setup, cache       | Read that action’s error; rerun transient failures. Versions and cache keys are pinned in the workflow files.                                                  |
-| Require site package         | Restore `package.json` and `bun.lock`; the workflows fail rather than skipping missing app inputs.                                                             |
-| Install                      | Run `bun install --frozen-lockfile`; resolve lockfile/package mismatches before retrying.                                                                      |
-| Lint                         | Run `bun run lint`; warnings fail under `.oxlintrc.json`.                                                                                                      |
-| Formatting                   | Run `bun run format` on changed files, then `bun run format:check`; settings are in `.oxfmtrc.json`.                                                           |
-| Chromium install / OG render | Run `bunx playwright install chromium`; inspect `scripts/generate.ts` errors.                                                                                  |
-| Fetch photos                 | Verify the four media/account secrets in the job’s GitHub environment via Doppler; inspect bucket/prefix and read access. See [environments](environments.md). |
-| Photo generation             | Check missing IDs, metadata, focal points and output caps from `scripts/build-photos.ts`; follow [photos](photos.md).                                          |
-| Next build / missing `out/`  | Run `bun run build`; keep `output: 'export'` in `next.config.ts`.                                                                                              |
-| Wrangler deploy              | Verify `wrangler.jsonc`, production Cloudflare token/account and built `out/`; use [operations](operations.md).                                                |
-| Terraform secret guard       | Match all required names in [environments](environments.md); `TF_STATE_BUCKET` must match `infra/backend.tf`.                                                  |
-| Terraform fmt / validate     | Run the local commands in `infra/README.md`; fix configuration errors shown in the log.                                                                        |
-| Terraform init / plan        | Check state R2 credentials, account/zone selectors and provider permissions. PR plans need read access and `-lock=false`.                                      |
-| PR comment                   | Inspect the `plan` job’s `pull-requests: write` permission and action error; the comment step runs even when planning fails.                                   |
-| Terraform apply              | Read the failed resource and saved plan log; verify the preceding Worker deploy succeeded. Fix and push to `main` for another apply.                           |
+| Failure                         | Reproduce or fix                                                                                                                                                                                            |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Setup / package guard / install | Restore `package.json` and a committed Bun lockfile. Reproduce with `bun install --frozen-lockfile`; inspect setup/cache failures before rerunning transient errors.                                        |
+| CLI download or install         | Workflows pins actionlint 1.7.12 and zizmor 1.32.0; Secrets pins Gitleaks 8.30.1. actionlint/Gitleaks archives must pass the downloaded checksum check before extraction. Inspect the failing install step. |
+| Lint / format / typecheck       | Run `bun install --frozen-lockfile`, then `bun run lint`, `bun run format:check`, or `bun run typecheck`; format with `bun run format`.                                                                     |
+| Build / test                    | Install Chromium with `bunx playwright install --with-deps chromium`; check the four media secrets and R2 read access, run `bun run build`, then `bun run test --project=chromium --reporter=line,html`.    |
+| Terraform                       | From `infra/`, run `terraform fmt -check -recursive`, `terraform init -backend=false -input=false -no-color`, and `terraform validate -no-color`; fix formatting, provider, or validation errors.           |
+| TFLint                          | From `infra/`, run `tflint --init --config=.tflint.hcl` then `tflint --config=.tflint.hcl --format=compact`; correct reported configuration issues.                                                         |
+| Workflows                       | Run `actionlint .github/workflows/*.yml` and `zizmor --offline .github/workflows`; fix the reported YAML or security findings.                                                                              |
+| Secrets                         | Run `gitleaks git --redact --log-opts="--all" .`; remove exposed credentials from history and rotate any credential that was active.                                                                        |
+| PR plan / apply                 | Verify the required Doppler-synced environment values and that `TF_STATE_BUCKET` matches `infra/backend.tf`; inspect Terraform output before retrying.                                                      |
+| Deploy                          | Verify `wrangler.jsonc`, production Cloudflare credentials, and successful `out/` build; see `docs/operations.md`.                                                                                          |
 
-Sources: `.github/workflows/pull-request.yml`, `.github/workflows/deploy.yml`, `infra/backend.tf`.
-The Worker may already be updated when Terraform apply fails because `apply` depends on `deploy`.
+Photo generation details are in `docs/photos.md`; environment values and secret setup are in
+`docs/environments.md`.
 
-For checks outside today’s workflows: `bun run typecheck`; then build and run `bun run test`.
-`playwright.config.ts` requires Chromium and WebKit; tests serve `out/` via `scripts/serve.ts`.
+The concrete workflow steps and permissions are defined in
+`.github/workflows/checks.yml`, `.github/workflows/pull-request.yml`, and
+`.github/workflows/deploy.yml`.

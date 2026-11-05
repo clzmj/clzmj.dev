@@ -41,11 +41,11 @@ with no repository-level secrets.
 
 The integration configuration is not versioned in this repository.
 
-| Destination             | Access                                                                                                | Workflow                                             |
-| ----------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| GitHub `ci`             | Read-only Cloudflare and state; no branch restriction documented by the existing infrastructure setup | PR build and `terraform plan -lock=false`            |
-| GitHub `production`     | Write Cloudflare and state; `main` only in the documented environment setup                           | Worker deploy; Terraform apply only on `main` pushes |
-| Doppler `clzmj-dev/dev` | Local media upload keys; no GitHub sync target recorded                                               | Mac upload command below                             |
+| Destination             | Access                                                                                                | Workflow                                                    |
+| ----------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| GitHub `ci`             | Read-only Cloudflare and state; no branch restriction documented by the existing infrastructure setup | Reusable site checks on all triggers; PR `plan -lock=false` |
+| GitHub `production`     | Write Cloudflare and state; `main` only in the documented environment setup                           | Worker deploy; Terraform apply only on `main` pushes        |
+| Doppler `clzmj-dev/dev` | Local media upload keys; no GitHub sync target recorded                                               | Mac upload command below                                    |
 
 Both GitHub environments receive the nine Doppler-synced names listed in
 [environments](../docs/environments.md#every-secret-read-by-workflows).
@@ -77,17 +77,26 @@ fetch sources before building; browsers receive generated files from `out/`.
 ## Local Terraform checks
 
 Run from the repository root; these commands avoid remote state access. Versions:
-`infra/versions.tf`; CI pins Terraform 1.17.1 in both workflow files.
+`infra/versions.tf`; CI pins Terraform 1.17.1 in `.github/workflows/checks.yml`, `pull-request.yml`
+and `deploy.yml`.
 
 ```sh
 terraform -chdir=infra fmt -check -recursive
 terraform -chdir=infra init -backend=false
 terraform -chdir=infra validate
+tflint --chdir=infra --init --config=.tflint.hcl
+tflint --chdir=infra --config=.tflint.hcl --format=compact
 ```
 
-A real PR plan runs fmt → init → validate → `plan -lock=false -out=tfplan`. A `main` push deploys
-the Worker first, then runs fmt → init → validate → plan → apply. Scheduled and manual deploys skip
-apply (`.github/workflows/deploy.yml`).
+The reusable Terraform check runs fmt → backend-free init → validate → TFLint without state
+credentials (`.github/workflows/checks.yml`, `infra/.tflint.hcl`).
+
+After all eight checks pass, a PR runs fmt → init → validate → `plan -lock=false -out=tfplan` and
+updates its plan comment (`.github/workflows/pull-request.yml`).
+
+A `main` push runs all checks → Worker build/deploy → Terraform fmt/init/validate/plan/apply.
+Scheduled and manual runs also require all checks, then build/deploy without apply
+(`.github/workflows/deploy.yml`).
 
 [All environment secrets](../docs/environments.md) · [CI failures](../docs/ci.md) · [Deployment and
 rollback](../docs/operations.md) · [ADRs](../docs/adr/README.md)
