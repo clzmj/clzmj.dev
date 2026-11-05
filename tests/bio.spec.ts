@@ -86,3 +86,70 @@ test('official company logos keep their order, links, full-bleed circles and ove
     '0s',
   );
 });
+
+test('company links keep trailing punctuation on the same mobile line', async ({ page }) => {
+  await page.setViewportSize({ width: 393, height: 852 });
+  await page.goto('/');
+  const groups = page.locator('.company-link');
+  await expect(groups).toHaveCount(5);
+  for (const group of await groups.all()) {
+    expect(await group.evaluate((element) => getComputedStyle(element).whiteSpace)).toBe('nowrap');
+  }
+  for (const [name, punctuation] of [
+    ['DD360', ','],
+    ['RappiCard', ','],
+    ['DiDi Food', '.'],
+  ]) {
+    const group = groups.filter({
+      has: page.getByRole('link', { name: `${name} (opens in a new tab)`, exact: true }),
+    });
+    expect(
+      await group.evaluate((element) => {
+        const link = element.querySelector('a')!;
+        const text = element.lastChild!;
+        const range = document.createRange();
+        range.selectNodeContents(text);
+        return {
+          punctuation: text.textContent,
+          top: range.getBoundingClientRect().top,
+          linkTop: link.getBoundingClientRect().top,
+        };
+      }),
+    ).toEqual({ punctuation, top: expect.any(Number), linkTop: expect.any(Number) });
+    const aligned = await group.evaluate((element) => {
+      const range = document.createRange();
+      range.selectNodeContents(element.lastChild!);
+      return Math.abs(
+        range.getBoundingClientRect().top - element.querySelector('a')!.getBoundingClientRect().top,
+      );
+    });
+    expect(aligned).toBeLessThan(2);
+  }
+});
+
+test('logo hairlines use 10 percent in light and 20 percent in dark, including auto', async ({
+  page,
+}) => {
+  await page.goto('/');
+  for (const [theme, scheme, opacity] of [
+    ['light', 'dark', '10%'],
+    ['dark', 'light', '20%'],
+    ['auto', 'dark', '20%'],
+    ['auto', 'light', '10%'],
+  ] as const) {
+    await page.evaluate((theme) => localStorage.setItem('theme', theme), theme);
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.reload();
+    await expect(page.locator('.theme-toggle')).toHaveAttribute('data-hydrated', 'true');
+    const styles = await page
+      .locator('.mini-avatar')
+      .first()
+      .evaluate((link) => ({
+        opacity: getComputedStyle(link).getPropertyValue('--logo-hairline-opacity').trim(),
+        shadow: getComputedStyle(link, '::after').boxShadow,
+      }));
+    expect(styles.opacity).toBe(opacity);
+    expect(styles.shadow).toContain('inset');
+    expect(styles.shadow).toContain(opacity === '20%' ? '0.2' : '0.1');
+  }
+});

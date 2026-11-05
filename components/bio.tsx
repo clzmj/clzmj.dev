@@ -10,9 +10,24 @@ export function Bio() {
     <div className="bio">
       {profile.paragraphs.map((paragraph) => (
         <p key={paragraphKey(paragraph)}>
-          {paragraph.map((part) => (
-            <Part key={partKey(part)} part={part} avatars={profile.avatarStack} />
-          ))}
+          {paragraph.map((part, index) => {
+            if (isProfileLink(part)) {
+              const next = paragraph[index + 1];
+              const punctuation = typeof next === 'string' ? next.match(/^[,.;:!?]+/)?.[0] : '';
+              return (
+                <span className="company-link whitespace-nowrap" key={partKey(part)}>
+                  <Part part={part} avatars={profile.avatarStack} />
+                  {punctuation}
+                </span>
+              );
+            }
+            const previous = paragraph[index - 1];
+            const text =
+              typeof part === 'string' && previous && isProfileLink(previous)
+                ? part.replace(/^[,.;:!?]+/, '')
+                : part;
+            return <Part key={partKey(part)} part={text} avatars={profile.avatarStack} />;
+          })}
         </p>
       ))}
     </div>

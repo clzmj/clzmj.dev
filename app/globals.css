@@ -11,6 +11,7 @@
 
 :root {
   color-scheme: light;
+  --logo-hairline-opacity: 10%;
   --bg: #fcfcfc;
   --gray-200: #f6f6f6;
   --gray-300: #f0f0f0;
@@ -47,6 +48,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
+    --logo-hairline-opacity: 20%;
     --bg: #0f0f0f;
     --gray-200: #1c1c1c;
     --gray-300: #232323;
@@ -73,6 +75,7 @@
 }
 
 html[data-theme='dark'] {
+  --logo-hairline-opacity: 20%;
   color-scheme: dark;
   --bg: #0f0f0f;
   --gray-200: #1c1c1c;
@@ -101,6 +104,7 @@ html[data-theme='dark'] {
 
 html[data-theme='light'] {
   color-scheme: light;
+  --logo-hairline-opacity: 10%;
   --bg: #fcfcfc;
   --gray-200: #f6f6f6;
   --gray-300: #f0f0f0;
@@ -358,7 +362,8 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gray-1200) 10%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--gray-1200) var(--logo-hairline-opacity), transparent);
   pointer-events: none;
 }
 
