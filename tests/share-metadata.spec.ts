@@ -1,9 +1,16 @@
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+
 import { expect, test } from '@playwright/test';
 
 const title = 'Carlos Lezama · ML & Software Engineer';
 const description =
   'ML and software engineer at Zillow, based in Mexico City. Previously data and ML at DD360, RappiCard and DiDi Food.';
-const imageUrl = 'https://clzmj.dev/opengraph-image.jpg';
+const imageVersion = createHash('sha256')
+  .update(readFileSync('out/opengraph-image.jpg'))
+  .digest('hex')
+  .slice(0, 8);
+const imageUrl = `https://clzmj.dev/opengraph-image.jpg?v=${imageVersion}`;
 const imageAlt =
   'Carlos Lezama, ML & Software Engineer: pixel-art Bingo next to a fan of four travel photos';
 
@@ -52,7 +59,7 @@ test('homepage exposes the expected social and canonical metadata', async ({ pag
     ],
   });
 
-  const imageResponse = await page.request.get('/opengraph-image.jpg');
+  const imageResponse = await page.request.get(`/opengraph-image.jpg?v=${imageVersion}`);
   expect(imageResponse.ok()).toBe(true);
   expect(imageResponse.headers()['content-type']).toContain('image/jpeg');
   const imageBytes = await imageResponse.body();

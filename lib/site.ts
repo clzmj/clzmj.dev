@@ -1,5 +1,8 @@
 export const site = {
   name: 'Carlos Lezama',
+  title: 'Carlos Lezama · ML & Software Engineer',
+  siteName: 'clzmj.dev',
+  jobTitle: 'ML & Software Engineer',
   url: 'https://clzmj.dev',
   email: 'hello@clzmj.dev',
   description:

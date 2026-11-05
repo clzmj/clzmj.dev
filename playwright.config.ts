@@ -2,9 +2,6 @@ import { defineConfig, devices } from '@playwright/test';
 
 import { bunExecutable } from './lib/runtime';
 
-const port = Number(process.env.PORT ?? 3106);
-const baseURL = `http://127.0.0.1:${port}`;
-
 export default defineConfig({
   testDir: 'tests',
   projects: [
@@ -22,13 +19,12 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   use: {
-    baseURL,
+    baseURL: 'http://127.0.0.1:3000',
   },
   webServer: {
     command: `${bunExecutable()} scripts/serve.ts`,
-    url: baseURL,
-    env: { PORT: String(port) },
-    reuseExistingServer: false,
+    url: 'http://127.0.0.1:3000',
+    reuseExistingServer: !process.env.CI,
     timeout: 30000,
   },
 });

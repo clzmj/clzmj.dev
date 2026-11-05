@@ -31,7 +31,7 @@ export default function HomePage() {
         name: site.name,
         url: site.url,
         email: site.email,
-        jobTitle: 'ML & Software Engineer',
+        jobTitle: site.jobTitle,
         homeLocation: {
           '@type': 'Place',
           name: site.locationLabel,

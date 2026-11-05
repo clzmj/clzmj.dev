@@ -1,3 +1,6 @@
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import { GeistSerif } from 'geist/font/serif/variable';
@@ -14,10 +17,16 @@ import icon512 from './icon-512.png';
 
 import './globals.css';
 
+const shareImageVersion = createHash('sha256')
+  .update(readFileSync('public/opengraph-image.jpg'))
+  .digest('hex')
+  .slice(0, 8);
+const shareImageUrl = `${site.url}/opengraph-image.jpg?v=${shareImageVersion}`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: 'Carlos Lezama · ML & Software Engineer',
+    default: site.title,
     template: `%s · ${site.name}`,
   },
   description: site.description,
@@ -37,12 +46,12 @@ export const metadata: Metadata = {
     type: 'website',
     locale: site.locale,
     url: site.url,
-    siteName: 'clzmj.dev',
-    title: 'Carlos Lezama · ML & Software Engineer',
+    siteName: site.siteName,
+    title: site.title,
     description: site.description,
     images: [
       {
-        url: 'https://clzmj.dev/opengraph-image.jpg',
+        url: shareImageUrl,
         width: 1200,
         height: 630,
         alt: 'Carlos Lezama, ML & Software Engineer: pixel-art Bingo next to a fan of four travel photos',
@@ -51,12 +60,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Carlos Lezama · ML & Software Engineer',
+    title: site.title,
     description: site.description,
     creator: '@clzmj',
     images: [
       {
-        url: 'https://clzmj.dev/opengraph-image.jpg',
+        url: shareImageUrl,
         alt: 'Carlos Lezama, ML & Software Engineer: pixel-art Bingo next to a fan of four travel photos',
       },
     ],
