@@ -2,7 +2,8 @@ export const site = {
   name: 'Carlos Lezama',
   url: 'https://clzmj.dev',
   email: 'hello@clzmj.dev',
-  description: 'Carlos Lezama, ML & Software Engineer in Mexico City.',
+  description:
+    'ML and software engineer at Zillow, based in Mexico City. Previously data and ML at DD360, RappiCard and DiDi Food.',
   github: 'https://github.com/clzmj',
   locale: 'en_US',
   timezone: 'America/Mexico_City',

@@ -17,7 +17,7 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: site.name,
+    default: 'Carlos Lezama · ML & Software Engineer',
     template: `%s · ${site.name}`,
   },
   description: site.description,
@@ -37,14 +37,33 @@ export const metadata: Metadata = {
     type: 'website',
     locale: site.locale,
     url: site.url,
-    siteName: site.name,
-    title: site.name,
+    siteName: 'clzmj.dev',
+    title: 'Carlos Lezama · ML & Software Engineer',
     description: site.description,
+    images: [
+      {
+        url: 'https://clzmj.dev/opengraph-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Carlos Lezama, ML & Software Engineer: pixel-art Bingo next to a fan of four travel photos',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: site.name,
+    title: 'Carlos Lezama · ML & Software Engineer',
     description: site.description,
+    creator: '@clzmj',
+    images: [
+      {
+        url: 'https://clzmj.dev/opengraph-image.jpg',
+        alt: 'Carlos Lezama, ML & Software Engineer: pixel-art Bingo next to a fan of four travel photos',
+      },
+    ],
+  },
+  other: {
+    'twitter:image:width': '1200',
+    'twitter:image:height': '630',
   },
 };
 
