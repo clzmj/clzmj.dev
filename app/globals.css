@@ -382,21 +382,18 @@ body {
   }
 }
 
-.section {
-  margin-top: 4rem;
+.main-stack {
+  display: flex;
+  flex-direction: column;
 }
 
-.section-elsewhere {
-  margin-top: 4rem;
+.main-stack > .section {
+  margin: 0;
+  padding: 0;
 }
 
-@media (min-width: 40rem) {
-  .section {
-    margin-top: 6rem;
-  }
-  .section-elsewhere {
-    margin-top: 8rem;
-  }
+.profile-section .bio p:last-child {
+  margin-bottom: 0;
 }
 
 .section-title {

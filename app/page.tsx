@@ -64,33 +64,37 @@ export default function HomePage() {
   return (
     <Shell markdownHref="/index.md">
       <JsonLd data={jsonLd} />
-      <header
-        className="identity animate-enter animate-enter-individual"
-        style={{ ['--stagger' as string]: 0 }}
-      >
-        <Bingo />
-        <div>
-          <h1 className="site-name">{site.name}</h1>
-          <p className="role">{role}</p>
+      <div className="main-stack gap-10">
+        <div className="profile-section">
+          <header
+            className="identity animate-enter animate-enter-individual"
+            style={{ ['--stagger' as string]: 0 }}
+          >
+            <Bingo />
+            <div>
+              <h1 className="site-name">{site.name}</h1>
+              <p className="role">{role}</p>
+            </div>
+          </header>
+          <div
+            className="animate-enter animate-enter-individual"
+            style={{ ['--stagger' as string]: 1 }}
+          >
+            <Bio />
+          </div>
         </div>
-      </header>
-      <div
-        className="animate-enter animate-enter-individual"
-        style={{ ['--stagger' as string]: 1 }}
-      >
-        <Bio />
+        <ContributionGraph />
+        <section
+          className="section section-elsewhere animate-enter animate-enter-individual"
+          style={{ ['--stagger' as string]: 3 }}
+          aria-labelledby="elsewhere-title"
+        >
+          <h2 id="elsewhere-title" className="section-title">
+            Elsewhere
+          </h2>
+          <PhotoFan photos={photos} />
+        </section>
       </div>
-      <ContributionGraph />
-      <section
-        className="section section-elsewhere animate-enter animate-enter-individual"
-        style={{ ['--stagger' as string]: 3 }}
-        aria-labelledby="elsewhere-title"
-      >
-        <h2 id="elsewhere-title" className="section-title">
-          Elsewhere
-        </h2>
-        <PhotoFan photos={photos} />
-      </section>
     </Shell>
   );
 }
