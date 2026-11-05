@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { loadContributions } from '../lib/contributions';
+
 test('the contribution graph opens on the newest weeks', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto('/');
@@ -35,16 +37,24 @@ for (const kind of ['zero', 'one', 'positive']) {
     await cell.scrollIntoViewIfNeeded();
     const date = await cell.getAttribute('data-date');
     const count = Number(await cell.getAttribute('data-count'));
+    const github = await cell.getAttribute('data-github');
+    const gitlab = await cell.getAttribute('data-gitlab');
+    const split = [
+      github === null ? null : `${github} GitHub`,
+      gitlab === null ? null : `${gitlab} GitLab`,
+    ].filter((source) => source !== null);
+    const suffix = split.length ? ` (${split.join(', ')})` : '';
+    if (split.length) expect(count).toBe(Number(github ?? 0) + Number(gitlab ?? 0));
     const label = new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
       timeZone: 'UTC',
     }).format(new Date(`${date}T00:00:00Z`));
+    const expected = `${count === 0 ? 'No' : count} ${count === 1 ? 'contribution' : 'contributions'} on ${label}${suffix}`;
+    await expect(cell).toHaveAccessibleName(expected);
     await cell.hover();
-    await expect(page.locator('[data-slot="contribution-tip"]')).toHaveText(
-      `${count === 0 ? 'No' : count} ${count === 1 ? 'contribution' : 'contributions'} on ${label}`,
-    );
+    await expect(page.getByRole('tooltip')).toHaveText(expected);
   });
 }
 
@@ -58,3 +68,37 @@ test('the mobile legend stays beside the contribution summary', async ({ page })
   expect(legend!.x).toBeGreaterThanOrEqual(summary!.x + summary!.width);
   expect(legend!.y + legend!.height / 2).toBeCloseTo(summary!.y + summary!.height / 2, 0);
 });
+
+test('the summary names and links only the sources included in the graph', async ({ page }) => {
+  await page.goto('/');
+  const data = loadContributions()!;
+  const sources = data.sources ?? ['github'];
+  const summary = page.locator('.contrib-summary');
+  await expect(summary).toContainText(
+    `${data.total.toLocaleString('en-US')} contributions in the last year`,
+  );
+  const links = summary.locator('.contrib-sources a');
+  await expect(links).toHaveCount(sources.length);
+  for (const [index, source] of sources.entries()) {
+    await expect(links.nth(index)).toHaveAttribute(
+      'href',
+      source === 'github' ? 'https://github.com/clzmj' : 'https://gitlab.com/clzmj',
+    );
+  }
+});
+
+for (const width of [393, 1440]) {
+  test(`source-split tooltips stay within the card at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    const cell = page.locator('.contrib-grid .contrib-cell').last();
+    await cell.scrollIntoViewIfNeeded();
+    await cell.hover();
+    const tip = page.locator('[data-slot="contribution-tip"]');
+    await expect(tip).toBeVisible();
+    const cardBox = await page.locator('.contrib').boundingBox();
+    const tipBox = await tip.boundingBox();
+    expect(tipBox!.x).toBeGreaterThanOrEqual(cardBox!.x);
+    expect(tipBox!.x + tipBox!.width).toBeLessThanOrEqual(cardBox!.x + cardBox!.width);
+  });
+}

@@ -450,6 +450,18 @@ body {
   margin: 0;
 }
 
+.contrib-summary {
+  min-width: 0;
+}
+
+.contrib-sources {
+  display: block;
+  margin-top: 2px;
+  color: var(--gray-900);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .contrib-head a {
   color: inherit;
   font-weight: 400;
@@ -473,6 +485,9 @@ body {
 
 .contrib-grid {
   display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   width: max-content;
   grid-auto-flow: column;
   grid-auto-columns: 9px;
@@ -511,7 +526,9 @@ body {
   color: var(--gray-1200);
   font-size: 14px;
   line-height: 1.375;
-  white-space: nowrap;
+  width: max-content;
+  max-width: calc(100% - 16px);
+  text-align: center;
   pointer-events: none;
   transform: translate(-50%, calc(-100% - 8px));
 }
