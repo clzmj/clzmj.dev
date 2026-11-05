@@ -9,7 +9,7 @@
     "lint": "oxlint --deny-warnings",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "start": "bun scripts/serve.ts",
     "shots": "bun scripts/shots.ts",
     "test": "playwright test"

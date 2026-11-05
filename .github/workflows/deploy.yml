@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: "0 8 * * *"
+    - cron: '0 8 * * *'
   workflow_dispatch:
 
 permissions:
@@ -16,8 +16,14 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  checks:
+    name: Checks
+    uses: ./.github/workflows/checks.yml # zizmor: ignore[self-repository] Local reusable workflow is bound to the caller commit.
+    secrets: inherit # zizmor: ignore[secrets-inherit] Required CI contract; site jobs explicitly use the ci environment.
+
   deploy:
     name: Build and deploy
+    needs: checks
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
@@ -25,12 +31,12 @@ jobs:
       contents: read
     steps:
       - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Set up Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: 1.4.4
 
@@ -48,7 +54,7 @@ jobs:
           fi
 
       - name: Cache Bun packages
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.bun/install/cache
           key: bun-1.4.4-${{ runner.os }}-${{ hashFiles('bun.lock', 'bun.lockb') }}
@@ -62,7 +68,7 @@ jobs:
           bun install --frozen-lockfile
 
       - name: Cache Playwright browsers
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock', 'bun.lockb') }}
@@ -79,7 +85,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.MEDIA_R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.MEDIA_R2_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: auto
-          AWS_EC2_METADATA_DISABLED: "true"
+          AWS_EC2_METADATA_DISABLED: 'true'
         run: |
           set -euo pipefail
           if [[ -z "${MEDIA_R2_BUCKET}" || -z "${CLOUDFLARE_ACCOUNT_ID}" || -z "${AWS_ACCESS_KEY_ID}" || -z "${AWS_SECRET_ACCESS_KEY}" ]]; then
@@ -121,19 +127,19 @@ jobs:
     name: Terraform apply
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: deploy
+    needs: [checks, deploy]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment: production
     permissions:
       contents: read
     steps:
       - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: 1.17.1
           terraform_wrapper: false
@@ -148,7 +154,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.TF_STATE_R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_STATE_R2_SECRET_ACCESS_KEY }}
           TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
-          AWS_EC2_METADATA_DISABLED: "true"
+          AWS_EC2_METADATA_DISABLED: 'true'
         run: |
           set -euo pipefail
           if [[ -z "${CLOUDFLARE_API_TOKEN}" || -z "${TF_VAR_cloudflare_account_id}" || -z "${TF_VAR_cloudflare_zone_id}" || -z "${AWS_ACCESS_KEY_ID}" || -z "${AWS_SECRET_ACCESS_KEY}" || -z "${TF_STATE_BUCKET}" ]]; then
