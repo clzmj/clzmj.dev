@@ -1,0 +1,43 @@
+{
+  "name": "clzmj-dev",
+  "private": true,
+  "scripts": {
+    "generate": "bun scripts/generate.ts",
+    "prebuild": "bun scripts/build-photos.ts && bun scripts/generate.ts",
+    "build": "next build",
+    "dev": "bun scripts/build-photos.ts && bun scripts/generate.ts && next dev",
+    "lint": "oxlint --deny-warnings",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "typecheck": "tsc --noEmit",
+    "start": "bun scripts/serve.ts",
+    "shots": "bun scripts/shots.ts",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.9.0",
+    "cn": "^0.5.2",
+    "geist": "1.9.0",
+    "motion": "^14.9.0",
+    "next": "16.4.4",
+    "react": "19",
+    "react-dom": "19"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@tailwindcss/postcss": "^4.3.4",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "lighthouse": "^13.6.0",
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.90.0",
+    "playwright": "^1.64.1",
+    "tailwindcss": "^4.3.4",
+    "typescript": "^7.0.2",
+    "wrangler": "4.156.2"
+  },
+  "engines": {
+    "bun": ">=1.3.14"
+  }
+}

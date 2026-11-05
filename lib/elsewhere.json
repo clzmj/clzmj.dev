@@ -1,0 +1,771 @@
+[
+  {
+    "id": "01",
+    "caption": "dad and me, squinting professionally.",
+    "alt": "my dad and me by the sea, both squinting professionally.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "01-2400.webp",
+    "width": 2400,
+    "height": 1800,
+    "color": "#858172",
+    "sizes": [
+      {
+        "file": "01-640.webp",
+        "width": 640,
+        "height": 480,
+        "quality": 85,
+        "bytes": 47214
+      },
+      {
+        "file": "01-1080.webp",
+        "width": 1080,
+        "height": 810,
+        "quality": 85,
+        "bytes": 99340
+      },
+      {
+        "file": "01-1600.webp",
+        "width": 1600,
+        "height": 1200,
+        "quality": 85,
+        "bytes": 183540
+      },
+      {
+        "file": "01-2400.webp",
+        "width": 2400,
+        "height": 1800,
+        "quality": 85,
+        "bytes": 443254
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 4032,
+    "sourceHeight": 3024
+  },
+  {
+    "id": "02",
+    "caption": "cookie, tiny boss. miss you.",
+    "alt": "cookie, tiny and already in charge. miss you, girl.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "02-2400.webp",
+    "width": 2400,
+    "height": 1800,
+    "color": "#9b9693",
+    "sizes": [
+      {
+        "file": "02-640.webp",
+        "width": 640,
+        "height": 480,
+        "quality": 85,
+        "bytes": 57366
+      },
+      {
+        "file": "02-1080.webp",
+        "width": 1080,
+        "height": 810,
+        "quality": 85,
+        "bytes": 165812
+      },
+      {
+        "file": "02-1600.webp",
+        "width": 1600,
+        "height": 1200,
+        "quality": 85,
+        "bytes": 336352
+      },
+      {
+        "file": "02-2400.webp",
+        "width": 2400,
+        "height": 1800,
+        "quality": 80,
+        "bytes": 589976
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 3264,
+    "sourceHeight": 2448
+  },
+  {
+    "id": "03",
+    "caption": "sis and me, \"exploring\" colombia.",
+    "alt": "my sister and me somewhere in colombia. we weren't lost, we were exploring.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "03-2320.webp",
+    "width": 2320,
+    "height": 3088,
+    "color": "#514235",
+    "sizes": [
+      {
+        "file": "03-640.webp",
+        "width": 640,
+        "height": 852,
+        "quality": 85,
+        "bytes": 55092
+      },
+      {
+        "file": "03-1080.webp",
+        "width": 1080,
+        "height": 1438,
+        "quality": 85,
+        "bytes": 130212
+      },
+      {
+        "file": "03-1600.webp",
+        "width": 1600,
+        "height": 2130,
+        "quality": 85,
+        "bytes": 238044
+      },
+      {
+        "file": "03-2320.webp",
+        "width": 2320,
+        "height": 3088,
+        "quality": 85,
+        "bytes": 424216
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 2320,
+    "sourceHeight": 3088
+  },
+  {
+    "id": "04",
+    "caption": "paris and a tall neighbor.",
+    "alt": "paris, and a very tall neighbor.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "04-1920.webp",
+    "width": 1920,
+    "height": 2380,
+    "color": "#5e748c",
+    "sizes": [
+      {
+        "file": "04-640.webp",
+        "width": 640,
+        "height": 793,
+        "quality": 85,
+        "bytes": 111264
+      },
+      {
+        "file": "04-1080.webp",
+        "width": 1080,
+        "height": 1339,
+        "quality": 85,
+        "bytes": 297734
+      },
+      {
+        "file": "04-1600.webp",
+        "width": 1600,
+        "height": 1983,
+        "quality": 85,
+        "bytes": 588276
+      },
+      {
+        "file": "04-1920.webp",
+        "width": 1920,
+        "height": 2380,
+        "quality": 75,
+        "bytes": 561804
+      }
+    ],
+    "omitted": [
+      {
+        "width": 2400,
+        "budget": 600000,
+        "attempts": [
+          {
+            "quality": 85,
+            "bytes": 1142034
+          },
+          {
+            "quality": 80,
+            "bytes": 955338
+          },
+          {
+            "quality": 75,
+            "bytes": 790092
+          }
+        ]
+      }
+    ],
+    "sourceWidth": 3024,
+    "sourceHeight": 3747
+  },
+  {
+    "id": "05",
+    "caption": "focaccia. focacce, technically.",
+    "alt": "my favorite focaccia. focacce, technically, because there were more.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "05-2160.webp",
+    "width": 2160,
+    "height": 3840,
+    "color": "#937d65",
+    "sizes": [
+      {
+        "file": "05-640.webp",
+        "width": 640,
+        "height": 1138,
+        "quality": 85,
+        "bytes": 78852
+      },
+      {
+        "file": "05-1080.webp",
+        "width": 1080,
+        "height": 1920,
+        "quality": 85,
+        "bytes": 172686
+      },
+      {
+        "file": "05-1600.webp",
+        "width": 1600,
+        "height": 2844,
+        "quality": 85,
+        "bytes": 312180
+      },
+      {
+        "file": "05-2160.webp",
+        "width": 2160,
+        "height": 3840,
+        "quality": 85,
+        "bytes": 485986
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 2160,
+    "sourceHeight": 3840
+  },
+  {
+    "id": "06",
+    "caption": "italy. my photography peaked.",
+    "alt": "a good one i took in italy. my photography peaked here.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "06-2400.webp",
+    "width": 2400,
+    "height": 3200,
+    "color": "#2f2e2e",
+    "sizes": [
+      {
+        "file": "06-640.webp",
+        "width": 640,
+        "height": 853,
+        "quality": 85,
+        "bytes": 36166
+      },
+      {
+        "file": "06-1080.webp",
+        "width": 1080,
+        "height": 1440,
+        "quality": 85,
+        "bytes": 79124
+      },
+      {
+        "file": "06-1600.webp",
+        "width": 1600,
+        "height": 2133,
+        "quality": 85,
+        "bytes": 140416
+      },
+      {
+        "file": "06-2400.webp",
+        "width": 2400,
+        "height": 3200,
+        "quality": 85,
+        "bytes": 265764
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 3024,
+    "sourceHeight": 4032
+  },
+  {
+    "id": "07",
+    "caption": "the adriatic, no filter.",
+    "alt": "the adriatic off croatia. the water really is that color.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "07-2400.webp",
+    "width": 2400,
+    "height": 3200,
+    "color": "#8e847b",
+    "sizes": [
+      {
+        "file": "07-640.webp",
+        "width": 640,
+        "height": 853,
+        "quality": 85,
+        "bytes": 62068
+      },
+      {
+        "file": "07-1080.webp",
+        "width": 1080,
+        "height": 1440,
+        "quality": 85,
+        "bytes": 148606
+      },
+      {
+        "file": "07-1600.webp",
+        "width": 1600,
+        "height": 2133,
+        "quality": 85,
+        "bytes": 304550
+      },
+      {
+        "file": "07-2400.webp",
+        "width": 2400,
+        "height": 3200,
+        "quality": 80,
+        "bytes": 483152
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 3024,
+    "sourceHeight": 4032
+  },
+  {
+    "id": "08",
+    "caption": "me below 20°c.",
+    "alt": "me, the second it drops below 20°c.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "08-2062.webp",
+    "width": 2062,
+    "height": 3664,
+    "color": "#817970",
+    "sizes": [
+      {
+        "file": "08-640.webp",
+        "width": 640,
+        "height": 1136,
+        "quality": 85,
+        "bytes": 64610
+      },
+      {
+        "file": "08-1080.webp",
+        "width": 1080,
+        "height": 1919,
+        "quality": 85,
+        "bytes": 177468
+      },
+      {
+        "file": "08-1600.webp",
+        "width": 1600,
+        "height": 2842,
+        "quality": 85,
+        "bytes": 370666
+      },
+      {
+        "file": "08-2062.webp",
+        "width": 2062,
+        "height": 3664,
+        "quality": 85,
+        "bytes": 553628
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 2062,
+    "sourceHeight": 3664
+  },
+  {
+    "id": "09",
+    "caption": "brazil souvenir. it's mine.",
+    "alt": "a souvenir from brazil. no, you can't have it.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "09-2184.webp",
+    "width": 2184,
+    "height": 2912,
+    "color": "#796c6a",
+    "sizes": [
+      {
+        "file": "09-640.webp",
+        "width": 640,
+        "height": 853,
+        "quality": 85,
+        "bytes": 74848
+      },
+      {
+        "file": "09-1080.webp",
+        "width": 1080,
+        "height": 1440,
+        "quality": 85,
+        "bytes": 160670
+      },
+      {
+        "file": "09-1600.webp",
+        "width": 1600,
+        "height": 2133,
+        "quality": 85,
+        "bytes": 297898
+      },
+      {
+        "file": "09-2184.webp",
+        "width": 2184,
+        "height": 2912,
+        "quality": 85,
+        "bytes": 434368
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 2184,
+    "sourceHeight": 2912
+  },
+  {
+    "id": "10",
+    "caption": "bingo, puppy edition.",
+    "alt": "bingo, puppy edition. maximum chaos, minimum size.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "10-1289.webp",
+    "width": 1289,
+    "height": 1289,
+    "color": "#70665a",
+    "sizes": [
+      {
+        "file": "10-640.webp",
+        "width": 640,
+        "height": 640,
+        "quality": 85,
+        "bytes": 22816
+      },
+      {
+        "file": "10-1080.webp",
+        "width": 1080,
+        "height": 1080,
+        "quality": 85,
+        "bytes": 47790
+      },
+      {
+        "file": "10-1289.webp",
+        "width": 1289,
+        "height": 1289,
+        "quality": 85,
+        "bytes": 61514
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 1289,
+    "sourceHeight": 1289
+  },
+  {
+    "id": "11",
+    "caption": "bingo, clearly plotting something.",
+    "alt": "bingo the other day, clearly plotting something.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "11-2340.webp",
+    "width": 2340,
+    "height": 4160,
+    "color": "#8e8566",
+    "sizes": [
+      {
+        "file": "11-640.webp",
+        "width": 640,
+        "height": 1137,
+        "quality": 85,
+        "bytes": 50236
+      },
+      {
+        "file": "11-1080.webp",
+        "width": 1080,
+        "height": 1920,
+        "quality": 85,
+        "bytes": 98808
+      },
+      {
+        "file": "11-1600.webp",
+        "width": 1600,
+        "height": 2844,
+        "quality": 85,
+        "bytes": 162742
+      },
+      {
+        "file": "11-2340.webp",
+        "width": 2340,
+        "height": 4160,
+        "quality": 85,
+        "bytes": 275686
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 2340,
+    "sourceHeight": 4160
+  },
+  {
+    "id": "12",
+    "caption": "bingo after a hike.",
+    "alt": "bingo after a hike. muddy, proud, zero regrets.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "12-720.webp",
+    "width": 720,
+    "height": 1280,
+    "color": "#7e6e65",
+    "sizes": [
+      {
+        "file": "12-640.webp",
+        "width": 640,
+        "height": 1138,
+        "quality": 85,
+        "bytes": 139834
+      },
+      {
+        "file": "12-720.webp",
+        "width": 720,
+        "height": 1280,
+        "quality": 85,
+        "bytes": 159314
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 720,
+    "sourceHeight": 1280
+  },
+  {
+    "id": "13",
+    "caption": "bingo and her sidekick.",
+    "alt": "bingo and me. she's the main character.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "13-1290.webp",
+    "width": 1290,
+    "height": 1290,
+    "color": "#81746b",
+    "sizes": [
+      {
+        "file": "13-640.webp",
+        "width": 640,
+        "height": 640,
+        "quality": 85,
+        "bytes": 50942
+      },
+      {
+        "file": "13-1080.webp",
+        "width": 1080,
+        "height": 1080,
+        "quality": 85,
+        "bytes": 92950
+      },
+      {
+        "file": "13-1290.webp",
+        "width": 1290,
+        "height": 1290,
+        "quality": 85,
+        "bytes": 112340
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 1290,
+    "sourceHeight": 1290
+  },
+  {
+    "id": "14",
+    "caption": "waiting for mexico to win.",
+    "alt": "mom, my sister and dad, ready to watch mexico win. still waiting.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "14-1123.webp",
+    "width": 1123,
+    "height": 1022,
+    "color": "#49443b",
+    "sizes": [
+      {
+        "file": "14-640.webp",
+        "width": 640,
+        "height": 583,
+        "quality": 85,
+        "bytes": 39576
+      },
+      {
+        "file": "14-1080.webp",
+        "width": 1080,
+        "height": 983,
+        "quality": 85,
+        "bytes": 78274
+      },
+      {
+        "file": "14-1123.webp",
+        "width": 1123,
+        "height": 1022,
+        "quality": 85,
+        "bytes": 81976
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 1123,
+    "sourceHeight": 1022
+  },
+  {
+    "id": "15",
+    "caption": "moving day. the boxes won.",
+    "alt": "mom, my sister and me on moving day. the boxes won.",
+    "focal": {
+      "x": 0.8,
+      "y": 0.5
+    },
+    "objectPosition": "80% 50%",
+    "src": "15-2048.webp",
+    "width": 2048,
+    "height": 1536,
+    "color": "#b6b0af",
+    "sizes": [
+      {
+        "file": "15-640.webp",
+        "width": 640,
+        "height": 480,
+        "quality": 85,
+        "bytes": 33232
+      },
+      {
+        "file": "15-1080.webp",
+        "width": 1080,
+        "height": 810,
+        "quality": 85,
+        "bytes": 72308
+      },
+      {
+        "file": "15-1600.webp",
+        "width": 1600,
+        "height": 1200,
+        "quality": 85,
+        "bytes": 127834
+      },
+      {
+        "file": "15-2048.webp",
+        "width": 2048,
+        "height": 1536,
+        "quality": 85,
+        "bytes": 184384
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 2048,
+    "sourceHeight": 1536
+  },
+  {
+    "id": "16",
+    "caption": "high school, mostly mom's work.",
+    "alt": "mom and me at my high school graduation. she did most of the work.",
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "objectPosition": "50% 50%",
+    "src": "16-822.webp",
+    "width": 822,
+    "height": 1096,
+    "color": "#6c6552",
+    "sizes": [
+      {
+        "file": "16-640.webp",
+        "width": 640,
+        "height": 852,
+        "quality": 85,
+        "bytes": 71516
+      },
+      {
+        "file": "16-822.webp",
+        "width": 822,
+        "height": 1096,
+        "quality": 85,
+        "bytes": 102998
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 822,
+    "sourceHeight": 1096
+  },
+  {
+    "id": "17",
+    "caption": "itam grad, powered by jovitacos.",
+    "alt": "mom and me at my itam graduation, powered by jovitacos from near campus.",
+    "focal": {
+      "x": 0.45,
+      "y": 0.5
+    },
+    "objectPosition": "45% 50%",
+    "src": "17-2400.webp",
+    "width": 2400,
+    "height": 2400,
+    "color": "#665c4e",
+    "sizes": [
+      {
+        "file": "17-640.webp",
+        "width": 640,
+        "height": 640,
+        "quality": 85,
+        "bytes": 60702
+      },
+      {
+        "file": "17-1080.webp",
+        "width": 1080,
+        "height": 1080,
+        "quality": 85,
+        "bytes": 177600
+      },
+      {
+        "file": "17-1600.webp",
+        "width": 1600,
+        "height": 1600,
+        "quality": 85,
+        "bytes": 358900
+      },
+      {
+        "file": "17-2400.webp",
+        "width": 2400,
+        "height": 2400,
+        "quality": 80,
+        "bytes": 486676
+      }
+    ],
+    "omitted": [],
+    "sourceWidth": 3041,
+    "sourceHeight": 3041
+  }
+]

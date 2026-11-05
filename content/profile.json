@@ -1,0 +1,73 @@
+{
+  "role": "ML & Software Engineer",
+  "avatarStack": [
+    {
+      "label": "Monopolio",
+      "href": "https://monopolio.com.mx/",
+      "src": "/logos/monopolio.png"
+    },
+    {
+      "label": "DD360",
+      "href": "https://dd360.mx/",
+      "src": "/logos/dd360.png"
+    },
+    {
+      "label": "RappiCard",
+      "href": "https://rappicard.mx/",
+      "src": "/logos/rappicard.png"
+    },
+    {
+      "label": "DiDi Food",
+      "href": "https://www.didi-food.com/es-MX/",
+      "src": "/logos/didi-food.png"
+    }
+  ],
+  "paragraphs": [
+    [
+      "I'm Carlos Lezama. I live in Mexico City and work at ",
+      {
+        "label": "Zillow",
+        "href": "https://www.zillow.com/"
+      },
+      " as a software engineer."
+    ],
+    [
+      "Before that, ",
+      {
+        "avatars": true
+      },
+      " I scraped half of Mexico's real estate for ",
+      {
+        "label": "Monopolio",
+        "href": "https://monopolio.com.mx/"
+      },
+      " at ",
+      {
+        "label": "DD360",
+        "href": "https://dd360.mx/"
+      },
+      ", wrangled credit card data at ",
+      {
+        "label": "RappiCard",
+        "href": "https://rappicard.mx/"
+      },
+      ", and crunched food delivery numbers at ",
+      {
+        "label": "DiDi Food",
+        "href": "https://www.didi-food.com/es-MX/"
+      },
+      "."
+    ],
+    [
+      "You can reach me at ",
+      {
+        "mail": true
+      },
+      ", or see my code on ",
+      {
+        "github": true
+      },
+      "."
+    ]
+  ]
+}

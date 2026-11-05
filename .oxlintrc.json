@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "oxc", "typescript", "react", "nextjs", "jsx-a11y", "import"],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    "node_modules",
+    ".next",
+    "out",
+    "shots",
+    "public",
+    "next-env.d.ts",
+    "content/contributions.json",
+    ".hidden-build-*"
+  ],
+  "options": {
+    "denyWarnings": true
+  },
+  "settings": {
+    "react": {
+      "version": "19"
+    }
+  },
+  "rules": {
+    "nextjs/no-img-element": "off",
+    "nextjs/no-html-link-for-pages": "off",
+    "react/set-state-in-effect": "off",
+    "react/purity": "off"
+  }
+}

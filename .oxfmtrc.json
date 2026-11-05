@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "jsxSingleQuote": false,
+  "trailingComma": "all",
+  "sortImports": true,
+  "ignorePatterns": [
+    "node_modules",
+    ".next",
+    "out",
+    "shots",
+    "public",
+    "next-env.d.ts",
+    "content/contributions.json",
+    ".hidden-build-*"
+  ]
+}
