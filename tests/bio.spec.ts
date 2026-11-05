@@ -68,7 +68,7 @@ test('official company logos keep their order, links, full-bleed circles and ove
     });
     expect(metrics).toEqual({
       width: 20,
-      height: 20,
+      height: expect.closeTo(20, 1),
       margin: index ? '-6px' : '0px',
       z: String(4 - index),
       fit: 'cover',

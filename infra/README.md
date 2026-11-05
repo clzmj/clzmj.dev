@@ -15,10 +15,10 @@ Terraform does not create the zone, and it does not define the Worker script, ve
 
 Doppler is the source of truth. It syncs two GitHub environments that use the same secret names. Edit secrets in Doppler, never in GitHub.
 
-| GitHub environment | Tokens | Branch limit |
-| --- | --- | --- |
-| `ci` | Read-only Cloudflare and read-only R2 state | None |
-| `production` | Write Cloudflare and write R2 state | `main` only |
+| GitHub environment | Tokens                                      | Branch limit |
+| ------------------ | ------------------------------------------- | ------------ |
+| `ci`               | Read-only Cloudflare and read-only R2 state | None         |
+| `production`       | Write Cloudflare and write R2 state         | `main` only  |
 
 There are no repository-level secrets. Both environments provide `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`, `TF_STATE_BUCKET`, `TF_STATE_R2_ACCESS_KEY_ID`, and `TF_STATE_R2_SECRET_ACCESS_KEY`.
 
@@ -40,11 +40,11 @@ doppler run --project clzmj-dev --config dev -- sh -c 'AWS_ACCESS_KEY_ID=$MEDIA_
 
 ## Workflows
 
-| Workflow | When | What |
-| --- | --- | --- |
-| `pull-request.yml` | Pull request | `bun run lint`, `bun run format:check`, install Playwright Chromium, and build the site. `terraform fmt -check`, `validate`, and `plan -lock=false`. Update one PR comment with the plan. |
-| `deploy.yml` | Push to `main` | Install Playwright Chromium, build, `wrangler deploy`, then `terraform apply`. A concurrency group keeps applies from overlapping. |
-| `deploy.yml` | Daily 08:00 UTC, and `workflow_dispatch` | Build and `wrangler deploy` only. The contributions graph is rendered at build time. |
+| Workflow           | When                                     | What                                                                                                                                                                                      |
+| ------------------ | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pull-request.yml` | Pull request                             | `bun run lint`, `bun run format:check`, install Playwright Chromium, and build the site. `terraform fmt -check`, `validate`, and `plan -lock=false`. Update one PR comment with the plan. |
+| `deploy.yml`       | Push to `main`                           | Install Playwright Chromium, build, `wrangler deploy`, then `terraform apply`. A concurrency group keeps applies from overlapping.                                                        |
+| `deploy.yml`       | Daily 08:00 UTC, and `workflow_dispatch` | Build and `wrangler deploy` only. The contributions graph is rendered at build time.                                                                                                      |
 
 The build fails if `package.json` or a Bun lockfile is missing, or if `bun run build` does not write `out/`. Production deploy also fails if `wrangler.jsonc` is missing. Build steps do not receive Cloudflare or R2 credentials.
 
