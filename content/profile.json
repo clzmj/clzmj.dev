@@ -27,7 +27,8 @@
       "I'm Carlos Lezama. I live in Mexico City and work at ",
       {
         "label": "Zillow",
-        "href": "https://www.zillow.com/"
+        "href": "https://www.zillow.com/",
+        "src": "/logos/zillow.png"
       },
       " as a software engineer."
     ],

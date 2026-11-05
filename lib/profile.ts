@@ -4,6 +4,7 @@ import { join } from 'node:path';
 export type ProfileLink = {
   label: string;
   href: string;
+  src?: string;
   previews?: string[];
 };
 
