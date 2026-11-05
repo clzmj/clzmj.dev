@@ -12,3 +12,8 @@ output "media_bucket_name" {
   description = "Private R2 bucket holding the Elsewhere photos."
   value       = cloudflare_r2_bucket.media.name
 }
+
+output "web_analytics_site_token" {
+  description = "Public Web Analytics beacon token; available after apply if manual installation is needed."
+  value       = cloudflare_web_analytics_site.apex.site_token
+}

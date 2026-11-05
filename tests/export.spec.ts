@@ -36,6 +36,7 @@ test('the home export has no removed publishing routes, assets, or links', async
   const sitemap = await (await request.get('/sitemap.xml')).text();
   expect(sitemap.match(/<loc>/g)).toHaveLength(1);
   expect(sitemap).toContain('<loc>https://clzmj.dev</loc>');
+  expect(sitemap).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}T/);
   for (const path of ['/index.md', '/llms.txt', '/llms-full.txt']) {
     const text = await (await request.get(path)).text();
     expect(text).not.toMatch(/writings|events|markdown-demo|rss\.xml/i);

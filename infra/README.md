@@ -17,19 +17,23 @@ flowchart LR
 
 ## Resources and buckets
 
-| Resource           | Terraform address / file                                          | Behavior                                                                   |
-| ------------------ | ----------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Apex custom domain | `cloudflare_workers_custom_domain.apex`, `infra/custom_domain.tf` | `clzmj.dev` → `clzmj-dev`; custom domain handles apex DNS                  |
-| www DNS            | `cloudflare_dns_record.www_aaaa`, `infra/dns.tf`                  | Proxied AAAA `100::`, TTL auto; redirect placeholder                       |
-| www redirect       | `cloudflare_ruleset.www_redirect`, `infra/redirects.tf`           | Single rule: 301 to HTTPS apex, keeping path and query                     |
-| HTTPS enforcement  | `cloudflare_zone_setting.always_use_https`, `infra/settings.tf`   | `on`                                                                       |
-| Minimum TLS        | `cloudflare_zone_setting.min_tls_version`, `infra/settings.tf`    | `1.2`                                                                      |
-| HSTS               | `cloudflare_zone_setting.security_header`, `infra/settings.tf`    | 31536000 seconds, include subdomains, nosniff; preload off                 |
-| Media R2 bucket    | `cloudflare_r2_bucket.media`, `infra/r2.tf`                       | `clzmj-dev-media`, default jurisdiction, WNAM, Standard; `prevent_destroy` |
-| State R2 bucket    | Backend in `infra/backend.tf`; not a managed bucket resource      | `clzmj-dev-tfstate`, key `clzmj.dev/terraform.tfstate`, native lockfile    |
+| Resource           | Terraform address / file                                                                                 | Behavior                                                                   |
+| ------------------ | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Apex custom domain | `cloudflare_workers_custom_domain.apex`, `infra/custom_domain.tf`                                        | `clzmj.dev` → `clzmj-dev`; custom domain handles apex DNS                  |
+| www DNS            | `cloudflare_dns_record.www_aaaa`, `infra/dns.tf`                                                         | Proxied AAAA `100::`, TTL auto; redirect placeholder                       |
+| Apex TXT           | `cloudflare_dns_record.google_site_verification`, `google_workspace_verification`, `spf`, `infra/dns.tf` | Existing exact Google verification and SPF values; `prevent_destroy`       |
+| www redirect       | `cloudflare_ruleset.www_redirect`, `infra/redirects.tf`                                                  | Single rule: 301 to HTTPS apex, keeping path and query                     |
+| HTTPS enforcement  | `cloudflare_zone_setting.always_use_https`, `infra/settings.tf`                                          | `on`                                                                       |
+| Minimum TLS        | `cloudflare_zone_setting.min_tls_version`, `infra/settings.tf`                                           | `1.2`                                                                      |
+| HSTS               | `cloudflare_zone_setting.security_header`, `infra/settings.tf`                                           | 31536000 seconds, include subdomains, nosniff; preload off                 |
+| Web Analytics      | `cloudflare_web_analytics_site.apex`, `infra/analytics.tf`                                               | Zone-backed automatic beacon installation, enabled                         |
+| Media R2 bucket    | `cloudflare_r2_bucket.media`, `infra/r2.tf`                                                              | `clzmj-dev-media`, default jurisdiction, WNAM, Standard; `prevent_destroy` |
+| State R2 bucket    | Backend in `infra/backend.tf`; not a managed bucket resource                                             | `clzmj-dev-tfstate`, key `clzmj.dev/terraform.tfstate`, native lockfile    |
 
-`infra/imports.tf` adopts the existing www record, redirect ruleset, zone settings and media bucket.
-Mail and domain-verification DNS records are not declared in `infra/*.tf`.
+`infra/imports.tf` adopts the existing www record, three apex TXT records, redirect ruleset, zone
+settings and media bucket. The two Google verification TXT records and SPF preserve the live API
+content exactly, including literal quotation marks, TTLs and existing comments. MX, DKIM and DMARC
+remain outside Terraform.
 
 No public media domain or runtime R2 binding is configured in `infra/` or `wrangler.jsonc`.
 
@@ -55,6 +59,36 @@ credentials. Cloudflare tokens include Workers R2 Storage Read in `ci` and Worke
 in production.
 
 Actual token policies and branch restrictions must be verified outside the repository.
+
+Web Analytics requires account-level **Account Settings Read** for refresh and **Account Settings
+Write** for creation/update, in addition to the existing zone and backend access. The read-only
+`ci` token successfully read the Web Analytics site list. The user reports that Gilfoyle verified
+**Account Settings Write** on the apply token `terraform-clzmj-dev`.
+
+## Analytics
+
+The provider-native Web Analytics resource requests automatic installation for the Cloudflare
+zone. Cloudflare documents automatic injection for proxied HTML and RUM on initial Worker
+requests; Worker subrequests do not produce RUM metrics. The Worker custom domain routes the
+initial visitor request through Cloudflare. Actual injection still needs verification after apply:
+check that the HTML contains `static.cloudflareinsights.com/beacon.min.js` and that browser
+requests reach `/cdn-cgi/rum`. A `Cache-Control: public, no-transform` response prevents injection.
+
+If automatic installation fails, retrieve the public beacon token using
+`terraform -chdir=infra output -raw web_analytics_site_token`, switch the resource to
+`auto_install = false` (remove `enabled`), and install one beacon snippet in the site layout. A new
+token is only available after creation; no token is hard-coded into the application by this change.
+
+Crawler Hints is outside this PR.
+
+Read-only verification on 2026-11-04 used `doppler run --project clzmj-dev --config ci`, the
+read-only state pair, and `terraform plan -lock=false`: **3 to import, 1 to add, 0 to change,
+0 to destroy**. All three existing apex TXT records have `no-op` actions in the JSON plan. No apply
+was run. The Web Analytics site and its beacon token remain pending apply.
+
+Sources: [provider Web Analytics resource](https://registry.terraform.io/providers/cloudflare/cloudflare/5.28.1/docs/resources/web_analytics_site),
+[automatic setup](https://developers.cloudflare.com/web-analytics/get-started/),
+[Worker RUM limitations](https://developers.cloudflare.com/web-analytics/faq/).
 
 The state pair maps to `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in Terraform steps. `ci` cannot
 write the state lock, so PR plans use `-lock=false`; production apply takes the lock.

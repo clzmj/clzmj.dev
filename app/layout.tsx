@@ -25,6 +25,7 @@ const shareImageUrl = `${site.url}/opengraph-image.jpg?v=${shareImageVersion}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
+  manifest: '/site.webmanifest',
   title: {
     default: site.title,
     template: `%s · ${site.name}`,
