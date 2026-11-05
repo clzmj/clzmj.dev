@@ -5,7 +5,6 @@ import { chromium } from 'playwright';
 
 import { parseContributions } from '../lib/contributions';
 import { homeMarkdown, llmsText } from '../lib/publish';
-import { site } from '../lib/site';
 import { renderShareCard } from './share-card';
 
 function writePublic(relativePath: string, contents: string | Uint8Array) {
@@ -59,30 +58,6 @@ async function main() {
   } finally {
     await browser.close();
   }
-  for (const size of [180, 192, 512]) {
-    const output = await new Bun.Image('public/avatar.png')
-      .resize(size, size, { fit: 'fill' })
-      .png()
-      .bytes();
-    writePublic(size === 180 ? 'manifest/apple-touch-icon.png' : `pwa-${size}.png`, output);
-  }
-  writePublic(
-    'site.webmanifest',
-    JSON.stringify({
-      id: '/',
-      name: site.title,
-      short_name: site.siteName,
-      start_url: '/',
-      display: 'browser',
-      background_color: '#fcfcfc',
-      theme_color: '#fcfcfc',
-      icons: [
-        { src: '/pwa-192.png', sizes: '192x192', type: 'image/png' },
-        { src: '/pwa-512.png', sizes: '512x512', type: 'image/png' },
-        { src: '/manifest/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-      ],
-    }),
-  );
 }
 
 await main();

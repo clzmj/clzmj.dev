@@ -62,11 +62,10 @@ Actual token policies and branch restrictions must be verified outside the repos
 
 Web Analytics requires account-level **Account Settings Read** for refresh and **Account Settings
 Write** for creation/update, in addition to the existing zone and backend access. The read-only
-`ci` token successfully read the Web Analytics site list. The production account token verified
-active, but its own policy endpoint returned HTTP 403; whether it already has Account Settings
-Write remains unverified. Manage any required permission change in the Doppler source token.
+`ci` token successfully read the Web Analytics site list. The user reports that Gilfoyle verified
+**Account Settings Write** on the apply token `terraform-clzmj-dev`.
 
-## Analytics and crawler discovery
+## Analytics
 
 The provider-native Web Analytics resource requests automatic installation for the Cloudflare
 zone. Cloudflare documents automatic injection for proxied HTML and RUM on initial Worker
@@ -80,10 +79,7 @@ If automatic installation fails, retrieve the public beacon token using
 `auto_install = false` (remove `enabled`), and install one beacon snippet in the site layout. A new
 token is only available after creation; no token is hard-coded into the application by this change.
 
-Crawler Hints is not exposed by the pinned Cloudflare provider v5.28.1: its installed schema has
-272 resources, no crawler resource or `crawler_hints` attribute, and the provider's supported zone
-setting IDs exclude it. It is therefore left unconfigured; no custom API mutation or provisioner
-is used.
+Crawler Hints is outside this PR.
 
 Read-only verification on 2026-11-04 used `doppler run --project clzmj-dev --config ci`, the
 read-only state pair, and `terraform plan -lock=false`: **3 to import, 1 to add, 0 to change,
@@ -91,10 +87,8 @@ read-only state pair, and `terraform plan -lock=false`: **3 to import, 1 to add,
 was run. The Web Analytics site and its beacon token remain pending apply.
 
 Sources: [provider Web Analytics resource](https://registry.terraform.io/providers/cloudflare/cloudflare/5.28.1/docs/resources/web_analytics_site),
-[provider supported zone settings](https://github.com/cloudflare/terraform-provider-cloudflare/blob/v5.28.1/docs/resources/zone_setting.md),
 [automatic setup](https://developers.cloudflare.com/web-analytics/get-started/),
-[Worker RUM limitations](https://developers.cloudflare.com/web-analytics/faq/), and
-[Crawler Hints](https://developers.cloudflare.com/cache/advanced-configuration/crawler-hints/).
+[Worker RUM limitations](https://developers.cloudflare.com/web-analytics/faq/).
 
 The state pair maps to `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in Terraform steps. `ci` cannot
 write the state lock, so PR plans use `-lock=false`; production apply takes the lock.
