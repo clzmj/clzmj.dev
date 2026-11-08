@@ -39,26 +39,27 @@ No public media domain or runtime R2 binding is configured in `infra/` or `wrang
 
 ## Credential contract
 
-Doppler is the source of truth and syncs GitHub environment secrets automatically. Change the source
-in Doppler, not the synced destination in GitHub. The documented setup uses environment secrets,
-with no repository-level secrets.
+Doppler is the source of truth. GitHub `ci` and `production` each store only a
+`DOPPLER_TOKEN`: a read-only service token scoped to `clzmj-dev/ci` and
+`clzmj-dev/prd`, respectively. Production is restricted to `main`. No native
+GitHub secret sync or repository-level credential fallback is used.
 
-The integration configuration is not versioned in this repository.
+Secret-consuming steps call `scripts/with-doppler.ts ci|prd -- <command>`. The
+helper downloads credentials over HTTPS, validates project/config metadata,
+registers values for GitHub masking, and supplies only the allowlist to its child
+without passing the service token. No secret files or GitHub environment/output
+files are written. Installs and unrelated checks never receive the token.
 
-| Destination             | Access                                                                                                | Workflow                                                    |
-| ----------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| GitHub `ci`             | Read-only Cloudflare and state; no branch restriction documented by the existing infrastructure setup | Reusable site checks on all triggers; PR `plan -lock=false` |
-| GitHub `production`     | Write Cloudflare and state; `main` only in the documented environment setup                           | Worker deploy; Terraform apply only on `main` pushes        |
-| Doppler `clzmj-dev/dev` | Local media upload keys; no GitHub sync target recorded                                               | Mac upload command below                                    |
+| Destination                                   | Access                                          | Workflow                                                 |
+| --------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------- |
+| GitHub `ci` → Doppler `clzmj-dev/ci`          | Read-only Cloudflare, state and media           | Site media checks; same-repository PR `plan -lock=false` |
+| GitHub `production` → Doppler `clzmj-dev/prd` | Scoped Cloudflare/state writes; read-only media | Worker deploy; apply only on `main` pushes               |
+| Doppler `clzmj-dev/dev`                       | Local media upload keys                         | Mac upload command below                                 |
 
-Both GitHub environments receive the nine Doppler-synced names listed in
-[environments](../docs/environments.md#every-secret-read-by-workflows).
-
-The media read pair is scoped to `clzmj-dev-media`; both environments use read-only media
-credentials. Cloudflare tokens include Workers R2 Storage Read in `ci` and Workers R2 Storage Write
-in production.
-
-Actual token policies and branch restrictions must be verified outside the repository.
+Both runtime configs provide the nine [allowlisted names](../docs/environments.md#runtime-secret-allowlist).
+The media read pair is scoped to `clzmj-dev-media`; Cloudflare tokens include
+Workers R2 Storage Read in `ci` and Workers R2 Storage Write in production.
+Actual token policies and branch restrictions require external verification.
 
 Web Analytics requires account-level **Account Settings Read** for refresh and **Account Settings
 Write** for creation/update, in addition to the existing zone and backend access. The read-only
@@ -132,5 +133,5 @@ A `main` push runs all checks → Worker build/deploy → Terraform fmt/init/val
 Scheduled and manual runs also require all checks, then build/deploy without apply
 (`.github/workflows/deploy.yml`).
 
-[All environment secrets](../docs/environments.md) · [CI failures](../docs/ci.md) · [Deployment and
+[Runtime secret contract](../docs/environments.md) · [CI failures](../docs/ci.md) · [Deployment and
 rollback](../docs/operations.md) · [ADRs](../docs/adr/README.md)
