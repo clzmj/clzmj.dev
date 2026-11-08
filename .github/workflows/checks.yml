@@ -52,6 +52,9 @@ jobs:
           set -euo pipefail
           bun install --frozen-lockfile
 
+      - name: Check runtime secret policy
+        run: bun scripts/check-runtime-secrets.ts
+
       - name: Lint
         run: bun run lint
 
@@ -209,19 +212,19 @@ jobs:
       - name: Fetch Elsewhere photos
         shell: bash
         env:
-          MEDIA_R2_BUCKET: ${{ secrets.MEDIA_R2_BUCKET }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.MEDIA_R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.MEDIA_R2_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: auto
-          AWS_EC2_METADATA_DISABLED: 'true'
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
         run: |
           set -euo pipefail
+          bun scripts/with-doppler.ts ci --only MEDIA_R2_BUCKET,CLOUDFLARE_ACCOUNT_ID,MEDIA_R2_ACCESS_KEY_ID,MEDIA_R2_SECRET_ACCESS_KEY -- bash -euo pipefail <<'DOPPLER_CHILD'
+          export AWS_ACCESS_KEY_ID="$MEDIA_R2_ACCESS_KEY_ID"
+          export AWS_SECRET_ACCESS_KEY="$MEDIA_R2_SECRET_ACCESS_KEY"
+          export AWS_DEFAULT_REGION=auto AWS_EC2_METADATA_DISABLED=true
           if [[ -z "${MEDIA_R2_BUCKET}" || -z "${CLOUDFLARE_ACCOUNT_ID}" || -z "${AWS_ACCESS_KEY_ID}" || -z "${AWS_SECRET_ACCESS_KEY}" ]]; then
-            echo "::error::A Doppler-synced media secret is missing from the ci environment. Required: MEDIA_R2_BUCKET, CLOUDFLARE_ACCOUNT_ID, MEDIA_R2_ACCESS_KEY_ID, MEDIA_R2_SECRET_ACCESS_KEY."
+            echo "::error::A Doppler runtime media secret is missing from the ci environment. Required: MEDIA_R2_BUCKET, CLOUDFLARE_ACCOUNT_ID, MEDIA_R2_ACCESS_KEY_ID, MEDIA_R2_SECRET_ACCESS_KEY."
             exit 1
           fi
           aws s3 sync "s3://${MEDIA_R2_BUCKET}/elsewhere/" assets/elsewhere/ --endpoint-url "https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com" --only-show-errors
+          DOPPLER_CHILD
 
       - name: Build
         shell: bash
@@ -293,19 +296,19 @@ jobs:
       - name: Fetch Elsewhere photos
         shell: bash
         env:
-          MEDIA_R2_BUCKET: ${{ secrets.MEDIA_R2_BUCKET }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.MEDIA_R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.MEDIA_R2_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: auto
-          AWS_EC2_METADATA_DISABLED: 'true'
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
         run: |
           set -euo pipefail
+          bun scripts/with-doppler.ts ci --only MEDIA_R2_BUCKET,CLOUDFLARE_ACCOUNT_ID,MEDIA_R2_ACCESS_KEY_ID,MEDIA_R2_SECRET_ACCESS_KEY -- bash -euo pipefail <<'DOPPLER_CHILD'
+          export AWS_ACCESS_KEY_ID="$MEDIA_R2_ACCESS_KEY_ID"
+          export AWS_SECRET_ACCESS_KEY="$MEDIA_R2_SECRET_ACCESS_KEY"
+          export AWS_DEFAULT_REGION=auto AWS_EC2_METADATA_DISABLED=true
           if [[ -z "${MEDIA_R2_BUCKET}" || -z "${CLOUDFLARE_ACCOUNT_ID}" || -z "${AWS_ACCESS_KEY_ID}" || -z "${AWS_SECRET_ACCESS_KEY}" ]]; then
-            echo "::error::A Doppler-synced media secret is missing from the ci environment. Required: MEDIA_R2_BUCKET, CLOUDFLARE_ACCOUNT_ID, MEDIA_R2_ACCESS_KEY_ID, MEDIA_R2_SECRET_ACCESS_KEY."
+            echo "::error::A Doppler runtime media secret is missing from the ci environment. Required: MEDIA_R2_BUCKET, CLOUDFLARE_ACCOUNT_ID, MEDIA_R2_ACCESS_KEY_ID, MEDIA_R2_SECRET_ACCESS_KEY."
             exit 1
           fi
           aws s3 sync "s3://${MEDIA_R2_BUCKET}/elsewhere/" assets/elsewhere/ --endpoint-url "https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com" --only-show-errors
+          DOPPLER_CHILD
 
       - name: Build
         shell: bash

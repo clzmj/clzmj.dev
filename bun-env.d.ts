@@ -22,8 +22,13 @@ declare const Bun: {
     command: string[],
     options: {
       env?: Record<string, string | undefined>;
+      stdin?: 'inherit';
       stdout?: 'inherit';
       stderr?: 'inherit';
     },
-  ) => { kill: () => void };
+  ) => { kill: () => void; exited: Promise<number> };
 };
+
+interface ImportMeta {
+  main: boolean;
+}

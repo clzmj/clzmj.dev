@@ -50,8 +50,8 @@ bunx wrangler@4.156.2 deploy
 ```
 
 This is the Worker command used by `.github/workflows/deploy.yml`; it bypasses the workflow checks
-and does not apply Terraform. Production credentials come through Doppler sync; source config
-mappings are not versioned ([environments](environments.md)).
+and does not apply Terraform. Production credentials are fetched at runtime from `clzmj-dev/prd` by the scoped
+Doppler helper ([environments](environments.md)).
 
 ## Roll back
 
@@ -79,19 +79,19 @@ Photo source replacements in R2 need separate recovery; Git does not store them 
 
 ## Rotate credentials
 
-| Credential           | Update location                                                                                                   | Verify afterward                                                        |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Media read pair      | Doppler source synced to GitHub `ci` and `production`                                                             | Build/Test check jobs and production “Fetch Elsewhere photos” steps     |
-| Media upload pair    | Doppler `clzmj-dev/dev`: `MEDIA_R2_UPLOAD_ACCESS_KEY_ID`, `MEDIA_R2_UPLOAD_SECRET_ACCESS_KEY`                     | Upload/download using [photos](photos.md)                               |
-| State R2 pair        | Doppler source synced to GitHub `ci` / `production`: `TF_STATE_R2_ACCESS_KEY_ID`, `TF_STATE_R2_SECRET_ACCESS_KEY` | PR read-only plan; production state lock and apply on a `main` push     |
-| Cloudflare API token | Doppler source synced to GitHub `ci` / `production`: `CLOUDFLARE_API_TOKEN`                                       | PR plan with read token; production Wrangler and apply with write token |
+| Credential           | Update location                                                                                        | Verify afterward                                                        |
+| -------------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| Media read pair      | Doppler `clzmj-dev/ci` and `clzmj-dev/prd`                                                             | Build/Test check jobs and production “Fetch Elsewhere photos” steps     |
+| Media upload pair    | Doppler `clzmj-dev/dev`: `MEDIA_R2_UPLOAD_ACCESS_KEY_ID`, `MEDIA_R2_UPLOAD_SECRET_ACCESS_KEY`          | Upload/download using [photos](photos.md)                               |
+| State R2 pair        | Doppler `clzmj-dev/ci` / `clzmj-dev/prd`: `TF_STATE_R2_ACCESS_KEY_ID`, `TF_STATE_R2_SECRET_ACCESS_KEY` | PR read-only plan; production state lock and apply on a `main` push     |
+| Cloudflare API token | Doppler `clzmj-dev/ci` / `clzmj-dev/prd`: `CLOUDFLARE_API_TOKEN`                                       | PR plan with read token; production Wrangler and apply with write token |
 
-Create the replacement credential with the same scope, update its named Doppler secret(s), and let
-the GitHub integration sync automatically. Validate the consuming jobs before revoking the old
-credential.
-
-The repository documents this sync, but not token-creation UI steps or the `ci`/`prd` source
-mapping.
+Create a replacement application credential with the same scope and update its
+named Doppler secret(s). The next runtime read uses it; validate consuming jobs
+before revoking the old credential. For a service-token rotation, replace only the
+relevant GitHub environment's `DOPPLER_TOKEN` with a new read-only token scoped to
+that same project/config, validate the jobs, then revoke the old token. See
+[the runtime contract](environments.md#runtime-doppler-access).
 
 Sources: `infra/README.md`, `.github/workflows/pull-request.yml`, `.github/workflows/deploy.yml`. R2
 pairs are mapped to standard AWS variables only inside their consuming step; see [all

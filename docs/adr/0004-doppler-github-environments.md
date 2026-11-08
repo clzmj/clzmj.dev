@@ -1,33 +1,41 @@
-# ADR 0004: Sync deployment secrets from Doppler to GitHub environments
+# ADR 0004: Fetch deployment secrets from Doppler at runtime
 
-Keep deployment secret values in Doppler and expose them to CI through scoped GitHub environments.
+Use one scoped Doppler service token per GitHub environment. Keep deployment
+credential values in Doppler and download them only when a consuming step runs.
 
 ## Context
 
-Infrastructure documentation identifies Doppler as the source of truth.
-
-The workflows request secrets through the GitHub `ci` and `production` environments, and do not use
-repository-level secrets (`infra/README.md`, `.github/workflows/pull-request.yml`,
-`.github/workflows/deploy.yml`).
+Site checks and PR plans use the GitHub `ci` environment; deploy and apply use
+`production`. Earlier workflows consumed copies synchronized through the Doppler
+GitHub integration. Runtime reads remove those copied application credentials and
+make the source project/config explicit in repository code.
 
 ## Decision
 
-Manage secret values in Doppler and sync the required values to GitHub environments.
+Store only `DOPPLER_TOKEN` in each GitHub environment: a read-only token scoped to
+`clzmj-dev/ci` for `ci`, and a separate read-only token scoped to `clzmj-dev/prd` for
+`production`. Restrict production to `main`.
 
-Reusable site checks and PR plans use `ci`; deployment and apply jobs use `production`
-(`.github/workflows/checks.yml`, `.github/workflows/pull-request.yml`,
-`.github/workflows/deploy.yml`).
-
-The repository documents the required GitHub secret names and environment permissions, but does not
-define the Doppler configuration names or a verifiable name-to-environment mapping
-(`infra/README.md`, `.github/workflows/pull-request.yml`, `.github/workflows/deploy.yml`).
+Secret-consuming steps call `scripts/with-doppler.ts ci|prd -- <command>`. It reads
+Doppler's HTTPS download API, validates project/config metadata, masks values in
+GitHub logs, and supplies only the explicit allowlist to its child. The child does
+not receive the service token. There are no secret files, GitHub environment or
+output writes, CLI fallback, or native synchronization dependencies.
 
 ## Alternatives considered
 
-- Store values as repository-level GitHub secrets: workflows select environment-scoped secrets and the infrastructure documentation says no repository-level secrets are used (`infra/README.md`, `.github/workflows/deploy.yml`).
-- Edit GitHub values directly: the repository documentation directs operators to manage values in Doppler (`infra/README.md`).
+- Native GitHub sync: duplicates application secrets in GitHub and requires sync
+  configuration and status checks.
+- Repository-level service token: loses the separate `ci`/production credential
+  contexts and the production branch restriction.
+- Inject secrets into every job step: exposes them to installation and checks
+  that do not consume them.
 
 ## Consequences
 
-GitHub jobs receive secrets through their declared environments. Repository files alone cannot
-confirm external Doppler configuration names or synchronization state.
+Doppler availability is required when consuming steps start. Config mismatches or
+missing allowlisted values fail before starting the child. Application credential
+rotation takes effect on the next runtime read; service-token rotation updates
+one GitHub environment secret. See [environments](../environments.md) for the
+allowlist and rotation sequence. Live GitHub/Doppler settings remain externally
+managed and must be verified separately.

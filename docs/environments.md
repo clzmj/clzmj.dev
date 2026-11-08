@@ -18,41 +18,62 @@ The reusable site checks use `ci` on PRs and before production deploys. The Terr
 Secrets checks declare no environment and receive no explicit environment secrets
 (`.github/workflows/checks.yml`).
 
-## Doppler configs and GitHub sync
+## Runtime Doppler access
 
-| Doppler config  | GitHub environment                                                                  | Repository evidence                        |
-| --------------- | ----------------------------------------------------------------------------------- | ------------------------------------------ |
-| `clzmj-dev/dev` | No sync target documented                                                           | Local media upload pair; `infra/README.md` |
-| `ci`            | `ci` consumes Doppler-synced secrets; source config mapping is not recorded         | `.github/workflows/pull-request.yml`       |
-| `prd`           | `production` consumes Doppler-synced secrets; source config mapping is not recorded | `.github/workflows/deploy.yml`             |
-| `stg`           | No workflow reference or sync mapping recorded                                      | Neither workflow selects staging           |
+Doppler is the source of truth. GitHub stores one `DOPPLER_TOKEN` environment
+secret per credential context. Each token is a read-only service token scoped to
+exactly one project/config; deployment credentials remain in Doppler.
 
-The repository does not contain Doppler integration configuration. Verify the source config in
-Doppler before rotation; the workflows only identify the destination GitHub environment. No staging
-deployment is defined in `.github/workflows/` or `wrangler.jsonc`.
+| Doppler project/config | GitHub environment | Runtime use                                 |
+| ---------------------- | ------------------ | ------------------------------------------- |
+| `clzmj-dev/dev`        | None               | Local media upload credentials              |
+| `clzmj-dev/ci`         | `ci`               | Read-only media fetch and Terraform plan    |
+| `clzmj-dev/prd`        | `production`       | Media fetch, Worker deploy, Terraform apply |
 
-## Every secret read by workflows
+The production GitHub environment must allow only `main`; deploy has an explicit
+`refs/heads/main` guard and apply additionally requires a push. PR plans run only
+for same-repository PRs. No staging deployment is defined.
 
-Doppler is the source of truth for the environment secrets; update it and let its GitHub sync
-propagate changes (`infra/README.md`). `GITHUB_TOKEN` is supplied by GitHub Actions. Identifiers
-below select resources; they grant no access by themselves.
+Only secret-consuming steps receive `DOPPLER_TOKEN`. They invoke
+`bun scripts/with-doppler.ts ci|prd -- <command>` (from `infra/`, use
+`../scripts/with-doppler.ts`). The helper fetches JSON directly over HTTPS,
+validates the reserved project/config values, registers downloaded values for
+GitHub log masking, then injects only the required allowlisted secrets into the
+child process. It removes `DOPPLER_TOKEN` before starting that child. It writes no
+secret files or GitHub environment/output files and has no CLI fallback.
 
-| Name                            | Where it lives / used                                                          | Scope and access                                                                                          |
-| ------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| `CLOUDFLARE_API_TOKEN`          | Doppler → GitHub `ci`, `production`; Terraform and production Wrangler         | `ci`: read-only, including Workers R2 Storage Read; production: write, including Workers R2 Storage Write |
-| `CLOUDFLARE_ACCOUNT_ID`         | Doppler → both environments; media fetch, Wrangler, Terraform                  | Account selector; mapped to `TF_VAR_cloudflare_account_id` for Terraform                                  |
-| `CLOUDFLARE_ZONE_ID`            | Doppler → both environments; Terraform                                         | Zone selector; mapped to `TF_VAR_cloudflare_zone_id`; `infra/zone.tf` checks `clzmj.dev`                  |
-| `TF_STATE_BUCKET`               | Doppler → both environments; Terraform                                         | Bucket selector; must equal `clzmj-dev-tfstate`                                                           |
-| `TF_STATE_R2_ACCESS_KEY_ID`     | Doppler → both environments; Terraform as `AWS_ACCESS_KEY_ID`                  | State bucket: read-only in `ci`; read/write in production                                                 |
-| `TF_STATE_R2_SECRET_ACCESS_KEY` | Doppler → both environments; Terraform as `AWS_SECRET_ACCESS_KEY`              | Paired state credential; same scope as preceding row                                                      |
-| `MEDIA_R2_BUCKET`               | Doppler → both environments; photo fetch                                       | Media bucket selector (`clzmj-dev-media`)                                                                 |
-| `MEDIA_R2_ACCESS_KEY_ID`        | Doppler → both environments; fetch as `AWS_ACCESS_KEY_ID`                      | Read-only, scoped to media bucket                                                                         |
-| `MEDIA_R2_SECRET_ACCESS_KEY`    | Doppler → both environments; fetch as `AWS_SECRET_ACCESS_KEY`                  | Paired read-only media credential                                                                         |
-| `GITHUB_TOKEN`                  | GitHub Actions; Build/Test build steps, production build and PR comment action | Check jobs and deploy: `contents: read`; PR plan additionally `pull-requests: write`                      |
+Dependency installation, builds, tests, and unrelated quality checks receive no
+Doppler service token. `GITHUB_TOKEN` remains supplied by GitHub for the existing
+build and PR comment permissions.
 
-Sources: `.github/workflows/checks.yml`, `.github/workflows/pull-request.yml`,
-`.github/workflows/deploy.yml`, `infra/backend.tf`, `infra/variables.tf`, `infra/README.md`. Actual
-token policies and Doppler integration settings are not versioned here.
+## Runtime secret allowlist
+
+Both configs must provide these nine names. They are downloaded at runtime;
+GitHub environments store only `DOPPLER_TOKEN`, not copies of these values.
+
+| Name                            | Use                                               | Access                                       |
+| ------------------------------- | ------------------------------------------------- | -------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`          | Terraform; production Wrangler                    | Read-only in `ci`; scoped writes in `prd`    |
+| `CLOUDFLARE_ACCOUNT_ID`         | R2 endpoint, Wrangler, Terraform account selector | Identifier                                   |
+| `CLOUDFLARE_ZONE_ID`            | Terraform `clzmj.dev` zone selector               | Identifier                                   |
+| `TF_STATE_BUCKET`               | Must equal `clzmj-dev-tfstate`                    | Bucket selector                              |
+| `TF_STATE_R2_ACCESS_KEY_ID`     | Terraform backend                                 | State read-only in `ci`; read/write in `prd` |
+| `TF_STATE_R2_SECRET_ACCESS_KEY` | Paired state secret                               | Same bucket scope                            |
+| `MEDIA_R2_BUCKET`               | Photo source bucket `clzmj-dev-media`             | Bucket selector                              |
+| `MEDIA_R2_ACCESS_KEY_ID`        | Photo downloads                                   | Read-only media access                       |
+| `MEDIA_R2_SECRET_ACCESS_KEY`    | Paired media secret                               | Read-only media access                       |
+
+Consuming child shells map R2 credentials to `AWS_ACCESS_KEY_ID` /
+`AWS_SECRET_ACCESS_KEY` and account/zone selectors to
+`TF_VAR_cloudflare_account_id` / `TF_VAR_cloudflare_zone_id`. CI cannot write state
+locks, so PR plans use `terraform plan -lock=false`.
+
+Rotate an application credential in its Doppler config; the next consuming step
+fetches the new value without a GitHub sync. Rotate a service token by issuing a
+replacement read-only token for the same project/config, replacing that
+GitHub environment's `DOPPLER_TOKEN`, verifying consuming jobs, then revoking the
+old token. Keep `ci` and `prd` tokens separate. Integration configuration and
+actual token policies require external verification.
 
 ## Local-only credentials and build switches
 

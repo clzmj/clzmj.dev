@@ -19,10 +19,10 @@ jobs:
   checks:
     name: Checks
     uses: ./.github/workflows/checks.yml # zizmor: ignore[self-repository] Local reusable workflow is bound to the caller commit.
-    secrets: inherit # zizmor: ignore[secrets-inherit] Required CI contract; site jobs explicitly use the ci environment.
 
   deploy:
     name: Build and deploy
+    if: github.ref == 'refs/heads/main'
     needs: checks
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -80,19 +80,19 @@ jobs:
       - name: Fetch Elsewhere photos
         shell: bash
         env:
-          MEDIA_R2_BUCKET: ${{ secrets.MEDIA_R2_BUCKET }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.MEDIA_R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.MEDIA_R2_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: auto
-          AWS_EC2_METADATA_DISABLED: 'true'
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
         run: |
           set -euo pipefail
+          bun scripts/with-doppler.ts prd --only MEDIA_R2_BUCKET,CLOUDFLARE_ACCOUNT_ID,MEDIA_R2_ACCESS_KEY_ID,MEDIA_R2_SECRET_ACCESS_KEY -- bash -euo pipefail <<'DOPPLER_CHILD'
+          export AWS_ACCESS_KEY_ID="$MEDIA_R2_ACCESS_KEY_ID"
+          export AWS_SECRET_ACCESS_KEY="$MEDIA_R2_SECRET_ACCESS_KEY"
+          export AWS_DEFAULT_REGION=auto AWS_EC2_METADATA_DISABLED=true
           if [[ -z "${MEDIA_R2_BUCKET}" || -z "${CLOUDFLARE_ACCOUNT_ID}" || -z "${AWS_ACCESS_KEY_ID}" || -z "${AWS_SECRET_ACCESS_KEY}" ]]; then
-            echo "::error::A Doppler-synced media secret is missing from the production environment. Required: MEDIA_R2_BUCKET, CLOUDFLARE_ACCOUNT_ID, MEDIA_R2_ACCESS_KEY_ID, MEDIA_R2_SECRET_ACCESS_KEY."
+            echo "::error::A Doppler runtime media secret is missing from the production environment. Required: MEDIA_R2_BUCKET, CLOUDFLARE_ACCOUNT_ID, MEDIA_R2_ACCESS_KEY_ID, MEDIA_R2_SECRET_ACCESS_KEY."
             exit 1
           fi
           aws s3 sync "s3://${MEDIA_R2_BUCKET}/elsewhere/" assets/elsewhere/ --endpoint-url "https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com" --only-show-errors
+          DOPPLER_CHILD
 
       - name: Build
         shell: bash
@@ -109,19 +109,20 @@ jobs:
       - name: Deploy the Worker
         shell: bash
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
         run: |
           set -euo pipefail
+          bun scripts/with-doppler.ts prd --only CLOUDFLARE_API_TOKEN,CLOUDFLARE_ACCOUNT_ID -- bash -euo pipefail <<'DOPPLER_CHILD'
           if [[ ! -f wrangler.jsonc ]]; then
             echo "::error::wrangler.jsonc is missing. The Worker config has not landed on this ref."
             exit 1
           fi
           if [[ -z "${CLOUDFLARE_API_TOKEN}" || -z "${CLOUDFLARE_ACCOUNT_ID}" ]]; then
-            echo "::error::A Doppler-synced Cloudflare secret is missing from the production environment."
+            echo "::error::A Doppler runtime Cloudflare secret is missing from the production environment."
             exit 1
           fi
           bunx wrangler@4.156.2 deploy
+          DOPPLER_CHILD
 
   apply:
     name: Terraform apply
@@ -138,6 +139,11 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
@@ -148,17 +154,17 @@ jobs:
         shell: bash
         working-directory: infra
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          TF_VAR_cloudflare_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.TF_STATE_R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_STATE_R2_SECRET_ACCESS_KEY }}
-          TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
-          AWS_EC2_METADATA_DISABLED: 'true'
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
         run: |
           set -euo pipefail
+          bun ../scripts/with-doppler.ts prd --only CLOUDFLARE_API_TOKEN,CLOUDFLARE_ACCOUNT_ID,CLOUDFLARE_ZONE_ID,TF_STATE_BUCKET,TF_STATE_R2_ACCESS_KEY_ID,TF_STATE_R2_SECRET_ACCESS_KEY -- bash -euo pipefail <<'DOPPLER_CHILD'
+          export TF_VAR_cloudflare_account_id="$CLOUDFLARE_ACCOUNT_ID"
+          export TF_VAR_cloudflare_zone_id="$CLOUDFLARE_ZONE_ID"
+          export AWS_ACCESS_KEY_ID="$TF_STATE_R2_ACCESS_KEY_ID"
+          export AWS_SECRET_ACCESS_KEY="$TF_STATE_R2_SECRET_ACCESS_KEY"
+          export AWS_EC2_METADATA_DISABLED=true
           if [[ -z "${CLOUDFLARE_API_TOKEN}" || -z "${TF_VAR_cloudflare_account_id}" || -z "${TF_VAR_cloudflare_zone_id}" || -z "${AWS_ACCESS_KEY_ID}" || -z "${AWS_SECRET_ACCESS_KEY}" || -z "${TF_STATE_BUCKET}" ]]; then
-            echo "::error::A Doppler-synced secret is missing from the production environment."
+            echo "::error::A Doppler runtime secret is missing from the production environment."
             exit 1
           fi
           if [[ "${TF_STATE_BUCKET}" != "clzmj-dev-tfstate" ]]; then
@@ -170,3 +176,4 @@ jobs:
           terraform validate -no-color
           terraform plan -input=false -no-color -out=tfplan
           terraform apply -input=false -auto-approve tfplan
+          DOPPLER_CHILD

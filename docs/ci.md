@@ -49,9 +49,9 @@ flowchart TD
   PLAN --> COMMENT["Create or update PR plan comment"]
 ```
 
-Terraform plan waits for all reusable checks, validates the six required `ci` environment values,
+Terraform plan waits for all reusable checks, downloads the nine allowlisted values from `clzmj-dev/ci` using the environment's scoped `DOPPLER_TOKEN`,
 and verifies the state bucket. It runs `terraform plan -lock=false`, saves the output, and creates
-or updates a PR comment even when planning fails.
+or updates a PR comment even when planning fails. Fork PRs skip the credentialed plan.
 
 | Job            | Dependency and access                                                           |
 | -------------- | ------------------------------------------------------------------------------- |
@@ -83,18 +83,18 @@ apply; production runs share a non-cancelling concurrency group.
 
 ## Failures
 
-| Failure                         | Reproduce or fix                                                                                                                                                                                            |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Setup / package guard / install | Restore `package.json` and a committed Bun lockfile. Reproduce with `bun install --frozen-lockfile`; inspect setup/cache failures before rerunning transient errors.                                        |
-| CLI download or install         | Workflows pins actionlint 1.7.12 and zizmor 1.32.0; Secrets pins Gitleaks 8.30.1. actionlint/Gitleaks archives must pass the downloaded checksum check before extraction. Inspect the failing install step. |
-| Lint / format / typecheck       | Run `bun install --frozen-lockfile`, then `bun run lint`, `bun run format:check`, or `bun run typecheck`; format with `bun run format`.                                                                     |
-| Build / test                    | Install Chromium with `bunx playwright install --with-deps chromium`; check the four media secrets and R2 read access, run `bun run build`, then `bun run test --project=chromium --reporter=line,html`.    |
-| Terraform                       | From `infra/`, run `terraform fmt -check -recursive`, `terraform init -backend=false -input=false -no-color`, and `terraform validate -no-color`; fix formatting, provider, or validation errors.           |
-| TFLint                          | From `infra/`, run `tflint --init --config=.tflint.hcl` then `tflint --config=.tflint.hcl --format=compact`; correct reported configuration issues.                                                         |
-| Workflows                       | Run `actionlint .github/workflows/*.yml` and `zizmor --offline .github/workflows`; fix the reported YAML or security findings.                                                                              |
-| Secrets                         | Run `gitleaks git --redact --log-opts="--all" .`; remove exposed credentials from history and rotate any credential that was active.                                                                        |
-| PR plan / apply                 | Verify the required Doppler-synced environment values and that `TF_STATE_BUCKET` matches `infra/backend.tf`; inspect Terraform output before retrying.                                                      |
-| Deploy                          | Verify `wrangler.jsonc`, production Cloudflare credentials, and successful `out/` build; see `docs/operations.md`.                                                                                          |
+| Failure                         | Reproduce or fix                                                                                                                                                                                                                  |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Setup / package guard / install | Restore `package.json` and a committed Bun lockfile. Reproduce with `bun install --frozen-lockfile`; inspect setup/cache failures before rerunning transient errors.                                                              |
+| CLI download or install         | Workflows pins actionlint 1.7.12 and zizmor 1.32.0; Secrets pins Gitleaks 8.30.1. actionlint/Gitleaks archives must pass the downloaded checksum check before extraction. Inspect the failing install step.                       |
+| Lint / format / typecheck       | Run `bun install --frozen-lockfile`, then `bun run lint`, `bun run format:check`, or `bun run typecheck`; format with `bun run format`.                                                                                           |
+| Build / test                    | Install Chromium with `bunx playwright install --with-deps chromium`; check the four media secrets and R2 read access, run `bun run build`, then `bun run test --project=chromium --reporter=line,html`.                          |
+| Terraform                       | From `infra/`, run `terraform fmt -check -recursive`, `terraform init -backend=false -input=false -no-color`, and `terraform validate -no-color`; fix formatting, provider, or validation errors.                                 |
+| TFLint                          | From `infra/`, run `tflint --init --config=.tflint.hcl` then `tflint --config=.tflint.hcl --format=compact`; correct reported configuration issues.                                                                               |
+| Workflows                       | Run `actionlint .github/workflows/*.yml` and `zizmor --offline .github/workflows`; fix the reported YAML or security findings.                                                                                                    |
+| Secrets                         | Run `gitleaks git --redact --log-opts="--all" .`; remove exposed credentials from history and rotate any credential that was active.                                                                                              |
+| PR plan / apply                 | Verify the environment-scoped `DOPPLER_TOKEN`, its project/config scope, runtime Doppler access, and required allowlisted values and that `TF_STATE_BUCKET` matches `infra/backend.tf`; inspect Terraform output before retrying. |
+| Deploy                          | Verify `wrangler.jsonc`, production Cloudflare credentials, and successful `out/` build; see `docs/operations.md`.                                                                                                                |
 
 Photo generation details are in `docs/photos.md`; environment values and secret setup are in
 `docs/environments.md`.
