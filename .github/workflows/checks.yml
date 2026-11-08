@@ -2,6 +2,9 @@ name: Checks
 
 on:
   workflow_call:
+    secrets:
+      DOPPLER_TOKEN:
+        required: true
 
 permissions:
   contents: read
