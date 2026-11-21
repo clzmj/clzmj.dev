@@ -60,6 +60,15 @@
       "."
     ],
     [
+      "Before any of that, I studied economics at ",
+      {
+        "label": "ITAM",
+        "href": "https://www.itam.mx",
+        "src": "/logos/itam.png"
+      },
+      "."
+    ],
+    [
       "You can reach me at ",
       {
         "mail": true

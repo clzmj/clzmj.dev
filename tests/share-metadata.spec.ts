@@ -5,7 +5,7 @@ import { expect, test } from '@playwright/test';
 
 const title = 'Carlos Lezama · ML & Software Engineer';
 const description =
-  'ML and software engineer at Zillow, based in Mexico City. Previously data and ML at DD360, RappiCard and DiDi Food.';
+  'ML and software engineer at Zillow, based in Mexico City. Previously data and ML at DD360, RappiCard and DiDi Food. Economics at ITAM.';
 const imageVersion = createHash('sha256')
   .update(readFileSync('out/opengraph-image.jpg'))
   .digest('hex')

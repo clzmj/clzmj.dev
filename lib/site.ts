@@ -6,7 +6,7 @@ export const site = {
   url: 'https://clzmj.dev',
   email: 'hello@clzmj.dev',
   description:
-    'ML and software engineer at Zillow, based in Mexico City. Previously data and ML at DD360, RappiCard and DiDi Food.',
+    'ML and software engineer at Zillow, based in Mexico City. Previously data and ML at DD360, RappiCard and DiDi Food. Economics at ITAM.',
   github: 'https://github.com/clzmj',
   locale: 'en_US',
   timezone: 'America/Mexico_City',
