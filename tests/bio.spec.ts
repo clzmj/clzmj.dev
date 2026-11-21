@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 const paragraphs = [
   "I'm Carlos Lezama. I live in Mexico City and work at Zillow as a software engineer.",
   "Before that, I scraped half of Mexico's real estate for Monopolio at DD360, wrangled credit card data at RappiCard, and crunched food delivery numbers at DiDi Food.",
+  'Before any of that, I studied economics at ITAM.',
   'You can reach me at hello@clzmj.dev, or see my code on GitHub.',
 ];
 const companies = [
@@ -10,11 +11,9 @@ const companies = [
   ['DD360', 'https://dd360.mx/'],
   ['RappiCard', 'https://rappicard.mx/'],
   ['DiDi Food', 'https://www.didi-food.com/es-MX/'],
+  ['ITAM', 'https://www.itam.mx'],
 ];
-test('the approved three-paragraph bio and company text links are exact', async ({
-  page,
-  request,
-}) => {
+test('the approved bio and company text links are exact', async ({ page, request }) => {
   await page.goto('/');
   expect(
     await page.locator('.bio p').evaluateAll((elements) =>
@@ -32,6 +31,14 @@ test('the approved three-paragraph bio and company text links are exact', async 
     );
   await expect(page.locator('.bio a[href="mailto:hello@clzmj.dev"]')).toHaveText('hello@clzmj.dev');
   await expect(page.locator('.bio a[href="https://github.com/clzmj"]')).toContainText('GitHub');
+  const itam = page.locator('.bio p').nth(2).locator('.mini-avatar');
+  await expect(itam).toHaveAttribute('href', 'https://www.itam.mx');
+  await expect(itam).toHaveAttribute('target', '_blank');
+  await expect(itam).toHaveAttribute('aria-label', 'ITAM');
+  await expect(itam.locator('img')).toHaveAttribute('src', '/logos/itam.png');
+  await expect(
+    page.getByRole('link', { name: 'ITAM (opens in a new tab)', exact: true }),
+  ).toHaveAttribute('href', 'https://www.itam.mx');
   await expect(page.locator('.bio')).not.toContainText(
     /Northwind|Lumen|Harbor|1,200\+|placeholder community/,
   );
@@ -50,8 +57,8 @@ test('official company logos keep their order, links, full-bleed circles and ove
   const logos = page.locator('.bio p').nth(1).locator('.mini-avatar');
   expect(
     await logos.evaluateAll((links) => links.map((link) => link.getAttribute('aria-label'))),
-  ).toEqual(companies.slice(1).map(([name]) => name));
-  for (const [index, [name, href]] of companies.slice(1).entries()) {
+  ).toEqual(companies.slice(1, 5).map(([name]) => name));
+  for (const [index, [name, href]] of companies.slice(1, 5).entries()) {
     const logo = logos.nth(index);
     await expect(logo).toHaveAttribute('href', href);
     await expect(logo).toHaveAttribute('title', name);
@@ -70,9 +77,9 @@ test('official company logos keep their order, links, full-bleed circles and ove
       };
     });
     expect(metrics).toEqual({
-      width: 20,
-      height: expect.closeTo(20, 1),
-      margin: index ? '-6px' : '0px',
+      width: 24,
+      height: expect.closeTo(24, 1),
+      margin: index ? '-7px' : '0px',
       z: String(4 - index),
       fit: 'cover',
       loaded: true,
@@ -94,7 +101,7 @@ test('company links keep trailing punctuation on the same mobile line', async ({
   await page.setViewportSize({ width: 393, height: 852 });
   await page.goto('/');
   const groups = page.locator('.company-link');
-  await expect(groups).toHaveCount(5);
+  await expect(groups).toHaveCount(6);
   for (const group of await groups.all()) {
     expect(await group.evaluate((element) => getComputedStyle(element).whiteSpace)).toBe('nowrap');
   }
