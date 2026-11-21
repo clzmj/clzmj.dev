@@ -13,10 +13,7 @@ const companies = [
   ['DiDi Food', 'https://www.didi-food.com/es-MX/'],
   ['ITAM', 'https://www.itam.mx'],
 ];
-test('the approved bio and company text links are exact', async ({
-  page,
-  request,
-}) => {
+test('the approved bio and company text links are exact', async ({ page, request }) => {
   await page.goto('/');
   expect(
     await page.locator('.bio p').evaluateAll((elements) =>
